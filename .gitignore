@@ -1,0 +1,110 @@
+# OS specific files
+**/.DS_Store
+**/Thumbs.db
+**/.Spotlight-V100
+**/.Trashes
+
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# debug information files
+*.dwo
+
+# No _darcs
+**/_darcs
+**/.project_config
+
+# Basilisk installation (local only)
+basilisk/
+**/.comphy-basilisk
+.docker_mode
+
+# Case folders (4-digit case numbers: 1000-9999)
+simulationCases/[0-9][0-9][0-9][0-9]/
+**/docs/simulationCases/[0-9][0-9][0-9][0-9]/
+
+# bview file
+**/display.html
+
+# SLURM output files
+*.err
+slurm-*.out
+slurm-*.err
+
+# Temporary sweep directories
+.sweep_tmp_*
+
+# postProcessing specific
+**/getData*
+**/getFacet*
+**/getFootPrint
+**/Video
+
+# always add .c and .h
+!*.c
+!*.h
+!*.sh
+!*.sbatch
+
+# Local install scripts (do not commit)
+reset_install_*.sh
+
+# Documentation generation artifacts
+**/__pycache__/
+**/*.pyc
+
+# Timestamped CSS backups
+**/custom_styles_backup_*.css
+
+# Local CLAUDE.md (references AGENTS.md)
+CLAUDE.md

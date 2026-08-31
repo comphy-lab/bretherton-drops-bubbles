@@ -67,13 +67,16 @@ The couplings and their treatment (all collected in
    wall corrupts the film curvature. `vof_solid_cleanup()` resets `f`
    to the continuous-phase value in full-solid cells after adaptation.
 3. **Interface–wall separation**: `heights.h`/`curvature.h` ignore
-   `cs`, so the wetting film must stay resolved by several cells; the
-   case adapts on `cs` to keep the wall region refined and logs a
-   warning if the film thins below one fine cell.
+   `cs`, so the wetting film must stay resolved by several cells. Note
+   that adapting on `cs` cannot refine the wall: `embed.h` prolongates
+   `cs` with `fraction_refine`, which is exact for a planar interface, so
+   a straight tube wall carries identically zero wavelet error. The film
+   is refined by the `f` and curvature criteria, and the case logs a
+   warning if it thins below four fine cells.
 
 Surface tension itself is embed-safe (`iforce.h` skips faces with
 $f_m = 0$), and `vof.h` carries explicit `EMBED` branches for the
-advection. Both couplings are verified in `testCases/`.
+advection. Both couplings are verified in `verificationCases/`.
 
 ## Requirements
 
@@ -85,8 +88,10 @@ advection. Both couplings are verified in `testCases/`.
 ## Quick start
 
 ```bash
-# smoke + verification tests (~1 minute on a laptop)
-bash testCases/runSmokeTests.sh
+# verification cases, then the smoke test
+bash runTests.sh                          # serial; the static-film case dominates
+VERIFICATION_THREADS=16 bash runTests.sh  # same, with OpenMP
+bash runTests.sh --smoke                  # smoke test alone (~1 minute)
 
 # single case with the defaults (bubble, Ca = 0.05)
 bash runSimulation.sh
@@ -112,11 +117,16 @@ python3 postProcess/bretherton_film.py simulationCases/10?? --out film.csv
 ├── src-local/embed-vof-tube.h - embed + axi + VOF compatibility layer
 ├── src-local/params.h - typed runtime-parameter accessors with defaults
 ├── src-local/parse_params.h - low-level key=value parameter parser
-├── testCases/embedAxiVofAdvection.c - verification: embed+axi+VOF advection vs exact solution
-├── testCases/laplaceEmbedTube.c - verification: Young-Laplace balance inside an embedded tube
-├── testCases/runSmokeTests.sh - compile-and-run smoke/verification driver
+├── verificationCases/embedAxiVofAdvection.c - embed+axi+VOF advection vs exact solution
+├── verificationCases/laplaceEmbedTube.c - Young-Laplace in an embedded tube; refinement sequence
+├── verificationCases/laplaceEmbedTubeAdapt.c - the same on an adapted tree, with a negative control
+├── verificationCases/staticFilmTube.c - near-wall gap sweep at production property ratios
+├── verificationCases/runVerification.sh - exact-solution case driver
+├── verificationCases/README.md - comparators, reference results and limits
+├── testCases/runSmokeTests.sh - smoke-test driver
 ├── testCases/smoke.params - coarse short-run parameters for the smoke test
-├── testCases/README.md - test classification (smoke / verification / validation)
+├── testCases/README.md - what a smoke test does and does not establish
+├── runTests.sh - entry point: verification cases, then the smoke test
 ├── postProcess/getFacets.c - extract interface facets from a snapshot
 ├── postProcess/bretherton_film.py - film thickness and Ca_b from case logs
 ├── default.params - baseline runtime parameters (bubble)

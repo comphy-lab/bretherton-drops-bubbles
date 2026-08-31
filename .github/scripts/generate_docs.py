@@ -258,7 +258,8 @@ def parse_git_remote() -> Tuple[str, str]:
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent.parent
-SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess']
+SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess',
+               'verificationCases', 'testCases']
 DOCS_DIR = REPO_ROOT / '.github' / 'docs'
 DOCS_RELATIVE_PATH = DOCS_DIR.relative_to(REPO_ROOT).as_posix()
 DOCS_URL_FRAGMENT = f"/{DOCS_RELATIVE_PATH.strip('/')}/"
@@ -422,6 +423,10 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     valid_names = {'Makefile'}
     # Exclude 4-digit numeric case folders (e.g., simulationCases/1000/)
     numeric_case_pattern = re.compile(r'/\d{4}/')
+    # Exclude transient compile-and-run directories (e.g.
+    # verificationCases/build-laplaceEmbedTube/), which hold copies of
+    # sources that are documented from their real location.
+    build_dir_pattern = re.compile(r'/build-[^/]*/')
     files = set()
 
     for dir_name in source_dirs:
@@ -431,6 +436,9 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
                 if f.is_file():
                     # Skip files in numeric case folders
                     if numeric_case_pattern.search(str(f)):
+                        continue
+                    # Skip files in transient build directories
+                    if build_dir_pattern.search(str(f)):
                         continue
                     if f.name in valid_names:
                         files.add(f)

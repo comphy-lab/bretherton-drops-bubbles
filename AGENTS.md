@@ -10,8 +10,10 @@ surface tension, Bretherton validation.
 bretherton-drops-bubbles/
 ├── src-local/         # project headers: parameter accessors + embed/VOF compatibility
 ├── simulationCases/   # Basilisk entry points; numbered case output directories (gitignored)
-├── testCases/         # smoke + verification cases and their driver
+├── verificationCases/ # exact-solution cases and their driver
+├── testCases/         # smoke test only
 ├── postProcess/       # snapshot and log analysis
+├── runTests.sh        # entry point: verification cases, then smoke test
 ├── default.params     # runtime defaults (bubble)
 ├── sweep.params       # bubble validation sweep contract
 └── sweep-drop.params  # drop counterpart sweep contract
@@ -40,11 +42,31 @@ bretherton-drops-bubbles/
 - Run cases through `runSimulation.sh` / `runParameterSweep.sh`; they
   create `simulationCases/<CaseNo>/` (CaseNo >= 1000; 9999 is reserved
   for the smoke test).
-- Smoke-test before committing solver changes:
-  `bash testCases/runSmokeTests.sh`. Tests are classified by evidence
-  source (see `testCases/README.md`): smoke = compiles and runs a few
-  steps; verification = exact solutions; validation = Bretherton /
-  Taylor data via the root sweep files on production hardware.
+- Run the evidence suite before committing solver changes:
+  `bash runTests.sh`. Cases are separated by evidence source, and the
+  separation is deliberate: `testCases/` = smoke, compiles and runs a few
+  steps against no comparator; `verificationCases/` = exact solutions of
+  the implemented equations (see `verificationCases/README.md`);
+  validation = independent experimental data (Taylor 1961, Aussillous &
+  Quéré 2000) via the root sweep files on production hardware. Bretherton
+  (1961) is an asymptotic solution of the lubrication limit, not
+  independent data — comparing against it is a limiting-case check, not
+  validation.
+- `adapt_wavelet()` on `cs` does **not** refine a flat embedded wall.
+  `embed.h` sets `cs.prolongation = fraction_refine`, which is exact for
+  any planar interface, so the tube wall carries identically zero wavelet
+  error at any `csErr`. Wall and film refinement come from the `f` and
+  `KAPPA` criteria plus the explicit `refine()` in the init event. Do not
+  add a `csErr` and assume the wall is resolved; check the cut-cell level
+  range instead.
+- A reported velocity is meaningless without the `TOLERANCE` it was
+  measured at. `verificationCases/staticFilmTube.c` shows that once the
+  density ratio is large, the spurious-current amplitude in a static
+  configuration is set by the projection residual rather than by
+  curvature: a 10x tighter tolerance moves it ~19x while leaving the
+  pressure jump unchanged. Always record the tolerance alongside any
+  velocity, and run the ladder before attributing a current to the
+  surface-tension discretisation.
 - Never hardcode a machine-local `qcc` path; resolve via `PATH` or
   `.project_config` (gitignored).
 - Do not commit `basilisk/`, `.comphy-basilisk`, case outputs, or

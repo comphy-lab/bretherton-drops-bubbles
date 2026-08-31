@@ -1,0 +1,12 @@
+# Drop counterpart sweep: same Ca range as sweep.params but a viscous
+# drop (viscosity and density matched to the continuous phase) instead
+# of a bubble. Comparing against the bubble sweep isolates the effect of
+# the dispersed-phase viscosity on the film thickness.
+BASE_CONFIG=default.params
+CASE_START=2000
+CASE_END=2004
+
+SWEEP_Ca=0.002,0.005,0.01,0.02,0.05
+SWEEP_MAXlevel=12
+SWEEP_muR=1
+SWEEP_rhoR=1

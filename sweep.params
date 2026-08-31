@@ -1,0 +1,12 @@
+# Bubble validation sweep: recover the Bretherton film-thickness law.
+# Cartesian product of SWEEP_* variables; CaseNo assigned from CASE_START.
+# Post-process with postProcess/bretherton_film.py: the measured tip
+# velocity (= Ca_b in code units) and steady film thickness are compared
+# against b/Rtube = 1.34 Ca_b^(2/3) (Bretherton 1961) and the
+# Aussillous-Quere (2000) correction at moderate Ca.
+BASE_CONFIG=default.params
+CASE_START=1000
+CASE_END=1004
+
+SWEEP_Ca=0.002,0.005,0.01,0.02,0.05
+SWEEP_MAXlevel=12

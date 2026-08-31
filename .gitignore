@@ -108,3 +108,7 @@ reset_install_*.sh
 
 # Local CLAUDE.md (references AGENTS.md)
 CLAUDE.md
+
+# Test build artefacts
+testCases/build-*/
+simulationCases/9999/

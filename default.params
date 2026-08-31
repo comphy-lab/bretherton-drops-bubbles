@@ -1,0 +1,17 @@
+# Base parameters for simulationCases/bretherton.c
+# Code units: sigma = mu_c = R (volume-equivalent drop/bubble radius) = 1
+CaseNo=1000
+MAXlevel=10
+MINlevel=4
+Ca=0.05        # imposed mean inlet capillary number mu_c U / sigma
+La=1           # Laplace number rho_c sigma R / mu_c^2
+muR=0.01       # viscosity ratio mu_d / mu_c (0.01 = bubble)
+rhoR=0.001     # density ratio rho_d / rho_c (0.001 = bubble)
+Rtube=0.7      # tube radius in units of R (< 1 for a confined drop/bubble)
+Rb0frac=0.8    # initial capsule radius as a fraction of Rtube
+xRear=1.0      # initial rear-tip distance from the inlet
+Ldomain=16     # domain size in units of R
+tmax=200
+tsnap=1
+tRamp=1        # inlet ramp time
+dtmax=0.01

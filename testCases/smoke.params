@@ -1,0 +1,17 @@
+# Smoke-test parameters: verify that bretherton.c compiles and runs a few
+# dozen time steps at coarse resolution. Not a physics run.
+CaseNo=9999
+MAXlevel=8
+MINlevel=4
+Ca=0.05
+La=1
+muR=0.01
+rhoR=0.001
+Rtube=0.7
+Rb0frac=0.8
+xRear=1.0
+Ldomain=16
+tmax=0.05
+tsnap=0.025
+tRamp=1
+dtmax=0.001

@@ -57,7 +57,6 @@ Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 #include "embed.h"
 #include "axi.h"
 #include "navier-stokes/centered.h"
-#define FILTERED 1
 #include "two-phase.h"
 #include "navier-stokes/conserving.h"
 #include "tension.h"

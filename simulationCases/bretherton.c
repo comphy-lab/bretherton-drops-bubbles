@@ -51,7 +51,14 @@ $b/R_{tube} = 1.34\,Ca_b^{2/3}/(1 + 2.5\cdot1.34\,Ca_b^{2/3})$.
 Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 [1000], `MAXlevel` [10], `MINlevel` [4], `Ca` [0.05], `La` [1], `muR`
 [0.01], `rhoR` [0.001], `Rtube` [0.7], `Rb0frac` [0.8], `xRear` [1.0],
-`Ldomain` [16], `tmax` [200], `tsnap` [1], `tRamp` [1], `dtmax` [0.01].
+`Ldomain` [16], `travelR` [10], `tmax` [`travelR`/`Ca`],
+`tsnap` [`tmax`/200], `tRamp` [1], `dtmax` [0.01].
+
+`tmax` and `tsnap` derive from the capillary number by default. The
+bubble advances at $U = Ca$, so a fixed run time gives a different
+travel distance at every $Ca$, and the film only reaches its steady
+thickness after several bubble lengths of advance. `travelR` sets that
+advance in units of $R$; the domain holds about 10.4.
 */
 
 #include "embed.h"
@@ -83,7 +90,7 @@ expressions (`t += tsnap` vs conditions) before `main()` assigns the
 runtime parameters, and a zero increment is misread as a second
 condition. */
 
-double tmax = 200., tsnap = 1., tRamp = 1.;
+double tmax = 200., tsnap = 1., tRamp = 1., travelR = 10.;
 double Rb0, Lcyl, Xb0, vol0;
 
 char nameOut[128], dumpFile[128], logFile[128];
@@ -135,8 +142,19 @@ int main (int argc, char const *argv[])
   Rb0frac = param_double ("Rb0frac", 0.8);
   xRear   = param_double ("xRear", 1.0);
   Ldomain = param_double ("Ldomain", 16.);
-  tmax    = param_double ("tmax", 200.);
-  tsnap   = param_double ("tsnap", 1.);
+  /**
+  The film reaches its steady thickness only after the bubble has
+  travelled several of its own lengths, and the mean inlet velocity is
+  $U = Ca$ in these units, so one fixed `tmax` can only ever be right at
+  one capillary number. The default therefore derives from a *travel
+  distance*: advancing `travelR` radii takes $t = travelR/Ca$. An
+  explicit `tmax` still wins. The snapshot cadence follows it, so a case
+  writes a fixed number of snapshots whatever its duration rather than
+  5000 of them at low $Ca$. */
+
+  travelR = param_double ("travelR", 10.);
+  tmax    = param_double ("tmax", travelR/Ca);
+  tsnap   = param_double ("tsnap", tmax/200.);
   tRamp   = param_double ("tRamp", 1.);
 
   /**
@@ -160,7 +178,8 @@ int main (int argc, char const *argv[])
       MINlevel > MAXlevel || Ca <= 0. || La <= 0. || muR <= 0. ||
       rhoR <= 0. || Rtube <= 0. || Rtube >= 1. ||
       Rb0frac <= 0. || Rb0frac >= 1. || xRear <= 0. || Ldomain <= 0. ||
-      tmax <= 0. || tsnap <= 0. || DT <= 0. || tRamp < 0.) {
+      tmax <= 0. || tsnap <= 0. || DT <= 0. || tRamp < 0. ||
+      travelR <= 0.) {
     fprintf (ferr, "ERROR: Invalid runtime parameters.\n");
     return 1;
   }
@@ -172,6 +191,16 @@ int main (int argc, char const *argv[])
   if (Xb0 + Lcyl/2. + Rb0 > Ldomain - 4.*Rtube)
     fprintf (ferr, "WARNING: little travel room ahead of the front tip; "
              "increase Ldomain or reduce xRear.\n");
+
+  /**
+  A run asking for more advance than the domain holds would drive the
+  bubble into the outlet before `tmax`. */
+
+  double room = Ldomain - (Xb0 + Lcyl/2. + Rb0);
+  if (Ca*tmax > room)
+    fprintf (ferr, "WARNING: requested advance %g R exceeds the %g R of "
+             "travel room ahead of the front tip; the bubble reaches the "
+             "outlet before tmax = %g.\n", Ca*tmax, room, tmax);
 
   L0 = Ldomain;
   init_grid (1 << MINlevel);

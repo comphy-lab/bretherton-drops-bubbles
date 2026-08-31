@@ -190,7 +190,9 @@ echo "========================================="
 echo ""
 
 mkdir -p "$CASE_DIR"
-cp "$PARAM_FILE" "$CASE_DIR/case.params"
+if [[ "$PARAM_FILE" != "$CASE_DIR/case.params" ]]; then
+  cp "$PARAM_FILE" "$CASE_DIR/case.params"
+fi
 cp "$SRC_FILE_ORIG" "$CASE_DIR/$SRC_FILE_LOCAL"
 
 cd "$CASE_DIR"

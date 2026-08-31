@@ -44,7 +44,10 @@ int main (int a, char const *arguments[])
   }
 
   snprintf (filename, sizeof(filename), "%s", arguments[1]);
-  restore (file = filename);
+  if (!restore (file = filename)) {
+    fprintf (ferr, "ERROR: cannot restore snapshot %s\n", filename);
+    return 1;
+  }
 
   output_facets (f, stdout);
   fflush (stdout);

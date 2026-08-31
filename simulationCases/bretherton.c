@@ -165,6 +165,11 @@ int main (int argc, char const *argv[])
     fprintf (ferr, "ERROR: Invalid runtime parameters.\n");
     return 1;
   }
+  if (Xb0 + Lcyl/2. + Rb0 >= Ldomain) {
+    fprintf (ferr, "ERROR: initial capsule crosses the outlet; "
+             "increase Ldomain or reduce xRear.\n");
+    return 1;
+  }
   if (Xb0 + Lcyl/2. + Rb0 > Ldomain - 4.*Rtube)
     fprintf (ferr, "WARNING: little travel room ahead of the front tip; "
              "increase Ldomain or reduce xRear.\n");
@@ -312,8 +317,8 @@ event logWriting (i++)
     dump (file = dumpFile);
     return 1;
   }
-  if (yMax > Rtube - L0/(1 << MAXlevel) && i > 10 && pid() == 0)
-    fprintf (ferr, "WARNING: film thinner than one cell at t=%g; "
+  if (bFilm < 4.*L0/(1 << MAXlevel) && i > 10 && pid() == 0)
+    fprintf (ferr, "WARNING: film resolved by fewer than 4 cells at t=%g; "
              "increase MAXlevel.\n", t);
   if (xTipF > L0 - 2.*Rtube) {
     if (pid() == 0)

@@ -68,7 +68,9 @@ def linear_fit(xs, ys):
 
 def analyse_case(case_dir: Path, window: float):
     params, rows = read_log(case_dir)
-    rtube = params.get("Rtube", 0.7)
+    if "Rtube" not in params:
+        raise ValueError("no Rtube in the log header; cannot normalise the film")
+    rtube = params["Rtube"]
     ca_imposed = params.get("Ca", float("nan"))
 
     t_all = [r[2] for r in rows]
@@ -132,10 +134,14 @@ def main(argv=None):
 
     fields = list(results[0].keys())
     if args.out:
-        with args.out.open("w", newline="") as fh:
-            writer = csv.DictWriter(fh, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(results)
+        try:
+            with args.out.open("w", newline="") as fh:
+                writer = csv.DictWriter(fh, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(results)
+        except OSError as exc:
+            print(f"ERROR: cannot write {args.out}: {exc}", file=sys.stderr)
+            return 1
         print(f"Wrote {args.out}")
 
     for r in results:

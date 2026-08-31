@@ -283,8 +283,11 @@ fi
 
 CONFIG_DIR="$(cd "$(dirname "$SWEEP_FILE")" && pwd)"
 
-# shellcheck disable=SC1090
-source "$SWEEP_FILE"
+# Read the sweep header with the same key=value parser as the runner
+# (never source the file: config is data, not shell code).
+BASE_CONFIG="$(get_param_value "BASE_CONFIG" "$SWEEP_FILE")"
+CASE_START="$(get_param_value "CASE_START" "$SWEEP_FILE")"
+CASE_END="$(get_param_value "CASE_END" "$SWEEP_FILE")"
 
 BASE_CONFIG="${BASE_CONFIG:-default.params}"
 CASE_START="${CASE_START:-1000}"

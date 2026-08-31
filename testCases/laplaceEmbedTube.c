@@ -113,4 +113,6 @@ event end (t = tend)
           dp, dpex, edp);
   printf ("max spurious velocity: %.6e\n", umax);
   printf (edp < TOL_DP && umax < TOL_U ? "PASS\n" : "FAIL\n");
+  if (!(edp < TOL_DP && umax < TOL_U))
+    exit (1);
 }

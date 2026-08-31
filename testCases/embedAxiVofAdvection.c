@@ -89,4 +89,6 @@ event end (t = 0.8)
 {
   printf ("max relative interface-position error: %g\n", maxerr);
   printf (maxerr < TOL_REL ? "PASS\n" : "FAIL\n");
+  if (!(maxerr < TOL_REL))
+    exit (1);
 }

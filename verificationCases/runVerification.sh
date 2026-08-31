@@ -113,13 +113,35 @@ run_case() {
   if grep -q "SKIP_EMBED_GUARDS" "$src"; then
     local nc_dir="${SCRIPT_DIR}/build-${name}-noguards"
     echo "  negative control: rebuilding with -DSKIP_EMBED_GUARDS (must FAIL)"
-    if build_and_run "$src" "$name" "$nc_dir" -DSKIP_EMBED_GUARDS && \
-       grep -q "^PASS$" "${nc_dir}/out.log"; then
+    # Build status, exit status and output are three different things. A
+    # qcc failure or a crash is not evidence that the guard assertion
+    # fired, so accept the control only when the binary built, exited
+    # non-zero, and said FAIL for itself.
+    rm -rf "$nc_dir"
+    mkdir -p "$nc_dir"
+    cp "$src" "$nc_dir/"
+    local nc_built=0 nc_status=0
+    if ( cd "$nc_dir" && qcc "${QCC_FLAGS[@]}" -DSKIP_EMBED_GUARDS \
+           "$(basename "$src")" -o "$name" -lm ) 2>"${nc_dir}/build.log"; then
+      nc_built=1
+      ( cd "$nc_dir" && ./"$name" > out.log 2> err.log ) || nc_status=$?
+    fi
+
+    if [[ $nc_built -eq 0 ]]; then
+      echo "${name} negative control: BUILD FAILED, so the control proves nothing" >&2
+      tail -5 "${nc_dir}/build.log" | sed 's/^/    /' >&2 || true
+      FAILED=1
+    elif [[ $nc_status -eq 0 ]]; then
       echo "${name} negative control: UNEXPECTED PASS without the embed guards" >&2
       echo "  the guard under test is not detecting the coupling it claims to" >&2
       FAILED=1
+    elif ! grep -q "^FAIL$" "${nc_dir}/out.log"; then
+      echo "${name} negative control: exited ${nc_status} without printing FAIL" >&2
+      echo "  it crashed rather than failing its own assertion" >&2
+      tail -5 "${nc_dir}/err.log" | sed 's/^/    /' >&2 || true
+      FAILED=1
     else
-      echo "  negative control: FAILED as required"
+      echo "  negative control: FAILED as required (exit ${nc_status})"
       grep -iE "^(P[0-9]|probe|violation)" "${nc_dir}/out.log" | sed 's/^/    /' || true
     fi
   fi

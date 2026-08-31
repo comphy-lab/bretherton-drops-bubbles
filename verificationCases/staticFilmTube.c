@@ -613,13 +613,28 @@ event logfile (t += tlog; t <= tend)
 {
   Result tmp;
   diagnose (&tmp);
-  if (nhist < NHIST) {
-    thist[nhist] = t;
-    uhist[nhist] = tmp.umax;
-    nhist++;
+  /**
+  Overflowing the buffer would silently drop the late samples, leaving
+  `usus` at zero and letting the gate pass with no evidence behind it. A
+  silent false pass is worse than a hard stop, so the unenforced
+  invariant above becomes an enforced one. */
+
+  if (nhist >= NHIST) {
+    fprintf (ferr, "ERROR: history buffer full (NHIST = %d, tend/tlog = %g); "
+             "increase NHIST\n", NHIST, (double) tend/tlog);
+    printf ("FAIL\n");
+    exit (1);
   }
-  fprintf (stderr, "%d %g %.6e %.6e %.6e\n",
-           run_id, t, tmp.dp, tmp.umax, tmp.umax_cut);
+  thist[nhist] = t;
+  uhist[nhist] = tmp.umax;
+  nhist++;
+  /**
+  The active `TOLERANCE` travels on every velocity sample: this case
+  demonstrates that the amplitude is tolerance-set, so a velocity without
+  its tolerance cannot be interpreted. */
+
+  fprintf (stderr, "%d %g %g %.6e %.6e %.6e\n",
+           run_id, TOLERANCE, t, tmp.dp, tmp.umax, tmp.umax_cut);
 }
 
 event end (t = tend)

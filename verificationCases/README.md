@@ -55,9 +55,10 @@ the resolution of some of the comparisons below. Build artefacts go to
 
 ## Reference results
 
-Single core, Basilisk `qcc`, quadtree, except `staticFilmTube`, whose
-numbers are from one 16-thread run; see the reproducibility note below
-for the spread between independent runs.
+Basilisk `qcc`, single core. `embedAxiVofAdvection`, `laplaceEmbedTube`
+and `staticFilmTube` run on uniform grids; only `laplaceEmbedTubeAdapt`
+adapts. The `staticFilmTube` numbers are from one 16-thread run; see the
+reproducibility note below for the spread between independent runs.
 
 `embedAxiVofAdvection` — max relative interface-position error
 $2.88\times10^{-5}$ (tolerance $10^{-2}$).

@@ -295,13 +295,29 @@ event init (t = 0)
 Spurious-current amplitude and pressure jump, logged over time and
 recorded at $t = t_{end}$. The pressure jump is measured between cell
 averages well inside ($r < R_d/2$) and well outside ($r > 3R_d/2$,
-fluid only) the droplet.
+fluid only) the droplet. The velocity maximum is taken over every cell
+with $c_s > 0$, cut cells included, since those sit against the wall and
+carry the largest curvature error.
 */
 static void dp_umax (double * dp, double * umax)
 {
   double pin = 0., pout = 0., win = 0., wout = 0., un = 0.;
   foreach (reduction(+:pin) reduction(+:pout)
            reduction(+:win) reduction(+:wout) reduction(max:un)) {
+
+    /**
+    The spurious-current maximum must include cut cells. Those are the
+    cells adjacent to the embedded wall, and they are where the
+    height-function curvature error this case measures is largest;
+    restricting `un` to full cells would let a near-wall parasitic
+    current exceed `TOL_U` unseen. The pressure averages stay on pure
+    fluid cells, where a cell-average of `p` is meaningful. */
+
+    if (cs[] > 0.) {
+      double u2 = sqrt (sq(u.x[]) + sq(u.y[]));
+      if (u2 > un)
+        un = u2;
+    }
     if (cs[] >= 1.) {
       double r = sqrt (sq(x - Xd) + sq(y));
       if (r < 0.5*Rd) {
@@ -312,9 +328,6 @@ static void dp_umax (double * dp, double * umax)
         pout += p[]*dv();
         wout += dv();
       }
-      double u2 = sqrt (sq(u.x[]) + sq(u.y[]));
-      if (u2 > un)
-        un = u2;
     }
   }
   *dp = pin/win - pout/wout;
@@ -325,7 +338,7 @@ event logfile (t += 0.1; t <= tend)
 {
   double dp, umax;
   dp_umax (&dp, &umax);
-  fprintf (stderr, "%d %g %.6e %.6e\n", N, t, dp, umax);
+  fprintf (stderr, "%d %g %g %.6e %.6e\n", N, TOLERANCE, t, dp, umax);
 }
 
 /**
@@ -343,6 +356,6 @@ event end (t = tend)
     lev_umax[ilev] = umax;
     ilev++;
   }
-  printf ("N = %d: pressure jump %.6e (exact %.6e), max|u| %.6e\n",
-          N, dp, 2.*SIGMA/Rd, umax);
+  printf ("N = %d (TOLERANCE %g): pressure jump %.6e (exact %.6e), "
+          "max|u| %.6e\n", N, TOLERANCE, dp, 2.*SIGMA/Rd, umax);
 }

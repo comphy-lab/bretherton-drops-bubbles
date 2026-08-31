@@ -402,13 +402,28 @@ static void probe_couplings (int iter)
 
 Identical to `laplaceEmbedTube.c`: cell averages of `p` well inside
 ($r < R_d/2$) and well outside ($r > 3R_d/2$, away from the wall) the
-droplet, and the maximum velocity magnitude over full fluid cells.
+droplet, and the maximum velocity magnitude over every cell with
+$c_s > 0$, cut cells included.
 */
 static void dp_umax (double * dp, double * umax)
 {
   double pin = 0., pout = 0., win = 0., wout = 0., un = 0.;
   foreach (reduction(+:pin) reduction(+:pout)
            reduction(+:win) reduction(+:wout) reduction(max:un)) {
+
+    /**
+    The spurious-current maximum must include cut cells. Those are the
+    cells adjacent to the embedded wall, and they are where the
+    height-function curvature error this case measures is largest;
+    restricting `un` to full cells would let a near-wall parasitic
+    current exceed `TOL_U` unseen. The pressure averages stay on pure
+    fluid cells, where a cell-average of `p` is meaningful. */
+
+    if (cs[] > 0.) {
+      double u2 = sqrt (sq(u.x[]) + sq(u.y[]));
+      if (u2 > un)
+        un = u2;
+    }
     if (cs[] >= 1.) {
       double r = sqrt (sq(x - Xd) + sq(y));
       if (r < 0.5*Rd) {
@@ -419,9 +434,6 @@ static void dp_umax (double * dp, double * umax)
         pout += p[]*dv();
         wout += dv();
       }
-      double u2 = sqrt (sq(u.x[]) + sq(u.y[]));
-      if (u2 > un)
-        un = u2;
     }
   }
   *dp = (win > 0. && wout > 0.) ? pin/win - pout/wout : nodata;
@@ -489,7 +501,7 @@ static void cut_cell_stats (long * ncut, int * lmin, int * lmax)
   *ncut = n; *lmin = lo; *lmax = hi;
 }
 
-static void summarise (const char * note, int iter)
+static void summarise (const char * note, int iter, bool fatal)
 {
   double dp, umax;
   dp_umax (&dp, &umax);
@@ -534,10 +546,18 @@ static void summarise (const char * note, int iter)
             iFirstSolid, vFirstSolid);
   printf ("P3 Young-Laplace: dp = %.6e (exact %.6e, rel. error %.3e, "
           "tol %.1e)\n", dp, dpex, edp, (double) TOL_DP);
-  printf ("   max spurious velocity = %.6e (tol %.1e) -> %s\n",
-          umax, (double) TOL_U, p3 ? "pass" : "FAIL");
+  printf ("   max spurious velocity = %.6e at TOLERANCE %g (tol %.1e) -> %s\n",
+          umax, TOLERANCE, (double) TOL_U, p3 ? "pass" : "FAIL");
 
-  bool ok = p1 && p2 && p3;
+  /**
+  A non-finite state is a failure in its own right, even with every probe
+  green: the probes sample fluid cells, so NaNs confined to solid or cut
+  cells would otherwise be reported as a pass. */
+
+  bool ok = p1 && p2 && p3 && !fatal;
+  if (fatal)
+    printf ("divergence: the solution is not finite, so the probes above "
+            "are not meaningful\n");
   printf (ok ? "PASS\n" : "FAIL\n");
   fflush (stdout);
   if (!ok)
@@ -562,17 +582,17 @@ event logfile (t += 0.1; t <= tend)
 {
   double dp, umax;
   dp_umax (&dp, &umax);
-  fprintf (stderr, "%g %.6e %.6e %.6e %.6e %.6e\n",
-           t, dp, umax, dcmMax, dfmMax, fSolidMax);
+  fprintf (stderr, "%g %g %.6e %.6e %.6e %.6e %.6e\n",
+           TOLERANCE, t, dp, umax, dcmMax, dfmMax, fSolidMax);
 }
 
 event sanity (i++)
 {
   if (nonfinite_state())
-    summarise ("non-finite solution", i);
+    summarise ("non-finite solution", i, true);
 }
 
 event end (t = tend)
 {
-  summarise ("t = tend", i);
+  summarise ("t = tend", i, false);
 }

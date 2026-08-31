@@ -66,6 +66,7 @@ dkms.conf
 
 # Basilisk installation (local only)
 basilisk/
+basilisk
 **/.comphy-basilisk
 .docker_mode
 
@@ -90,6 +91,11 @@ slurm-*.err
 **/getFootPrint
 **/Video
 
+# ...but the generated documentation pages for those sources are site
+# content, not simulation output, and must be published.
+!.github/docs/**/getData*
+!.github/docs/**/getFacet*
+
 # always add .c and .h
 !*.c
 !*.h
@@ -109,6 +115,10 @@ reset_install_*.sh
 # Local CLAUDE.md (references AGENTS.md)
 CLAUDE.md
 
-# Test build artefacts
+# Test, verification and smoke build artefacts
 testCases/build-*/
+verificationCases/build-*/
 simulationCases/9999/
+
+# Virtual environment created by .github/scripts/build.sh
+.venv/

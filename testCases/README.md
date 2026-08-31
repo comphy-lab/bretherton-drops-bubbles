@@ -1,35 +1,33 @@
-# Test cases
+# Smoke test
 
-Basilisk tests are not unit tests: every case here proves, at minimum,
-that the code compiles and integrates a few time steps (a *smoke test*).
-Cases are classified by their evidence source:
+This directory holds the repository's smoke test and nothing else.
 
-| Case | Class | Evidence |
-|------|-------|----------|
-| `embedAxiVofAdvection.c` | verification | exact solution $r(t)=\sqrt{r_0^2+2t}$ of axisymmetric VOF advection with an embedded wall (adapted from upstream `src/test/missing_metric.c`) |
-| `laplaceEmbedTube.c` | verification | Young–Laplace pressure jump $\Delta p = 2\sigma/R_d$ and zero velocity for a static droplet inside an embedded tube |
-| `smoke.params` + `simulationCases/bretherton.c` | smoke test | compiles and integrates ~60 steps at coarse resolution; checks the log is produced and nothing blows up |
+A smoke test proves that `simulationCases/bretherton.c` compiles and
+integrates a few dozen time steps at coarse resolution without producing
+a truncated log or blowing up. It compares against **nothing**, so it
+supports no claim about the discretisation or about the physics. Its
+value is that it fails loudly and in seconds when a change breaks the
+build or the parameter path.
 
-The *validation* campaign (comparison against Bretherton's law and
-Taylor/Aussillous–Quéré data, i.e. evidence independent of the
-implemented equations) is configured by `sweep.params` (bubble) and
-`sweep-drop.params` (drop) at the repository root and is meant for
-production hardware, not this directory.
+| File | Role |
+|------|------|
+| `smoke.params` | coarse, short-run parameters (`MAXlevel = 9`, `tmax = 0.05`) |
+| `runSmokeTests.sh` | builds and runs the case, then checks the log |
+
+Cases that compare against an exact solution live in
+[`../verificationCases/`](../verificationCases/) and are driven by
+`../verificationCases/runVerification.sh`. The campaign that compares
+against independent experimental data — Taylor (1961) and
+Aussillous & Quéré (2000) — is configured by `sweep.params` and
+`sweep-drop.params` at the repository root and is meant for production
+hardware. Those three evidence sources support three different claims
+and are deliberately kept apart.
 
 ## Running
 
 ```bash
-bash testCases/runSmokeTests.sh              # everything
-bash testCases/runSmokeTests.sh --skip-main  # only the two verification cases
+bash testCases/runSmokeTests.sh   # this directory only
+bash runTests.sh                  # verification cases, then this
 ```
 
-Both verification cases print `PASS`/`FAIL` and their measured errors.
-Reference results on a single core (Basilisk `qcc`, quadtree):
-
-- `embedAxiVofAdvection`: max relative interface-position error
-  ~3×10⁻⁵ (tolerance 10⁻²).
-- `laplaceEmbedTube`: pressure-jump error ~6×10⁻⁴ (tolerance 2×10⁻²),
-  spurious currents ~4×10⁻⁵ σ/μ (tolerance 10⁻³) at t = 1.
-
-Build artefacts go to `testCases/build-*/` and the smoke case to
-`simulationCases/9999/`; both are gitignored.
+The build goes to `simulationCases/9999/`, which is gitignored.

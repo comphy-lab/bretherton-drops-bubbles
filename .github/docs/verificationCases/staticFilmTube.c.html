@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>verificationCases/staticFilmTube.c | Bretherton drops and bubbles</title>
+
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="interface--wall separation inside an embedded tube (evidence source: exact Young--Laplace solution of the implemented equations).">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="axi.h, embed-vof-tube.h, embed.h, navier-stokes/centered.h, staticfilmtube, stencil, struct, tension.h, two-phase.h">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "..";
+  </script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+
+            <div class="page-content">
+
+                                <h1 class="page-title">verificationCases/staticFilmTube.c</h1>
+
+
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/verificationCases/staticFilmTube.c" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+
+                <h1 id="staticfilmtube.c">staticFilmTube.c</h1>
+                <p><strong>Verification</strong> of curvature and
+                property-jump errors for a thin interface–wall
+                separation inside an embedded tube (evidence source:
+                exact Young–Laplace solution of the implemented
+                equations).</p>
+                <h2 id="claim">Claim</h2>
+                <p>At production property ratios, the discrete solver
+                reproduces the exact static solution of the equations it
+                implements – a bubble at rest with <span
+                class="math inline">\(\Delta p = 2\sigma/R_d\)</span>
+                and <span class="math inline">\(\mathbf{u} \equiv
+                0\)</span> – to within a stated tolerance, and the error
+                grows as the interface is brought to within a few cells
+                of the embedded wall.</p>
+                <h2 id="comparator">Comparator</h2>
+                <p>The comparator is an <em>exact solution of the
+                implemented equations</em>, not an experiment or a
+                correlation: a sphere of radius <span
+                class="math inline">\(R_d\)</span> held in equilibrium
+                by surface tension in a quiescent, gravity-free,
+                axisymmetric domain. For that state the momentum
+                equation is satisfied by <span
+                class="math inline">\(\mathbf{u} = 0\)</span> with a
+                piecewise-uniform pressure, so the exact solution is
+                independent of how close the sphere sits to the tube
+                wall and of the wall’s own no-slip condition. This is
+                therefore verification: every non-zero velocity is a
+                spurious (parasitic) current, and every deviation of the
+                measured jump from <span
+                class="math inline">\(2\sigma/R_d\)</span> is
+                discretisation error.</p>
+                <p>The third coupling documented in
+                <code>src-local/embed-vof-tube.h</code> is the one under
+                test: <code>heights.h</code>/<code>curvature.h</code>
+                have no knowledge of <code>cs</code>, so the film
+                between the interface and the embedded wall must remain
+                resolved by several cells. This case measures the price
+                of violating that.</p>
+                <h2 id="motivation">Motivation</h2>
+                <p>The production campaign
+                (<code>simulationCases/bretherton.c</code>) runs a
+                bubble at <span class="math inline">\(R_{tube} =
+                0.7\)</span>, <span class="math inline">\(L_{domain} =
+                16\)</span>, <code>MAXlevel = 12</code>, i.e. <span
+                class="math inline">\(\Delta = 3.906\times
+                10^{-3}\)</span>. The Bretherton estimate <span
+                class="math inline">\(b = 1.34\,Ca^{2/3}
+                R_{tube}\)</span> gives roughly 32 cells of film at
+                <span class="math inline">\(Ca = 0.05\)</span> but only
+                about 3.8 cells at <span class="math inline">\(Ca =
+                0.002\)</span>, below the repository’s own four-cell
+                warning threshold. No existing verification case
+                exercises curvature evaluation at a few-cell
+                interface–wall gap, and none carries any density or
+                viscosity contrast: <code>laplaceEmbedTube.c</code> uses
+                matched properties and so cannot probe the property-jump
+                path at all. This case closes both gaps.</p>
+                <p>Unlike <code>laplaceEmbedTube.c</code> this case does
+                <strong>not</strong> define <code>FILTERED</code>, so
+                the density and viscosity fields are constructed exactly
+                as in <code>simulationCases/bretherton.c</code>.</p>
+                <h2 id="geometry-and-sampling-regions">Geometry and
+                sampling regions</h2>
+                <p>Axisymmetric domain <span class="math inline">\(L_0 =
+                2\)</span>, uniform grid <span class="math inline">\(N =
+                256\)</span>, hence <span class="math inline">\(\Delta =
+                7.8125\times 10^{-3}\)</span>. The tube wall is embedded
+                at <span class="math inline">\(y = R_{tube} =
+                0.7\)</span> (fluid below). A spherical bubble of radius
+                <span class="math inline">\(R_d\)</span> is centred on
+                the axis at <span class="math inline">\(x = X_d =
+                0.75\)</span>; it never touches the wall, so the
+                equilibrium shape is exactly a sphere and the
+                interface–wall gap is <span
+                class="math inline">\(R_{tube} - R_d\)</span>.</p>
+                <p>Because <span class="math inline">\(R_d \approx
+                0.65\)</span> leaves essentially no fluid at <span
+                class="math inline">\(r &gt; 1.5 R_d\)</span> inside the
+                tube, the continuous phase cannot be sampled radially as
+                in <code>laplaceEmbedTube.c</code>. It is sampled
+                <strong>axially displaced</strong> instead:</p>
+                <ul>
+                <li><em>inside</em> (dispersed phase): full cells
+                (<code>cs &gt;= 1</code>) with <span
+                class="math inline">\(r = \sqrt{(x-X_d)^2 + y^2} &lt;
+                R_d/2\)</span>;</li>
+                <li><em>outside</em> (continuous phase): full cells with
+                <span class="math inline">\(x &gt; 1.6\)</span>, i.e. at
+                least 23 cells beyond the bubble’s far tip at <span
+                class="math inline">\(x = X_d + R_d \approx
+                1.42\)</span>.</li>
+                </ul>
+                <p>Both regions are counted, and their phase purity is
+                asserted (<span class="math inline">\(f &gt; 1 -
+                10^{-10}\)</span> inside, <span class="math inline">\(f
+                &lt; 10^{-10}\)</span> outside); an empty, small or
+                impure region is a hard failure, since it would silently
+                corrupt the measured jump.</p>
+                <h2 id="gap-sweep">Gap sweep</h2>
+                <p><span class="math inline">\(R_d\)</span> is chosen to
+                give gaps of exactly 4, 6 and 8 cells: <span
+                class="math inline">\(R_d = R_{tube} - n\Delta\)</span>
+                for <span class="math inline">\(n = 4, 6, 8\)</span>,
+                i.e. <span class="math inline">\(R_d = 0.66875,\
+                0.653125,\ 0.6375\)</span>.</p>
+                <h2 id="tolerance-control">Tolerance control</h2>
+                <p>The run to <span class="math inline">\(t_{end} =
+                2\)</span> is roughly three visco-capillary times <span
+                class="math inline">\(\mu_c R_d/\sigma \approx
+                0.65\)</span>, long enough for the parasitic-current
+                amplitude to be more than a transient. The 4-cell gap –
+                the headline admissibility case – is repeated with a
+                ten-fold tighter Poisson <code>TOLERANCE</code> (<span
+                class="math inline">\(10^{-6}\)</span> against the
+                baseline <span class="math inline">\(10^{-5}\)</span>).
+                If <span class="math inline">\(\Delta p\)</span> and
+                <span class="math inline">\(\max|\mathbf{u}|\)</span>
+                are unmoved, the measured error is discretisation error
+                and can be attributed to curvature and the property jump
+                rather than to an under-converged projection. “Unmoved”
+                is defined non-arbitrarily: for <span
+                class="math inline">\(\Delta p\)</span>, a relative
+                shift below a tenth of the gate tolerance; for <span
+                class="math inline">\(\max|\mathbf{u}|\)</span>, a
+                relative shift below twice the within-run coefficient of
+                variation of that same statistic over <span
+                class="math inline">\(t \ge t_{end}/2\)</span>, which is
+                measured and reported rather than assumed.</p>
+                <p>A third point is added at the tolerance the
+                production campaign actually uses,
+                <code>TOLERANCE</code> <span class="math inline">\(=
+                10^{-4}\)</span>, which is <em>looser</em> than the
+                baseline here. The three-point ladder <span
+                class="math inline">\(10^{-4}, 10^{-5}, 10^{-6}\)</span>
+                at the 4-cell gap therefore says directly whether the
+                projection tolerance or the film resolution is the
+                binding constraint on the production configuration.</p>
+                <p>The 6- and 8-cell gaps are not tolerance-controlled;
+                that remains an untested assumption.</p>
+                <h2 id="pass-predicate">Pass predicate</h2>
+                <p>The gate is applied at the <strong>largest (8-cell)
+                gap</strong>, where the film is comfortably
+                resolved:</p>
+                <ul>
+                <li>relative <span class="math inline">\(\Delta
+                p\)</span> error below 2%;</li>
+                <li>sustained spurious-current amplitude below <span
+                class="math inline">\(2\times
+                10^{-4}\,\sigma/\mu_c\)</span>. This threshold is not
+                arbitrary: the smallest production capillary number is
+                <span class="math inline">\(Ca = 0.002\)</span>, so the
+                imposed velocity there is <span
+                class="math inline">\(0.002\,\sigma/\mu_c\)</span> in
+                code units, and the threshold demands that spurious
+                currents stay below 10% of it. The gated statistic is
+                the <em>peak</em> of <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> over the
+                logged samples in the second half of the run, <span
+                class="math inline">\(t \ge t_{end}/2\)</span>, not the
+                instantaneous value at <span
+                class="math inline">\(t_{end}\)</span>: the
+                parasitic-current amplitude fluctuates by tens of
+                percent between samples, so a snapshot is not a
+                reproducible bound whereas a second-half peak is a
+                conservative one;</li>
+                <li>every sampling region non-empty, adequately
+                populated and phase-pure.</li>
+                </ul>
+                <p>Gating at 8 cells makes the 4-cell result
+                <em>diagnostic</em> rather than self-referential: if the
+                solver is certified at a comfortably resolved
+                separation, a 4-cell failure is attributable to the film
+                resolution and not to a broken solver. The full table is
+                printed unconditionally and is the scientific product;
+                gaps that miss the thresholds are flagged with explicit
+                advisory lines and, for the 4-cell gap, an admissibility
+                verdict. Machine-readable results go to
+                <code>staticFilmTube-gap.csv</code>.</p>
+                <h2 id="limits">Limits</h2>
+                <p>This is a <strong>static</strong> bound. It
+                constrains curvature and property-jump error at a given
+                interface–wall separation on a uniform grid, with a
+                spherical interface and a quiescent exact solution. It
+                says nothing directly about whether the <em>dynamic</em>
+                Bretherton film at the same separation is adequately
+                resolved: the dynamic film is not spherical, carries a
+                lubrication pressure gradient, is advected, and in
+                production sits on an adapted tree rather than a uniform
+                grid. A pass here is necessary, not sufficient.
+                Conversely, a failure here is a genuine obstruction,
+                since the dynamic problem is strictly harder.</p>
+                <p>Three further limits are worth naming explicitly.</p>
+                <p>First, whenever the tolerance ladder shows <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> moving
+                with <code>TOLERANCE</code>, the tabulated
+                spurious-current amplitude is an <em>upper bound set by
+                the projection</em>, not a measurement of the
+                curvature-driven current. Under those conditions the
+                velocity column bounds the solver configuration and not
+                the surface-tension discretisation, and the <span
+                class="math inline">\(\Delta p\)</span> column is the
+                only quantity in the table that speaks to curvature. The
+                case prints which of the two situations holds rather
+                than leaving it to the reader.</p>
+                <p>Second, the <span class="math inline">\(\Delta
+                p\)</span> errors reported here are comparable in
+                magnitude to the temporal fluctuation of <span
+                class="math inline">\(\Delta p\)</span> within a single
+                run, so the <em>ordering</em> of the three gaps is not
+                resolved; only their common magnitude, and its change
+                with <span class="math inline">\(\Delta\)</span>, are
+                meaningful.</p>
+                <p>Third, the gap sweep varies the interface–wall
+                separation at fixed <span
+                class="math inline">\(\Delta\)</span>, which necessarily
+                also varies <span
+                class="math inline">\(R_d/\Delta\)</span>. The two
+                effects are not separated within a single grid; they are
+                distinguished only by comparing runs at different <span
+                class="math inline">\(N\)</span>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/embed.h" title="Link to Basilisk source for embed.h"><span class="im">"embed.h"</span></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/axi.h" title="Link to Basilisk source for axi.h"><span class="im">"axi.h"</span></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/two-phase.h" title="Link to Basilisk source for two-phase.h"><span class="im">"two-phase.h"</span></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/tension.h" title="Link to Basilisk source for tension.h"><span class="im">"tension.h"</span></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="../src-local/embed-vof-tube.h.html" title="Link to local documentation for embed-vof-tube.h"><span class="im">"embed-vof-tube.h"</span></a><span class="pp"></span></span></code></pre></div></div>
+                <h2 id="parameters">Parameters</h2>
+                <p>Code units <span class="math inline">\(\sigma = \mu_c
+                = R = 1\)</span>, matching
+                <code>simulationCases/bretherton.c</code>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rtube    </span><span class="fl">0.7</span><span class="pp"></span><span class="dv">178</span><span class="pp"></span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Ldom     </span><span class="fl">2.0</span><span class="pp"></span><span class="dv">179</span><span class="pp"></span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Ngrid    </span><span class="dv">256</span><span class="pp"></span><span class="dv">180</span><span class="pp"></span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define hgrid    </span><span class="op">(</span>Ldom<span class="op">/(</span><span class="dt">double</span><span class="op">)</span><span class="pp">Ngrid</span><span class="op">)</span><span class="pp"></span><span class="dv">181</span><span class="pp"></span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Xd       </span><span class="fl">0.75</span><span class="pp"></span><span class="dv">182</span><span class="pp"></span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define tend     </span><span class="fl">2.0</span><span class="pp"></span><span class="dv">184</span><span class="pp"></span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define tlog     </span><span class="fl">0.05</span><span class="pp"></span><span class="dv">185</span><span class="pp"></span></span></code></pre></div></div>
+                <p>History buffer; must exceed <code>tend/tlog</code>
+                (an integer constant expression is required at file
+                scope).</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NHIST    </span><span class="dv">64</span><span class="pp"></span><span class="dv">188</span><span class="pp"></span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_BASE </span><span class="fl">1e-5</span><span class="pp"></span><span class="dv">190</span><span class="pp"></span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_TIGHT </span><span class="fl">1e-6</span><span class="pp"></span><span class="dv">191</span><span class="pp"></span></span></code></pre></div></div>
+                <p>The projection tolerance actually used by
+                <code>simulationCases/bretherton.c</code>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_PROD </span><span class="fl">1e-4</span><span class="pp"></span><span class="dv">194</span><span class="pp"></span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define DTMAX    </span><span class="fl">1e-2</span><span class="pp"></span><span class="dv">195</span><span class="pp"></span><span class="dv">196</span><span class="pp"></span></span></code></pre></div></div>
+                <p>Sampling regions.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define RIN_FRAC </span><span class="fl">0.5</span><span class="pp"></span><span class="dv">198</span><span class="pp"></span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define XOUT     </span><span class="fl">1.6</span><span class="pp"></span><span class="dv">199</span><span class="pp"></span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NMIN_IN  </span><span class="dv">100</span><span class="pp"></span><span class="dv">200</span><span class="pp"></span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NMIN_OUT </span><span class="dv">100</span><span class="pp"></span><span class="dv">201</span><span class="pp"></span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define FPURE    </span><span class="fl">1e-10</span><span class="pp"></span><span class="dv">202</span><span class="pp"></span><span class="dv">203</span><span class="pp"></span></span></code></pre></div></div>
+                <p>A shift in <span class="math inline">\(\Delta
+                p\)</span> under the tolerance control is material if it
+                is a tenth of the gate tolerance or more; below that the
+                projection tolerance cannot plausibly account for the
+                measured curvature error.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_DP_TOLCTL </span><span class="fl">2e-3</span><span class="pp"></span><span class="dv">207</span><span class="pp"></span><span class="dv">208</span><span class="pp"></span></span></code></pre></div></div>
+                <p>Gate, applied at the 8-cell gap only (see the pass
+                predicate above).</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define GAP_GATE </span><span class="fl">8.</span><span class="pp"></span><span class="dv">210</span><span class="pp"></span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_DP   </span><span class="fl">2e-2</span><span class="pp"></span><span class="dv">211</span><span class="pp"></span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_U    </span><span class="fl">2e-4</span><span class="pp"></span><span class="dv">212</span><span class="pp"></span><span class="dv">213</span><span class="pp"></span></span></code></pre></div></div>
+                <p>Plateau criterion: the mean of <span
+                class="math inline">\(\max|u|\)</span> over the last
+                quarter of the run no more than 5% above its mean over
+                the second quarter. Windowed means are used because the
+                instantaneous amplitude fluctuates by tens of percent
+                between logged samples.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PLATEAU_RATIO </span><span class="fl">1.05</span><span class="pp"></span><span class="dv">218</span><span class="pp"></span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NRUN </span><span class="dv">5</span><span class="pp"></span><span class="dv">220</span><span class="pp"></span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span></code></pre></div></div>
+                <h2 id="run-bookkeeping">Run bookkeeping</h2>
+                <p><code>Rd</code> and <code>TOLERANCE</code> are reset
+                before each call to <code>run()</code>; the results of
+                every run are collected here and reported together at
+                the end.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> gapcells<span class="op">,</span> Rd<span class="op">,</span> gap<span class="op">,</span> tol<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> dp<span class="op">,</span> dpex<span class="op">,</span> edp<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> umax<span class="op">,</span> umax_cut<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> upeak<span class="op">,</span> tpeak<span class="op">,</span> usus<span class="op">,</span> uwin1<span class="op">,</span> uwin2<span class="op">,</span> uratio<span class="op">,</span> ucv<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> Rdeff<span class="op">,</span> dpeff<span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nin<span class="op">,</span> nout<span class="op">,</span> nsteps<span class="op">;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> fmin_in<span class="op">,</span> fmax_out<span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> pure<span class="op">,</span> populated<span class="op">;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> Result<span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> Rd <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> run_id <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> Result res<span class="op">[</span>NRUN<span class="op">];</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> thist<span class="op">[</span>NHIST<span class="op">],</span> uhist<span class="op">[</span>NHIST<span class="op">];</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> nhist <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  L0 <span class="op">=</span> Ldom<span class="op">;</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  N  <span class="op">=</span> Ngrid<span class="op">;</span></span></code></pre></div></div>
+                <p>Fluid 1 (<code>f = 1</code>) is the dispersed bubble;
+                fluid 2 (<code>f = 0</code>) is the continuous wetting
+                phase. The production bubble defaults are
+                <code>La = 1</code>, <code>muR = 0.01</code>,
+                <code>rhoR = 0.001</code>, and the property construction
+                below is copied verbatim from
+                <code>simulationCases/bretherton.c</code>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> La <span class="op">=</span> <span class="fl">1.</span><span class="op">,</span> muR <span class="op">=</span> <span class="fl">0.01</span><span class="op">,</span> rhoR <span class="op">=</span> <span class="fl">0.001</span><span class="op">;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  rho1 <span class="op">=</span> La<span class="op">*</span>rhoR<span class="op">;</span> mu1 <span class="op">=</span> muR<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  rho2 <span class="op">=</span> La<span class="op">;</span>      mu2 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  f<span class="op">.</span>sigma <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  DT <span class="op">=</span> DTMAX<span class="op">;</span></span></code></pre></div></div>
+                <p>Three gaps at the baseline tolerance, then the 4-cell
+                gap repeated at a ten-fold tighter and at the production
+                projection tolerance.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> gapcells<span class="op">[</span>NRUN<span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="fl">4.</span><span class="op">,</span> <span class="fl">6.</span><span class="op">,</span> <span class="fl">8.</span><span class="op">,</span> <span class="fl">4.</span><span class="op">,</span> <span class="fl">4.</span><span class="op">};</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> tols<span class="op">[</span>NRUN<span class="op">]</span>     <span class="op">=</span> <span class="op">{</span>TOL_BASE<span class="op">,</span> TOL_BASE<span class="op">,</span> TOL_BASE<span class="op">,</span> TOL_TIGHT<span class="op">,</span> TOL_PROD<span class="op">};</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>run_id <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> run_id <span class="op">&lt;</span> NRUN<span class="op">;</span> run_id<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    Rd <span class="op">=</span> Rtube <span class="op">-</span> gapcells<span class="op">[</span>run_id<span class="op">]*</span>hgrid<span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    TOLERANCE <span class="op">=</span> tols<span class="op">[</span>run_id<span class="op">];</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    res<span class="op">[</span>run_id<span class="op">].</span>gapcells <span class="op">=</span> gapcells<span class="op">[</span>run_id<span class="op">];</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    res<span class="op">[</span>run_id<span class="op">].</span>tol <span class="op">=</span> TOLERANCE<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    nhist <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;# run </span><span class="sc">%d</span><span class="st">: gap = </span><span class="sc">%g</span><span class="st"> cells, Rd = </span><span class="sc">%.6f</span><span class="st">, TOLERANCE = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>             run_id<span class="op">,</span> gapcells<span class="op">[</span>run_id<span class="op">],</span> Rd<span class="op">,</span> TOLERANCE<span class="op">);</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    run<span class="op">();</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div></div>
+                <h2 id="report">Report</h2>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> delta <span class="op">=</span> hgrid<span class="op">;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;== staticFilmTube: static bubble near an embedded tube wall ==</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;grid        : L0 = </span><span class="sc">%g</span><span class="st">, N = </span><span class="sc">%d</span><span class="st">, Delta = </span><span class="sc">%.6e</span><span class="st">, Rtube = </span><span class="sc">%g</span><span class="st">, Xd = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>          Ldom<span class="op">,</span> Ngrid<span class="op">,</span> delta<span class="op">,</span> Rtube<span class="op">,</span> Xd<span class="op">);</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;properties  : rho1 = </span><span class="sc">%g</span><span class="st">, mu1 = </span><span class="sc">%g</span><span class="st"> (dispersed) | &quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;rho2 = </span><span class="sc">%g</span><span class="st">, mu2 = </span><span class="sc">%g</span><span class="st"> (continuous) | sigma = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          rho1<span class="op">,</span> mu1<span class="op">,</span> rho2<span class="op">,</span> mu2<span class="op">,</span> f<span class="op">.</span>sigma<span class="op">);</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;run control : DT = </span><span class="sc">%g</span><span class="st">, tend = </span><span class="sc">%g</span><span class="st">, baseline TOLERANCE = </span><span class="sc">%g</span><span class="st">, &quot;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;tight TOLERANCE = </span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> DTMAX<span class="op">,</span> tend<span class="op">,</span> TOL_BASE<span class="op">,</span> TOL_TIGHT<span class="op">);</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;sampling    : inside r &lt; </span><span class="sc">%g</span><span class="st">*Rd about (</span><span class="sc">%g</span><span class="st">,0); &quot;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;outside x &gt; </span><span class="sc">%g</span><span class="st"> with cs &gt;=</span><span class="sc">\n\n</span><span class="st">&quot;</span><span class="op">,</span> RIN_FRAC<span class="op">,</span> Xd<span class="op">,</span> XOUT<span class="op">);</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5s</span><span class="st"> </span><span class="sc">%-9s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-8s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-9s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;gap&quot;</span><span class="op">,</span> <span class="st">&quot;Rd&quot;</span><span class="op">,</span> <span class="st">&quot;TOLERANCE&quot;</span><span class="op">,</span> <span class="st">&quot;steps&quot;</span><span class="op">,</span> <span class="st">&quot;dp&quot;</span><span class="op">,</span> <span class="st">&quot;dp_exact&quot;</span><span class="op">,</span> <span class="st">&quot;rel.err&quot;</span><span class="op">,</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;max|u|&quot;</span><span class="op">,</span> <span class="st">&quot;max|u|_cut&quot;</span><span class="op">,</span> <span class="st">&quot;Rd_eff&quot;</span><span class="op">);</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5s</span><span class="st"> </span><span class="sc">%-9s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-8s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-9s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;[cell]&quot;</span><span class="op">,</span> <span class="st">&quot;[R]&quot;</span><span class="op">,</span> <span class="st">&quot;&quot;</span><span class="op">,</span> <span class="st">&quot;&quot;</span><span class="op">,</span> <span class="st">&quot;[sig/R]&quot;</span><span class="op">,</span> <span class="st">&quot;[sig/R]&quot;</span><span class="op">,</span> <span class="st">&quot;[-]&quot;</span><span class="op">,</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;[sig/mu]&quot;</span><span class="op">,</span> <span class="st">&quot;[sig/mu]&quot;</span><span class="op">,</span> <span class="st">&quot;[R]&quot;</span><span class="op">);</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5.1f</span><span class="st"> </span><span class="sc">%-9.6f</span><span class="st"> </span><span class="sc">%-10.1e</span><span class="st"> </span><span class="sc">%-8d</span><span class="st"> </span><span class="sc">%-12.6e</span><span class="st"> </span><span class="sc">%-12.6e</span><span class="st"> </span><span class="sc">%-10.3e</span><span class="st"> &quot;</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;</span><span class="sc">%-11.4e</span><span class="st"> </span><span class="sc">%-11.4e</span><span class="st"> </span><span class="sc">%-9.6f\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>Rd<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>nsteps<span class="op">,</span> r<span class="op">-&gt;</span>dp<span class="op">,</span> r<span class="op">-&gt;</span>dpex<span class="op">,</span> r<span class="op">-&gt;</span>edp<span class="op">,</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>umax<span class="op">,</span> r<span class="op">-&gt;</span>umax_cut<span class="op">,</span> r<span class="op">-&gt;</span>Rdeff<span class="op">);</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Sampling regions and phase purity</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-8s</span><span class="st"> </span><span class="sc">%-9s</span><span class="st"> </span><span class="sc">%-14s</span><span class="st"> </span><span class="sc">%-14s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;gap&quot;</span><span class="op">,</span> <span class="st">&quot;TOLERANCE&quot;</span><span class="op">,</span> <span class="st">&quot;n_in&quot;</span><span class="op">,</span> <span class="st">&quot;n_out&quot;</span><span class="op">,</span> <span class="st">&quot;min(f) inside&quot;</span><span class="op">,</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;max(f) outside&quot;</span><span class="op">);</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5.1f</span><span class="st"> </span><span class="sc">%-10.1e</span><span class="st"> </span><span class="sc">%-8d</span><span class="st"> </span><span class="sc">%-9d</span><span class="st"> </span><span class="sc">%-14.6e</span><span class="st"> </span><span class="sc">%-14.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>nin<span class="op">,</span> r<span class="op">-&gt;</span>nout<span class="op">,</span> r<span class="op">-&gt;</span>fmin_in<span class="op">,</span> r<span class="op">-&gt;</span>fmax_out<span class="op">);</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Parasitic-current time history (has max|u| plateaued by tend?)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5s</span><span class="st"> </span><span class="sc">%-10s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-13s</span><span class="st"> </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-9s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-7s</span><span class="st"> </span><span class="sc">%-7s</span><span class="st"> </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;gap&quot;</span><span class="op">,</span> <span class="st">&quot;TOLERANCE&quot;</span><span class="op">,</span> <span class="st">&quot;u(tend)&quot;</span><span class="op">,</span> <span class="st">&quot;sustained&quot;</span><span class="op">,</span> <span class="st">&quot;peak&quot;</span><span class="op">,</span> <span class="st">&quot;t_peak&quot;</span><span class="op">,</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;mean 2nd qu&quot;</span><span class="op">,</span> <span class="st">&quot;mean 4th qu&quot;</span><span class="op">,</span> <span class="st">&quot;ratio&quot;</span><span class="op">,</span> <span class="st">&quot;cv&quot;</span><span class="op">,</span> <span class="st">&quot;verdict&quot;</span><span class="op">);</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%-5.1f</span><span class="st"> </span><span class="sc">%-10.1e</span><span class="st"> </span><span class="sc">%-12.4e</span><span class="st"> </span><span class="sc">%-13.4e</span><span class="st"> </span><span class="sc">%-12.4e</span><span class="st"> </span><span class="sc">%-9.3f</span><span class="st"> </span><span class="sc">%-11.4e</span><span class="st"> </span><span class="sc">%-11.4e</span><span class="st"> &quot;</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;</span><span class="sc">%-7.3f</span><span class="st"> </span><span class="sc">%-7.3f</span><span class="st"> </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>umax<span class="op">,</span> r<span class="op">-&gt;</span>usus<span class="op">,</span> r<span class="op">-&gt;</span>upeak<span class="op">,</span> r<span class="op">-&gt;</span>tpeak<span class="op">,</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>uwin1<span class="op">,</span> r<span class="op">-&gt;</span>uwin2<span class="op">,</span> r<span class="op">-&gt;</span>uratio<span class="op">,</span> r<span class="op">-&gt;</span>ucv<span class="op">,</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>uratio <span class="op">&lt;=</span> PLATEAU_RATIO <span class="op">?</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;plateaued/decaying&quot;</span> <span class="op">:</span> <span class="st">&quot;STILL GROWING at tend&quot;</span><span class="op">);</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  </span><span class="sc">\&quot;</span><span class="st">sustained</span><span class="sc">\&quot;</span><span class="st"> = peak of max|u| over logged samples with &quot;</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;t &gt;= tend/2; this is the gated statistic.</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span></code></pre></div></div>
+                <h3 id="tolerance-control-1">Tolerance control</h3>
+                <p>Runs 0 and 3 are the same 4-cell configuration at
+                <span class="math inline">\(10^{-5}\)</span> and <span
+                class="math inline">\(10^{-6}\)</span>. A material shift
+                would mean the reported error is contaminated by the
+                projection tolerance and cannot be attributed to
+                curvature.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> ddp <span class="op">=</span> fabs <span class="op">(</span>res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>dp <span class="op">-</span> res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>dp<span class="op">)/</span>fabs <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>dp<span class="op">);</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> du  <span class="op">=</span> <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">?</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                fabs <span class="op">(</span>res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>usus <span class="op">-</span> res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus<span class="op">)/</span>res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus <span class="op">:</span> HUGE<span class="op">);</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> ucv <span class="op">=</span> <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>ucv <span class="op">&gt;</span> res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>ucv <span class="op">?</span> res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>ucv <span class="op">:</span> res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>ucv<span class="op">);</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> dp_moved <span class="op">=</span> <span class="op">(</span>ddp <span class="op">&gt;=</span> TOL_DP_TOLCTL<span class="op">);</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> u_moved  <span class="op">=</span> <span class="op">(</span>du <span class="op">&gt;=</span> <span class="fl">2.</span><span class="op">*</span>ucv<span class="op">);</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Tolerance ladder at the 4-cell gap &quot;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;(production TOLERANCE is </span><span class="sc">%g</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> TOL_PROD<span class="op">);</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  </span><span class="sc">%-12s</span><span class="st"> </span><span class="sc">%-14s</span><span class="st"> </span><span class="sc">%-11s</span><span class="st"> </span><span class="sc">%-15s</span><span class="st"> </span><span class="sc">%-7s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;TOLERANCE&quot;</span><span class="op">,</span> <span class="st">&quot;dp&quot;</span><span class="op">,</span> <span class="st">&quot;rel.err&quot;</span><span class="op">,</span> <span class="st">&quot;sustained max|u|&quot;</span><span class="op">,</span> <span class="st">&quot;cv&quot;</span><span class="op">);</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> ladder<span class="op">[</span><span class="dv">3</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="dv">4</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">3</span><span class="op">};</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">3</span><span class="op">;</span> k<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>ladder<span class="op">[</span>k<span class="op">]];</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  </span><span class="sc">%-12.1e</span><span class="st"> </span><span class="sc">%-14.6e</span><span class="st"> </span><span class="sc">%-11.3e</span><span class="st"> </span><span class="sc">%-15.4e</span><span class="st"> </span><span class="sc">%-7.3f\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>            r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>dp<span class="op">,</span> r<span class="op">-&gt;</span>edp<span class="op">,</span> r<span class="op">-&gt;</span>usus<span class="op">,</span> r<span class="op">-&gt;</span>ucv<span class="op">);</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Tolerance control (4-cell gap, TOLERANCE </span><span class="sc">%g</span><span class="st"> -&gt; </span><span class="sc">%g</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>          TOL_BASE<span class="op">,</span> TOL_TIGHT<span class="op">);</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  dp        : </span><span class="sc">%.6e</span><span class="st"> -&gt; </span><span class="sc">%.6e</span><span class="st">  (relative change </span><span class="sc">%.3e</span><span class="st">; &quot;</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;material if &gt;= </span><span class="sc">%.1e</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>          res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>dp<span class="op">,</span> res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>dp<span class="op">,</span> ddp<span class="op">,</span> TOL_DP_TOLCTL<span class="op">);</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  max|u|    : </span><span class="sc">%.6e</span><span class="st"> -&gt; </span><span class="sc">%.6e</span><span class="st">  (sustained, relative change </span><span class="sc">%.3e</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>          res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus<span class="op">,</span> res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>usus<span class="op">,</span> du<span class="op">);</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  scatter   : within-run coefficient of variation of max|u| over &quot;</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;t &gt;= tend/2 is </span><span class="sc">%.3f</span><span class="st"> (baseline) and </span><span class="sc">%.3f</span><span class="st"> (tight); a change is &quot;</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;called material only above twice the larger, i.e. </span><span class="sc">%.3f\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>          res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>ucv<span class="op">,</span> res<span class="op">[</span><span class="dv">3</span><span class="op">].</span>ucv<span class="op">,</span> <span class="fl">2.</span><span class="op">*</span>ucv<span class="op">);</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  =&gt; dp </span><span class="sc">%s</span><span class="st">; max|u| </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>          dp_moved <span class="op">?</span> <span class="st">&quot;MOVED MATERIALLY&quot;</span> <span class="op">:</span> <span class="st">&quot;unmoved&quot;</span><span class="op">,</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>          u_moved <span class="op">?</span> <span class="st">&quot;MOVED MATERIALLY&quot;</span> <span class="op">:</span> <span class="st">&quot;unmoved (within its own scatter)&quot;</span><span class="op">);</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  =&gt; the measured pressure jump </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> dp_moved <span class="op">?</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;cannot be attributed to curvature: it is contaminated by the &quot;</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;projection tolerance&quot;</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>          <span class="op">:</span> <span class="st">&quot;is discretisation error, not projection-tolerance error, and &quot;</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;may be attributed to curvature and the property jump&quot;</span><span class="op">);</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  =&gt; the spurious-current amplitude </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> u_moved <span class="op">?</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;is NOT a curvature bound: it is set by the projection tolerance, &quot;</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;so the tabulated max|u| is an upper bound on the curvature-driven &quot;</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;current and not a measurement of it&quot;</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>          <span class="op">:</span> <span class="st">&quot;is insensitive to the projection tolerance and may be read as a &quot;</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;curvature-driven amplitude&quot;</span><span class="op">);</span></span></code></pre></div></div>
+                <h3 id="advisories-and-gate">Advisories and gate</h3>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Advisories</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nadv <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>r<span class="op">-&gt;</span>edp <span class="op">&gt;=</span> TOL_DP<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      printf <span class="op">(</span><span class="st">&quot;  ADVISORY: gap </span><span class="sc">%.1f</span><span class="st"> cells (TOLERANCE </span><span class="sc">%g</span><span class="st">): relative dp error &quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;</span><span class="sc">%.3e</span><span class="st"> exceeds </span><span class="sc">%.3e\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>edp<span class="op">,</span> TOL_DP<span class="op">);</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      nadv<span class="op">++;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>r<span class="op">-&gt;</span>usus <span class="op">&gt;=</span> TOL_U<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      printf <span class="op">(</span><span class="st">&quot;  ADVISORY: gap </span><span class="sc">%.1f</span><span class="st"> cells (TOLERANCE </span><span class="sc">%g</span><span class="st">): sustained max|u| &quot;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;</span><span class="sc">%.4e</span><span class="st"> exceeds </span><span class="sc">%.4e</span><span class="st"> sigma/mu_c</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>              r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>usus<span class="op">,</span> TOL_U<span class="op">);</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>      nadv<span class="op">++;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>r<span class="op">-&gt;</span>uratio <span class="op">&gt;</span> PLATEAU_RATIO<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>      printf <span class="op">(</span><span class="st">&quot;  ADVISORY: gap </span><span class="sc">%.1f</span><span class="st"> cells (TOLERANCE </span><span class="sc">%g</span><span class="st">): max|u| has not &quot;</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;plateaued by tend (mean over the last quarter is </span><span class="sc">%.3f</span><span class="st"> times &quot;</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;the mean over the second quarter); the reported amplitude is a &quot;</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;lower bound, not a converged value</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>              r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>uratio<span class="op">);</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>      nadv<span class="op">++;</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>nadv<span class="op">)</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  none</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span></code></pre></div></div>
+                <p>The 4-cell gap answers the admissibility question for
+                the <span class="math inline">\(Ca = 0.002\)</span>
+                production case at <code>MAXlevel = 12</code>, where the
+                Bretherton film is about 3.8 cells thick. It is reported
+                here, prominently, and is deliberately <em>not</em> used
+                to relax anything.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> ok4 <span class="op">=</span> <span class="op">(</span>res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>edp <span class="op">&lt;</span> TOL_DP <span class="op">&amp;&amp;</span> res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus <span class="op">&lt;</span> TOL_U<span class="op">);</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">ADMISSIBILITY (4-cell interface--wall gap, the Ca = 0.002 &quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;production condition at MAXlevel 12)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  relative dp error </span><span class="sc">%.3e</span><span class="st"> (threshold </span><span class="sc">%.3e</span><span class="st">), sustained max|u| </span><span class="sc">%.4e</span><span class="st"> &quot;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;(threshold </span><span class="sc">%.4e</span><span class="st"> sigma/mu_c)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>          res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>edp<span class="op">,</span> TOL_DP<span class="op">,</span> res<span class="op">[</span><span class="dv">0</span><span class="op">].</span>usus<span class="op">,</span> TOL_U<span class="op">);</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  =&gt; a 4-cell gap </span><span class="sc">%s</span><span class="st"> the static thresholds at production &quot;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;property ratios</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> ok4 <span class="op">?</span> <span class="st">&quot;MEETS&quot;</span> <span class="op">:</span> <span class="st">&quot;DOES NOT MEET&quot;</span><span class="op">);</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  at the production projection tolerance (</span><span class="sc">%g</span><span class="st">) the same &quot;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;configuration gives relative dp error </span><span class="sc">%.3e</span><span class="st"> and sustained max|u| &quot;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;</span><span class="sc">%.4e</span><span class="st">: </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> TOL_PROD<span class="op">,</span> res<span class="op">[</span><span class="dv">4</span><span class="op">].</span>edp<span class="op">,</span> res<span class="op">[</span><span class="dv">4</span><span class="op">].</span>usus<span class="op">,</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span>res<span class="op">[</span><span class="dv">4</span><span class="op">].</span>edp <span class="op">&lt;</span> TOL_DP <span class="op">&amp;&amp;</span> res<span class="op">[</span><span class="dv">4</span><span class="op">].</span>usus <span class="op">&lt;</span> TOL_U<span class="op">)</span> <span class="op">?</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;also within the static thresholds&quot;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>          <span class="op">:</span> <span class="st">&quot;OUTSIDE the static thresholds -- the production projection &quot;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;tolerance, not the film resolution, is then the binding &quot;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;constraint&quot;</span><span class="op">);</span></span></code></pre></div></div>
+                <p>The gate itself.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  Result <span class="op">*</span> g <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res<span class="op">[</span>i<span class="op">].</span>gapcells <span class="op">==</span> GAP_GATE <span class="op">&amp;&amp;</span> res<span class="op">[</span>i<span class="op">].</span>tol <span class="op">==</span> TOL_BASE<span class="op">)</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      g <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> integrity <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>res<span class="op">[</span>i<span class="op">].</span>populated <span class="op">||</span> <span class="op">!</span>res<span class="op">[</span>i<span class="op">].</span>pure<span class="op">)</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      integrity <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> pass <span class="op">=</span> <span class="op">(</span>g <span class="op">!=</span> NULL<span class="op">)</span> <span class="op">&amp;&amp;</span> integrity <span class="op">&amp;&amp;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>g<span class="op">-&gt;</span>edp <span class="op">&lt;</span> TOL_DP<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>g<span class="op">-&gt;</span>usus <span class="op">&lt;</span> TOL_U<span class="op">);</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">Gate (gap = </span><span class="sc">%g</span><span class="st"> cells, TOLERANCE = </span><span class="sc">%g</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> GAP_GATE<span class="op">,</span> TOL_BASE<span class="op">);</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>g <span class="op">==</span> NULL<span class="op">)</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  gated run missing</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  relative dp error </span><span class="sc">%.3e</span><span class="st"> &lt; </span><span class="sc">%.3e</span><span class="st"> : </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>            g<span class="op">-&gt;</span>edp<span class="op">,</span> TOL_DP<span class="op">,</span> g<span class="op">-&gt;</span>edp <span class="op">&lt;</span> TOL_DP <span class="op">?</span> <span class="st">&quot;yes&quot;</span> <span class="op">:</span> <span class="st">&quot;NO&quot;</span><span class="op">);</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  sustained max|u| </span><span class="sc">%.4e</span><span class="st"> &lt; </span><span class="sc">%.4e</span><span class="st"> sigma/mu_c : </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>            g<span class="op">-&gt;</span>usus<span class="op">,</span> TOL_U<span class="op">,</span> g<span class="op">-&gt;</span>usus <span class="op">&lt;</span> TOL_U <span class="op">?</span> <span class="st">&quot;yes&quot;</span> <span class="op">:</span> <span class="st">&quot;NO&quot;</span><span class="op">);</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;  sampling-region integrity (all runs) : </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>          integrity <span class="op">?</span> <span class="st">&quot;yes&quot;</span> <span class="op">:</span> <span class="st">&quot;NO&quot;</span><span class="op">);</span></span></code></pre></div></div>
+                <h3 id="machine-readable-output">Machine-readable
+                output</h3>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">FILE</span> <span class="op">*</span> fp <span class="op">=</span> fopen <span class="op">(</span><span class="st">&quot;staticFilmTube-gap.csv&quot;</span><span class="op">,</span> <span class="st">&quot;w&quot;</span><span class="op">);</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>fp <span class="op">==</span> NULL<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;ERROR: cannot open staticFilmTube-gap.csv</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;FAIL</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    exit <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# staticFilmTube.c: static bubble near an embedded tube wall</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# comparator: exact static solution u == 0, dp = 2*sigma/Rd</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# L0=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> Ldom<span class="op">);</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# Rtube=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> Rtube<span class="op">);</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# Xd=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> Xd<span class="op">);</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# N=</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> Ngrid<span class="op">);</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# Delta=</span><span class="sc">%.9e\n</span><span class="st">&quot;</span><span class="op">,</span> delta<span class="op">);</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# sigma=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> f<span class="op">.</span>sigma<span class="op">);</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# rho1=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> rho1<span class="op">);</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# rho2=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> rho2<span class="op">);</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# mu1=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> mu1<span class="op">);</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# mu2=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> mu2<span class="op">);</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# tend=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> tend<span class="op">);</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# DT=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> DTMAX<span class="op">);</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# TOLERANCE_baseline=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_BASE<span class="op">);</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# TOLERANCE_tight=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_TIGHT<span class="op">);</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# TOL_DP=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_DP<span class="op">);</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;# TOL_U=</span><span class="sc">%g\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_U<span class="op">);</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;gap_cells,Rd,gap,tolerance,nsteps,dp,dp_exact,rel_error,&quot;</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;umax_tend,umax_tend_cutcells,umax_sustained,umax_peak,t_peak,&quot;</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;umax_mean_2nd_quarter,umax_mean_4th_quarter,umax_ratio,umax_cv,&quot;</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;Rd_eff,dp_exact_eff,n_in,n_out,min_f_in,max_f_out</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> NRUN<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;</span><span class="sc">%g</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%g</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,&quot;</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%.9e</span><span class="st">,</span><span class="sc">%.9e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>             r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>Rd<span class="op">,</span> r<span class="op">-&gt;</span>gap<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>nsteps<span class="op">,</span> r<span class="op">-&gt;</span>dp<span class="op">,</span> r<span class="op">-&gt;</span>dpex<span class="op">,</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>             r<span class="op">-&gt;</span>edp<span class="op">,</span> r<span class="op">-&gt;</span>umax<span class="op">,</span> r<span class="op">-&gt;</span>umax_cut<span class="op">,</span> r<span class="op">-&gt;</span>usus<span class="op">,</span> r<span class="op">-&gt;</span>upeak<span class="op">,</span> r<span class="op">-&gt;</span>tpeak<span class="op">,</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>             r<span class="op">-&gt;</span>uwin1<span class="op">,</span> r<span class="op">-&gt;</span>uwin2<span class="op">,</span> r<span class="op">-&gt;</span>uratio<span class="op">,</span> r<span class="op">-&gt;</span>ucv<span class="op">,</span> r<span class="op">-&gt;</span>Rdeff<span class="op">,</span> r<span class="op">-&gt;</span>dpeff<span class="op">,</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>             r<span class="op">-&gt;</span>nin<span class="op">,</span> r<span class="op">-&gt;</span>nout<span class="op">,</span> r<span class="op">-&gt;</span>fmin_in<span class="op">,</span> r<span class="op">-&gt;</span>fmax_out<span class="op">);</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>  fclose <span class="op">(</span>fp<span class="op">);</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">\n</span><span class="st">wrote staticFilmTube-gap.csv</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> pass <span class="op">?</span> <span class="st">&quot;PASS&quot;</span> <span class="op">:</span> <span class="st">&quot;FAIL&quot;</span><span class="op">);</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>pass<span class="op">)</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>    exit <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="initialisation">Initialisation</h2>
+                <p>The wall is embedded first (which also synchronises
+                the axisymmetric metric), then the spherical interface
+                is initialised and cleaned inside the solid. The sphere
+                never reaches the wall, so the cleanup is a no-op here;
+                it is kept to mirror the production sequence
+                exactly.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  tube_solid <span class="op">(</span>Rtube<span class="op">);</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  fraction <span class="op">(</span>f<span class="op">,</span> Rd <span class="op">-</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">)));</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="diagnostics">Diagnostics</h2>
+                <p>The pressure jump is measured between volume-weighted
+                cell averages of the two sampling regions defined in the
+                header block. Both regions are counted and checked for
+                phase purity, so a mis-specified region fails loudly
+                rather than returning a plausible-looking number.
+                <code>umax</code> is taken over full fluid cells
+                (<code>cs &gt;= 1</code>), matching
+                <code>laplaceEmbedTube.c</code>; <code>umax_cut</code>
+                additionally includes the cut cells adjacent to the
+                wall, which is where the height-function stencil is most
+                exposed.</p>
+                <p><code>Rdeff</code> is the radius recovered from the
+                conserved VOF volume, <span class="math inline">\(\int
+                f\,\mathrm{d}v = \tfrac{2}{3}R_d^3\)</span> in the
+                axisymmetric measure. It verifies that the comparator
+                radius is still the radius of the bubble actually
+                present on the grid.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> diagnose <span class="op">(</span>Result <span class="op">*</span> r<span class="op">)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> pin <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> pout <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> win <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> wout <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> nin <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> nout <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> fo <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> fi <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>pin<span class="op">)</span> reduction<span class="op">(+:</span>pout<span class="op">)</span> reduction<span class="op">(+:</span>win<span class="op">)</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(+:</span>wout<span class="op">)</span> reduction<span class="op">(+:</span>nin<span class="op">)</span> reduction<span class="op">(+:</span>nout<span class="op">)</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(</span>max<span class="op">:</span>fo<span class="op">)</span> reduction<span class="op">(</span>min<span class="op">:</span>fi<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;=</span> <span class="fl">1.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> rr <span class="op">=</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">));</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>rr <span class="op">&lt;</span> RIN_FRAC<span class="op">*</span>Rd<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        pin <span class="op">+=</span> p<span class="op">[]*</span>dv<span class="op">();</span> win <span class="op">+=</span> dv<span class="op">();</span> nin <span class="op">+=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>f<span class="op">[]</span> <span class="op">&lt;</span> fi<span class="op">)</span> fi <span class="op">=</span> f<span class="op">[];</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> XOUT<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        pout <span class="op">+=</span> p<span class="op">[]*</span>dv<span class="op">();</span> wout <span class="op">+=</span> dv<span class="op">();</span> nout <span class="op">+=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>f<span class="op">[]</span> <span class="op">&gt;</span> fo<span class="op">)</span> fo <span class="op">=</span> f<span class="op">[];</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> un <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> unc <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> vol <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>un<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>unc<span class="op">)</span> reduction<span class="op">(+:</span>vol<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> u2 <span class="op">=</span> sqrt <span class="op">(</span>sq<span class="op">(</span>u<span class="op">.</span>x<span class="op">[])</span> <span class="op">+</span> sq<span class="op">(</span>u<span class="op">.</span>y<span class="op">[]));</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>u2 <span class="op">&gt;</span> unc<span class="op">)</span> unc <span class="op">=</span> u2<span class="op">;</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;=</span> <span class="fl">1.</span> <span class="op">&amp;&amp;</span> u2 <span class="op">&gt;</span> un<span class="op">)</span> un <span class="op">=</span> u2<span class="op">;</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>      vol <span class="op">+=</span> f<span class="op">[]*</span>dv<span class="op">();</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>Rd <span class="op">=</span> Rd<span class="op">;</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>gap <span class="op">=</span> Rtube <span class="op">-</span> Rd<span class="op">;</span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>nin <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">)</span> nin<span class="op">;</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>nout <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">)</span> nout<span class="op">;</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>fmin_in <span class="op">=</span> fi<span class="op">;</span></span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>fmax_out <span class="op">=</span> fo<span class="op">;</span></span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>populated <span class="op">=</span> <span class="op">(</span>nin <span class="op">&gt;=</span> NMIN_IN <span class="op">&amp;&amp;</span> nout <span class="op">&gt;=</span> NMIN_OUT<span class="op">);</span></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>pure <span class="op">=</span> <span class="op">(</span>nin <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> nout <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> fi <span class="op">&gt;</span> <span class="fl">1.</span> <span class="op">-</span> FPURE <span class="op">&amp;&amp;</span> fo <span class="op">&lt;</span> FPURE<span class="op">);</span></span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>dp <span class="op">=</span> <span class="op">(</span>win <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> wout <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">?</span> pin<span class="op">/</span>win <span class="op">-</span> pout<span class="op">/</span>wout <span class="op">:</span> nan<span class="op">(</span><span class="st">&quot;&quot;</span><span class="op">);</span></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>dpex <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>f<span class="op">.</span>sigma<span class="op">/</span>Rd<span class="op">;</span></span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>edp <span class="op">=</span> fabs <span class="op">(</span>r<span class="op">-&gt;</span>dp <span class="op">-</span> r<span class="op">-&gt;</span>dpex<span class="op">)/</span>r<span class="op">-&gt;</span>dpex<span class="op">;</span></span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>umax <span class="op">=</span> un<span class="op">;</span></span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>umax_cut <span class="op">=</span> unc<span class="op">;</span></span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>Rdeff <span class="op">=</span> pow <span class="op">(</span><span class="fl">1.5</span><span class="op">*</span>vol<span class="op">,</span> <span class="fl">1.</span><span class="op">/</span><span class="fl">3.</span><span class="op">);</span></span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>dpeff <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>f<span class="op">.</span>sigma<span class="op">/</span>r<span class="op">-&gt;</span>Rdeff<span class="op">;</span></span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>The parasitic-current history is stored so that the
+                report can state whether <code>max|u|</code> has
+                plateaued by <span
+                class="math inline">\(t_{end}\)</span> rather than
+                presenting a snapshot as a converged amplitude. Because
+                the amplitude fluctuates between samples, the plateau
+                test compares the <em>mean</em> over the last quarter of
+                the run with the mean over the second quarter; the peak
+                over the second half is reported separately as the
+                conservative amplitude.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>event logfile <span class="op">(</span>t <span class="op">+=</span> tlog<span class="op">;</span> t <span class="op">&lt;=</span> tend<span class="op">)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  Result tmp<span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  diagnose <span class="op">(&amp;</span>tmp<span class="op">);</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>nhist <span class="op">&lt;</span> NHIST<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    thist<span class="op">[</span>nhist<span class="op">]</span> <span class="op">=</span> t<span class="op">;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    uhist<span class="op">[</span>nhist<span class="op">]</span> <span class="op">=</span> tmp<span class="op">.</span>umax<span class="op">;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    nhist<span class="op">++;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;</span><span class="sc">%d</span><span class="st"> </span><span class="sc">%g</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>           run_id<span class="op">,</span> t<span class="op">,</span> tmp<span class="op">.</span>dp<span class="op">,</span> tmp<span class="op">.</span>umax<span class="op">,</span> tmp<span class="op">.</span>umax_cut<span class="op">);</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>event end <span class="op">(</span>t <span class="op">=</span> tend<span class="op">)</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  Result <span class="op">*</span> r <span class="op">=</span> <span class="op">&amp;</span>res<span class="op">[</span>run_id<span class="op">];</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> gapcells <span class="op">=</span> r<span class="op">-&gt;</span>gapcells<span class="op">,</span> tol <span class="op">=</span> r<span class="op">-&gt;</span>tol<span class="op">;</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  diagnose <span class="op">(</span>r<span class="op">);</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>gapcells <span class="op">=</span> gapcells<span class="op">;</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>tol <span class="op">=</span> tol<span class="op">;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>nsteps <span class="op">=</span> iter<span class="op">;</span></span></code></pre></div></div>
+                <p>Overall peak, the conservative “sustained” amplitude
+                (peak over <span class="math inline">\(t \ge
+                t_{end}/2\)</span>, the gated statistic), and the
+                windowed means whose ratio is the plateau criterion.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> upeak <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> tpeak <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> usus <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> s1 <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> s2 <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> sh <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> shh <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n1 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> n2 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> nh <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> nhist<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>uhist<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;</span> upeak<span class="op">)</span> <span class="op">{</span> upeak <span class="op">=</span> uhist<span class="op">[</span>i<span class="op">];</span> tpeak <span class="op">=</span> thist<span class="op">[</span>i<span class="op">];</span> <span class="op">}</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>thist<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;=</span> <span class="fl">0.5</span><span class="op">*</span>tend<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>uhist<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;</span> usus<span class="op">)</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        usus <span class="op">=</span> uhist<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>      sh <span class="op">+=</span> uhist<span class="op">[</span>i<span class="op">];</span> shh <span class="op">+=</span> sq<span class="op">(</span>uhist<span class="op">[</span>i<span class="op">]);</span> nh<span class="op">++;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>thist<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0.25</span><span class="op">*</span>tend <span class="op">&amp;&amp;</span> thist<span class="op">[</span>i<span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">0.5</span><span class="op">*</span>tend<span class="op">)</span> <span class="op">{</span> s1 <span class="op">+=</span> uhist<span class="op">[</span>i<span class="op">];</span> n1<span class="op">++;</span> <span class="op">}</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>thist<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0.75</span><span class="op">*</span>tend<span class="op">)</span> <span class="op">{</span> s2 <span class="op">+=</span> uhist<span class="op">[</span>i<span class="op">];</span> n2<span class="op">++;</span> <span class="op">}</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>upeak <span class="op">=</span> upeak<span class="op">;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>tpeak <span class="op">=</span> tpeak<span class="op">;</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>usus <span class="op">=</span> usus<span class="op">;</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>uwin1 <span class="op">=</span> <span class="op">(</span>n1 <span class="op">?</span> s1<span class="op">/</span>n1 <span class="op">:</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>uwin2 <span class="op">=</span> <span class="op">(</span>n2 <span class="op">?</span> s2<span class="op">/</span>n2 <span class="op">:</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  r<span class="op">-&gt;</span>uratio <span class="op">=</span> <span class="op">(</span>r<span class="op">-&gt;</span>uwin1 <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">?</span> r<span class="op">-&gt;</span>uwin2<span class="op">/</span>r<span class="op">-&gt;</span>uwin1 <span class="op">:</span> HUGE<span class="op">);</span></span></code></pre></div></div>
+                <p>Coefficient of variation of <code>max|u|</code> over
+                the second half of the run. This measures the intrinsic
+                scatter of the statistic and is used to calibrate what
+                counts as a <em>material</em> change under the
+                tolerance-control comparison; without it, any threshold
+                on <code>max|u|</code> would be arbitrary.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>nh <span class="op">&gt;</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> mean <span class="op">=</span> sh<span class="op">/</span>nh<span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> var <span class="op">=</span> shh<span class="op">/</span>nh <span class="op">-</span> sq<span class="op">(</span>mean<span class="op">);</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    r<span class="op">-&gt;</span>ucv <span class="op">=</span> <span class="op">(</span>mean <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> var <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">?</span> sqrt <span class="op">(</span>var<span class="op">)/</span>mean <span class="op">:</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  else</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    r<span class="op">-&gt;</span>ucv <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;# run </span><span class="sc">%d</span><span class="st"> done: gap </span><span class="sc">%.1f</span><span class="st"> cells, Rd </span><span class="sc">%.6f</span><span class="st">, TOLERANCE </span><span class="sc">%g</span><span class="st">, &quot;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;steps </span><span class="sc">%d</span><span class="st">, dp </span><span class="sc">%.6e</span><span class="st"> (exact </span><span class="sc">%.6e</span><span class="st">, rel.err </span><span class="sc">%.3e</span><span class="st">), max|u| </span><span class="sc">%.4e</span><span class="st">, &quot;</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;n_in </span><span class="sc">%d</span><span class="st">, n_out </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>           run_id<span class="op">,</span> r<span class="op">-&gt;</span>gapcells<span class="op">,</span> r<span class="op">-&gt;</span>Rd<span class="op">,</span> r<span class="op">-&gt;</span>tol<span class="op">,</span> r<span class="op">-&gt;</span>nsteps<span class="op">,</span> r<span class="op">-&gt;</span>dp<span class="op">,</span> r<span class="op">-&gt;</span>dpex<span class="op">,</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>           r<span class="op">-&gt;</span>edp<span class="op">,</span> r<span class="op">-&gt;</span>umax<span class="op">,</span> r<span class="op">-&gt;</span>nin<span class="op">,</span> r<span class="op">-&gt;</span>nout<span class="op">);</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/verificationCases/staticFilmTube.c" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

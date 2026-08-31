@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>verificationCases/laplaceEmbedTubeAdapt.c | Bretherton drops and bubbles</title>
+
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="adaptive tree, and a direct test of the three embed/axi/VOF couplings that src-local/embed-vof-tube.h exists to guard.">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="axi.h, columns, embed-vof-tube.h, embed.h, laplaceembedtubeadapt, navier-stokes/centered.h, tension.h, two-phase.h">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "..";
+  </script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+
+            <div class="page-content">
+
+                                <h1 class="page-title">verificationCases/laplaceEmbedTubeAdapt.c</h1>
+
+
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/verificationCases/laplaceEmbedTubeAdapt.c" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+
+                <h1
+                id="laplaceembedtubeadapt.c">laplaceEmbedTubeAdapt.c</h1>
+                <p><strong>Verification</strong> of surface tension
+                inside an embedded tube <em>on an adaptive tree</em>,
+                and a direct test of the three embed/axi/VOF couplings
+                that <code>src-local/embed-vof-tube.h</code> exists to
+                guard.</p>
+                <h2 id="claim">Claim</h2>
+                <p>For a static spherical droplet of radius <span
+                class="math inline">\(R_d\)</span> held on the axis of
+                an embedded tube of radius <span
+                class="math inline">\(R_{tube}\)</span>, with matched
+                densities and viscosities and no gravity, the exact
+                solution of the <em>implemented</em> equations is <span
+                class="math inline">\(\mathbf{u} \equiv 0\)</span>
+                everywhere and a uniform pressure jump <span
+                class="math inline">\(\Delta p = 2\sigma/R_d\)</span>
+                across the interface. On an adaptive tree, and provided
+                the grid is re-synchronised after every
+                <code>adapt_wavelet()</code> call, the discrete solution
+                stays within the same tolerances as the uniform <span
+                class="math inline">\(N = 128\)</span> case.</p>
+                <p>The comparator is an exact solution of the equations
+                the solver claims to discretise, so this is
+                <em>verification</em>, not validation: it says nothing
+                about whether those equations describe a real drop in a
+                tube.</p>
+                <h2 id="relation-to-laplaceembedtube.c">Relation to
+                <code>laplaceEmbedTube.c</code></h2>
+                <p>The physical setup is identical — <span
+                class="math inline">\(L_0 = 2\)</span>, <span
+                class="math inline">\(R_d = 0.4\)</span>, <span
+                class="math inline">\(R_{tube} = 0.7\)</span>, <span
+                class="math inline">\(X_d = 1\)</span>, <span
+                class="math inline">\(\sigma = 1\)</span>, <span
+                class="math inline">\(\rho_1 = \rho_2 = 1\)</span>,
+                <span class="math inline">\(\mu_1 = \mu_2 = 1\)</span>,
+                <code>DT</code> <span class="math inline">\(=
+                10^{-2}\)</span>, <code>TOLERANCE</code> <span
+                class="math inline">\(= 10^{-5}\)</span>, <span
+                class="math inline">\(t_{end} = 1\)</span> — and
+                <code>MAXLEVEL</code> <span class="math inline">\(=
+                7\)</span> reproduces that case’s finest spacing <span
+                class="math inline">\(\Delta = L_0/128\)</span>. The
+                only difference is the grid: here the run starts from a
+                coarse <code>init_grid(1 &lt;&lt; MINLEVEL)</code> and
+                <code>adapt_wavelet()</code> runs every step.</p>
+                <p>The comparison is therefore direct <em>at the
+                interface</em>, which the <code>f</code> criterion pins
+                at <code>MAXLEVEL</code>; it is not direct at the wall,
+                which ends up at <code>MINLEVEL</code> — see the
+                refinement criteria below, and the grid statistics the
+                case prints.</p>
+                <p>Density and viscosity filtering is deliberately
+                absent: with <span class="math inline">\(\rho_1 =
+                \rho_2\)</span> and <span class="math inline">\(\mu_1 =
+                \mu_2\)</span> the property functions of
+                <code>two-phase-generic.h</code> are identically unity
+                whether or not the smoothed field replaces
+                <code>f</code>, so <code>#define FILTERED</code> would
+                be inert — and the production solver no longer sets it
+                either.</p>
+                <h2 id="refinement-criteria">Refinement criteria</h2>
+                <p><code>adapt_wavelet()</code> on <span
+                class="math inline">\(\{f, c_s, u_x, u_y\}\)</span> with
+                thresholds <span class="math inline">\(\{10^{-3},
+                10^{-3}, 10^{-2}, 10^{-2}\}\)</span> between
+                <code>MINLEVEL</code> <span class="math inline">\(=
+                4\)</span> and <code>MAXLEVEL</code> <span
+                class="math inline">\(= 7\)</span>. The choices:</p>
+                <ul>
+                <li><code>fErr</code> <span class="math inline">\(=
+                10^{-3}\)</span> holds the whole droplet interface at
+                <code>MAXLEVEL</code>;</li>
+                <li><code>csErr</code> <span class="math inline">\(=
+                10^{-3}\)</span> was intended to hold the tube wall at
+                <code>MAXLEVEL</code>. <strong>It does not, and this
+                case measures that.</strong> The wall is planar and
+                grid-aligned, and <code>embed.h</code> sets
+                <code>cs.prolongation = fraction_refine</code>, which
+                reproduces a planar interface exactly; the wavelet error
+                of <code>cs</code> is therefore identically zero along a
+                straight tube wall and no refinement is requested.
+                Measured here: the <code>init</code> event refines the
+                wall band to <code>MAXLEVEL</code>, the first
+                <code>adapt_wavelet()</code> coarsens it straight back,
+                and at <span class="math inline">\(t = t_{end}\)</span>
+                <strong>all 16 cut cells sit at
+                <code>MINLEVEL</code></strong>. Lowering
+                <code>csErr</code> cannot change this — the error is
+                zero, not small. This contradicts the remedy suggested
+                in <code>src-local/embed-vof-tube.h</code> for coupling
+                3 (“cases must refine the wall region (e.g. by adapting
+                on <code>cs</code>)”), and it applies equally to
+                <code>simulationCases/bretherton.c</code>, which uses
+                the same criterion: there, wall refinement is delivered
+                by the <em>interface</em> criteria once the film is
+                close to the wall, not by <code>cs</code>. A case that
+                needs the wall refined independently of the interface
+                must raise <code>MINLEVEL</code> or add an explicit
+                geometric criterion.</li>
+                <li><code>uErr</code> <span class="math inline">\(=
+                10^{-2}\)</span> is set an order of magnitude
+                <em>above</em> the spurious velocity the case is allowed
+                to reach (<code>TOL_U</code> <span
+                class="math inline">\(= 10^{-3}\)</span>). The exact
+                solution has <span class="math inline">\(\mathbf{u}
+                \equiv 0\)</span>, so a tighter velocity criterion would
+                refine on numerical noise and the mesh would stop being
+                a controlled variable. Velocity is kept in the criterion
+                list because the production solver adapts on it, but
+                here it is deliberately inactive.</li>
+                </ul>
+                <p>The production solver also adapts on the curvature
+                <code>KAPPA</code>; that is omitted here because the
+                interface is a sphere of fixed radius and
+                <code>fErr</code> alone already pins it at
+                <code>MAXLEVEL</code>.</p>
+                <p>Note that <code>MINLEVEL</code> <span
+                class="math inline">\(= 4\)</span> means the droplet
+                interior and the far field coarsen to <span
+                class="math inline">\(\Delta = L_0/16\)</span>. Both are
+                regions of uniform pressure, so the cell-averaged
+                pressures used below are not sensitive to this.</p>
+                <h2 id="the-three-probes">The three probes</h2>
+                <p><code>src-local/embed-vof-tube.h</code> names three
+                couplings, <em>all three triggered by adaptation</em>.
+                No other case in this repository runs on an adaptive
+                grid, so until now none of them was exercised in the
+                situation the header was written for. Each probe below
+                targets one of them and is evaluated after
+                <strong>every</strong> adaptation step, with the running
+                maximum carried to the end of the run.</p>
+                <p><strong>P1 — metric consistency.</strong> With
+                <code>AXI</code> and <code>EMBED</code> the metric must
+                satisfy <span class="math inline">\(c_m =
+                y\,c_s\)</span> and <span class="math inline">\(f_m =
+                y\,f_s\)</span> (with the cut-cell plane-centre
+                correction of <code>axi.h</code>). <code>axi.h</code>
+                fills <code>cm</code>/<code>fm</code> once, in its
+                <code>metric</code> event at <code>i = 0</code>, when
+                <code>cs = 1</code> everywhere; every later
+                <code>solid()</code> call and every
+                <code>adapt_wavelet()</code> — which re-prolongates
+                <code>cs</code>/<code>fs</code> — leaves them stale. The
+                probe recomputes reference fields with the <em>same</em>
+                arithmetic as <code>axi.h</code>’s
+                <code>cm_update()</code> and <code>fm_update()</code>
+                (including the
+                <code>facet_normal</code>/<code>plane_center</code>
+                correction in cut cells, the <span
+                class="math inline">\(-\sigma(1 - f_{s,x})\)</span>
+                shift on <span class="math inline">\(x\)</span>-faces,
+                and the fact that in <code>foreach_face(y)</code> the
+                coordinate <code>y</code> is the face position, not the
+                cell centre) and reports <span
+                class="math inline">\(\max|c_m - c_m^{ref}|\)</span> and
+                <span class="math inline">\(\max|f_m -
+                f_m^{ref}|\)</span>. The probe iterates over
+                <code>foreach()</code> and <code>foreach_face()</code>,
+                i.e. over exactly the domain
+                <code>cm_update()</code>/<code>fm_update()</code> write,
+                which includes the faces on the domain boundary. Both
+                maxima must be at round-off, <code>TOL_METRIC</code>
+                <span class="math inline">\(= 10^{-12}\)</span>.</p>
+                <p>Because the probe recomputes exactly what
+                <code>embed_axi_metric_sync()</code> writes, in the
+                guarded build P1 is close to tautological: it confirms
+                that the sync was actually invoked and that nothing
+                between the sync and the probe perturbed the metric. Its
+                discriminating power is demonstrated by the negative
+                control, where the same probe fires.</p>
+                <p><strong>P2 — no dispersed phase inside the
+                solid.</strong> <code>vof.h</code> only updates cells
+                with <code>cs &gt; 0</code>, but adaptation prolongates
+                <code>f</code> with no knowledge of <code>cs</code>, so
+                refined solid cells can inherit non-zero <code>f</code>
+                from fluid neighbours, corrupting the (non-embed-aware)
+                height-function columns near the wall. The probe reports
+                <span class="math inline">\(\max|f|\)</span> over cells
+                with <span class="math inline">\(c_s \le 0\)</span> and
+                requires it to be exactly zero.</p>
+                <p><strong>P3 — Young–Laplace.</strong> Relative error
+                of the measured pressure jump below <code>TOL_DP</code>
+                <span class="math inline">\(= 2\times 10^{-2}\)</span>
+                and <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> below
+                <code>TOL_U</code> <span class="math inline">\(=
+                10^{-3}\)</span> at <span class="math inline">\(t =
+                t_{end}\)</span>, using the same thresholds and the same
+                measurement regions as the uniform case: cell averages
+                of <code>p</code> over <span class="math inline">\(r
+                &lt; R_d/2\)</span> inside and over <span
+                class="math inline">\(r &gt; 3R_d/2\)</span>, <span
+                class="math inline">\(y &lt; R_{tube} - 0.1\)</span>,
+                full fluid cells only, outside. This is the
+                physics-level consequence of couplings 1–3 being handled
+                correctly.</p>
+                <h2 id="negative-control">Negative control</h2>
+                <p>Compile with <code>-DSKIP_EMBED_GUARDS</code> to omit
+                the post-adaptation <code>embed_axi_metric_sync()</code>
+                and <code>vof_solid_cleanup()</code> calls — and only
+                those; the <code>init</code> event still synchronises
+                through <code>tube_solid()</code>, so the initial state
+                is identical in both builds and the control isolates the
+                <em>adaptation</em> coupling.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I..</span>/src-local <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    laplaceEmbedTubeAdapt.c <span class="at">-o</span> laplaceEmbedTubeAdapt <span class="at">-lm</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I..</span>/src-local <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> <span class="at">-DSKIP_EMBED_GUARDS</span> <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    laplaceEmbedTubeAdapt.c <span class="at">-o</span> laplaceEmbedTubeAdaptNoGuard <span class="at">-lm</span></span></code></pre></div></div>
+                <p>The guard-less build is expected to fail, and to fail
+                <em>on P1 or P2</em>, i.e. for the reason the header
+                states, rather than merely by producing NaN. The probes
+                therefore run before any solver step consumes the
+                corrupted state, and the first firing iteration and
+                magnitude are recorded and printed. If the guard-less
+                build were to pass, that would be a finding about the
+                header — not a reason to weaken this case.</p>
+                <p>Observed behaviour (this machine, serial, Basilisk as
+                of writing):</p>
+                <ul>
+                <li>the guard-less build <strong>fails, on P1</strong>,
+                at the very first adaptation (<code>i = 0</code>), with
+                <span class="math inline">\(\max|f_m - f_m^{ref}| =
+                6.25\times10^{-4}\)</span> against a local <span
+                class="math inline">\(f_m \approx 0.28\)</span>, i.e. a
+                relative metric error of about <span
+                class="math inline">\(2\times10^{-3}\)</span>. <span
+                class="math inline">\(\max|c_m - c_m^{ref}|\)</span>
+                stays exactly zero: <code>cm</code> has a dedicated
+                axisymmetric prolongation (<code>refine_cm_axi</code>)
+                and its restriction happens to be exact for a planar
+                wall, whereas the <span
+                class="math inline">\(x\)</span>-face metric is not
+                restored;</li>
+                <li>the violation persists, unchanged in magnitude, for
+                all 921 steps;</li>
+                <li><strong>P2 never fires</strong> (see the limits
+                below);</li>
+                <li><strong>P3 is bit-identical between the two
+                builds</strong>: same <span class="math inline">\(\Delta
+                p\)</span>, same <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> to all
+                printed digits, same step count, same leaf count.
+                Instrumenting the offending face shows why: in this
+                geometry the only stale face is the one on the outflow
+                boundary <span class="math inline">\(x = L_0\)</span> in
+                the wall cut-cell row, where the default no-flux
+                condition makes the face flux zero regardless of <span
+                class="math inline">\(f_m\)</span>.</li>
+                </ul>
+                <p>So the negative control does fail for the reason the
+                header claims — the metric is left inconsistent by
+                adaptation — but in <em>this</em> configuration that
+                inconsistency has no measurable dynamical consequence.
+                The case therefore establishes that
+                <code>embed_axi_metric_sync()</code> is doing something
+                real and necessary for metric consistency; it does
+                <strong>not</strong> establish that omitting it would
+                corrupt a production Bretherton run. That would need a
+                configuration in which stale interior faces carry
+                non-zero flux.</p>
+                <h2 id="outputs">Outputs</h2>
+                <ul>
+                <li>the running maxima of P1 and P2 and their
+                first-firing iterations;</li>
+                <li><span class="math inline">\(\Delta p\)</span>, its
+                exact value, the relative error and <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> at <span
+                class="math inline">\(t = t_{end}\)</span>;</li>
+                <li>final grid statistics: leaf count, level range,
+                finest <span class="math inline">\(\Delta\)</span>, and
+                the number and level range of the cut cells — the last
+                of these is what exposes the <code>cs</code>-refinement
+                behaviour discussed above;</li>
+                <li>a time series of <span class="math inline">\(\Delta
+                p\)</span>, <span
+                class="math inline">\(\max|\mathbf{u}|\)</span> and the
+                P1/P2 maxima on stderr;</li>
+                <li>a bare <code>PASS</code> or <code>FAIL</code> line
+                on stdout, with <code>exit(1)</code> on failure.</li>
+                </ul>
+                <h2 id="limits">Limits</h2>
+                <ul>
+                <li>One geometry, one droplet radius, one tube radius,
+                one interface–wall separation <span
+                class="math inline">\(R_{tube} - R_d = 0.3\)</span>:
+                about 19 cells at <code>MAXLEVEL</code> on the interface
+                side, about 2.4 cells at <code>MINLEVEL</code> on the
+                wall side. Coupling 3 (interface–wall separation) is
+                therefore <em>satisfied by construction</em> here, not
+                tested: this case establishes nothing about what happens
+                when the interface approaches the wall to within a few
+                cells, which is exactly the Bretherton film regime.</li>
+                <li>The wall ends up at <code>MINLEVEL</code> (see the
+                refinement criteria). That is a measured property of
+                <code>adapt_wavelet</code> on <code>cs</code> for a
+                planar boundary, reported rather than worked around, but
+                it does mean the cut cells here are coarse and that the
+                metric coupling is exercised only through the single 7 →
+                4 coarsening of the wall band during the first
+                adaptation steps, not through sustained churn of the cut
+                cells.</li>
+                <li>For the same reason the dispersed phase never
+                reaches the wall, so <code>f</code> is zero in the solid
+                region throughout and <strong>P2 has no opportunity to
+                fire</strong>. It is a necessary condition that the
+                guarded build satisfies, and a genuine regression guard,
+                but the negative control here can only exercise P1. A
+                case in which the drop touches or nearly touches the
+                wall would be needed to exercise P2.</li>
+                <li>Matched properties only (<span
+                class="math inline">\(\rho_1 = \rho_2\)</span>, <span
+                class="math inline">\(\mu_1 = \mu_2\)</span>): nothing
+                is established about the density and viscosity contrasts
+                the production solver runs at.</li>
+                <li>One resolution: <code>MAXLEVEL</code> <span
+                class="math inline">\(= 7\)</span> only, so this is a
+                tolerance check at fixed resolution, not a convergence
+                study. The uniform refinement sequence lives in
+                <code>laplaceEmbedTube.c</code>.</li>
+                <li>The measured jump is a difference of cell averages
+                over finite regions, not a pointwise jump, so it carries
+                its own discretisation error.</li>
+                <li>P1 is a consistency check of the <em>live</em>
+                metric against <code>axi.h</code>’s own formulae. It
+                does not verify that those formulae are themselves the
+                correct axisymmetric metric; that is
+                <code>axi.h</code>’s claim, guarded upstream by <a
+                href="http://basilisk.fr/src/test/missing_metric.c"><code>src/test/missing_metric.c</code></a>.</li>
+                </ul>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/embed.h" title="Link to Basilisk source for embed.h"><span class="im">"embed.h"</span></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/axi.h" title="Link to Basilisk source for axi.h"><span class="im">"axi.h"</span></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/two-phase.h" title="Link to Basilisk source for two-phase.h"><span class="im">"two-phase.h"</span></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/tension.h" title="Link to Basilisk source for tension.h"><span class="im">"tension.h"</span></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="../src-local/embed-vof-tube.h.html" title="Link to local documentation for embed-vof-tube.h"><span class="im">"embed-vof-tube.h"</span></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rtube </span><span class="fl">0.7</span><span class="pp"></span><span class="dv">236</span><span class="pp"></span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rd </span><span class="fl">0.4</span><span class="pp"></span><span class="dv">237</span><span class="pp"></span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Xd </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">238</span><span class="pp"></span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define tend </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">239</span><span class="pp"></span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXLEVEL </span><span class="dv">7</span><span class="pp"></span><span class="dv">241</span><span class="pp"></span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MINLEVEL </span><span class="dv">4</span><span class="pp"></span><span class="dv">242</span><span class="pp"></span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define fErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">244</span><span class="pp"></span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#define csErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">245</span><span class="pp"></span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#define uErr </span><span class="fl">1e-2</span><span class="pp"></span><span class="dv">246</span><span class="pp"></span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_DP </span><span class="fl">2e-2</span><span class="pp"></span><span class="dv">248</span><span class="pp"></span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_U </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">249</span><span class="pp"></span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_METRIC </span><span class="fl">1e-12</span><span class="pp"></span><span class="dv">250</span><span class="pp"></span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span></code></pre></div></div>
+                <h2 id="probe-state">Probe state</h2>
+                <p>Running maxima and the iteration at which each probe
+                first exceeds its threshold (<code>-1</code> while it
+                has never fired).</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> dcmMax <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> dfmMax <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> fSolidMax <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> iFirstMetric <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">,</span> iFirstSolid <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> vFirstMetric <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> vFirstSolid <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  L0 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  init_grid <span class="op">(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> MINLEVEL<span class="op">);</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  rho1 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> mu1 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  rho2 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> mu2 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  f<span class="op">.</span>sigma <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  TOLERANCE <span class="op">=</span> <span class="fl">1e-5</span><span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  DT <span class="op">=</span> <span class="fl">1e-2</span><span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  run<span class="op">();</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="initialisation">Initialisation</h2>
+                <p>Refine the interface and the wall to
+                <code>MAXLEVEL</code> <em>before</em> embedding the
+                solid and initialising <code>f</code>, so that both are
+                laid down on the mesh they will be carried on.
+                <code>tube_solid()</code> synchronises the metric; this
+                happens in both builds, so the two differ only in what
+                they do after <code>adapt_wavelet()</code>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  refine <span class="op">(</span>fabs <span class="op">(</span>sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">))</span> <span class="op">-</span> Rd<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">&amp;&amp;</span> level <span class="op">&lt;</span> MAXLEVEL<span class="op">);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  refine <span class="op">(</span>fabs <span class="op">(</span>y <span class="op">-</span> Rtube<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">&amp;&amp;</span> level <span class="op">&lt;</span> MAXLEVEL<span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  tube_solid <span class="op">(</span>Rtube<span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  fraction <span class="op">(</span>f<span class="op">,</span> Rd <span class="op">-</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">)));</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="p1-and-p2-the-coupling-probes">P1 and P2: the
+                coupling probes</h2>
+                <p><code>metric_deviation()</code> recomputes
+                <code>cm</code> and <code>fm</code> from the live
+                <code>cs</code>/<code>fs</code> with the same arithmetic
+                as <code>cm_update()</code>/<code>fm_update()</code> in
+                <code>$BASILISK/axi.h</code> and returns the maximum
+                absolute deviation of the live fields from that
+                reference. <code>cm</code> and <code>fm</code> are read
+                through plain-field aliases, following
+                <code>axi.h</code>’s own idiom for these
+                <code>(const)</code>-declared metric fields.</p>
+                <p><code>solid_fraction_max()</code> returns <span
+                class="math inline">\(\max|f|\)</span> over full-solid
+                cells: the absolute value, so that a <em>negative</em>
+                fraction prolongated into the solid is caught as well as
+                a positive one.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> metric_deviation <span class="op">(</span><span class="dt">double</span> <span class="op">*</span> dcm<span class="op">,</span> <span class="dt">double</span> <span class="op">*</span> dfm<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> ecm <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> efm <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(AXI) &amp;&amp; defined(EMBED)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  scalar cmref<span class="op">[];</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  face vector fmref<span class="op">[];</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      coord p<span class="op">,</span> n <span class="op">=</span> facet_normal <span class="op">(</span>point<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> alpha <span class="op">=</span> plane_alpha <span class="op">(</span>cs<span class="op">[],</span> n<span class="op">);</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      plane_center <span class="op">(</span>n<span class="op">,</span> alpha<span class="op">,</span> cs<span class="op">[],</span> <span class="op">&amp;</span>p<span class="op">);</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      cmref<span class="op">[]</span> <span class="op">=</span> <span class="op">(</span>y <span class="op">+</span> Delta<span class="op">*</span>p<span class="op">.</span>y<span class="op">)*</span>cs<span class="op">[];</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    else</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      cmref<span class="op">[]</span> <span class="op">=</span> y<span class="op">*</span>cs<span class="op">[];</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div></div>
+                <p>In <code>foreach_face(x)</code> the coordinate
+                <code>y</code> is the cell-centre radius (an <span
+                class="math inline">\(x\)</span>-face has the radius of
+                its cell); in <code>foreach_face(y)</code> it is the
+                face radius, which vanishes on the axis — hence the
+                <code>max(y, 1e-20)</code> floor, copied from
+                <code>fm_update()</code>.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  foreach_face<span class="op">(</span>x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> sig <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      coord n <span class="op">=</span> facet_normal <span class="op">(</span>point<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      sig <span class="op">=</span> sign<span class="op">(</span>n<span class="op">.</span>y<span class="op">)*</span>Delta<span class="op">/</span><span class="fl">2.</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    fmref<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> <span class="op">(</span>y <span class="op">-</span> sig<span class="op">*(</span><span class="fl">1.</span> <span class="op">-</span> fs<span class="op">.</span>x<span class="op">[]))*</span>fs<span class="op">.</span>x<span class="op">[];</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  foreach_face<span class="op">(</span>y<span class="op">)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    fmref<span class="op">.</span>y<span class="op">[]</span> <span class="op">=</span> max<span class="op">(</span>y<span class="op">,</span> <span class="fl">1e-20</span><span class="op">)*</span>fs<span class="op">.</span>y<span class="op">[];</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  scalar cmv <span class="op">=</span> cm<span class="op">;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  face vector fmv <span class="op">=</span> fm<span class="op">;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>ecm<span class="op">))</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fabs <span class="op">(</span>cmv<span class="op">[]</span> <span class="op">-</span> cmref<span class="op">[])</span> <span class="op">&gt;</span> ecm<span class="op">)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      ecm <span class="op">=</span> fabs <span class="op">(</span>cmv<span class="op">[]</span> <span class="op">-</span> cmref<span class="op">[]);</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  foreach_face <span class="op">(</span>x<span class="op">,</span> reduction<span class="op">(</span>max<span class="op">:</span>efm<span class="op">))</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fabs <span class="op">(</span>fmv<span class="op">.</span>x<span class="op">[]</span> <span class="op">-</span> fmref<span class="op">.</span>x<span class="op">[])</span> <span class="op">&gt;</span> efm<span class="op">)</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      efm <span class="op">=</span> fabs <span class="op">(</span>fmv<span class="op">.</span>x<span class="op">[]</span> <span class="op">-</span> fmref<span class="op">.</span>x<span class="op">[]);</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  foreach_face <span class="op">(</span>y<span class="op">,</span> reduction<span class="op">(</span>max<span class="op">:</span>efm<span class="op">))</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fabs <span class="op">(</span>fmv<span class="op">.</span>y<span class="op">[]</span> <span class="op">-</span> fmref<span class="op">.</span>y<span class="op">[])</span> <span class="op">&gt;</span> efm<span class="op">)</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      efm <span class="op">=</span> fabs <span class="op">(</span>fmv<span class="op">.</span>y<span class="op">[]</span> <span class="op">-</span> fmref<span class="op">.</span>y<span class="op">[]);</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>dcm <span class="op">=</span> ecm<span class="op">;</span> <span class="op">*</span>dfm <span class="op">=</span> efm<span class="op">;</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> solid_fraction_max <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> fm2 <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>fm2<span class="op">))</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> fabs <span class="op">(</span>f<span class="op">[])</span> <span class="op">&gt;</span> fm2<span class="op">)</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      fm2 <span class="op">=</span> fabs <span class="op">(</span>f<span class="op">[]);</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> fm2<span class="op">;</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>Updates the running maxima and records the first
+                violation of each predicate. Called after every
+                adaptation.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> probe_couplings <span class="op">(</span><span class="dt">int</span> iter<span class="op">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> dcm<span class="op">,</span> dfm<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  metric_deviation <span class="op">(&amp;</span>dcm<span class="op">,</span> <span class="op">&amp;</span>dfm<span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> fsol <span class="op">=</span> solid_fraction_max<span class="op">();</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>dcm <span class="op">&gt;</span> dcmMax<span class="op">)</span> dcmMax <span class="op">=</span> dcm<span class="op">;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>dfm <span class="op">&gt;</span> dfmMax<span class="op">)</span> dfmMax <span class="op">=</span> dfm<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>fsol <span class="op">&gt;</span> fSolidMax<span class="op">)</span> fSolidMax <span class="op">=</span> fsol<span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>iFirstMetric <span class="op">&lt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>dcm <span class="op">&gt;=</span> TOL_METRIC <span class="op">||</span> dfm <span class="op">&gt;=</span> TOL_METRIC<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    iFirstMetric <span class="op">=</span> iter<span class="op">;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    vFirstMetric <span class="op">=</span> max <span class="op">(</span>dcm<span class="op">,</span> dfm<span class="op">);</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>ferr<span class="op">,</span> <span class="st">&quot;# P1 fired at i = </span><span class="sc">%d</span><span class="st">: max|cm - y*cs| = </span><span class="sc">%.6e</span><span class="st">, &quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;max|fm - y*fs| = </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span> iter<span class="op">,</span> dcm<span class="op">,</span> dfm<span class="op">);</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>iFirstSolid <span class="op">&lt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> fsol <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    iFirstSolid <span class="op">=</span> iter<span class="op">;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    vFirstSolid <span class="op">=</span> fsol<span class="op">;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>ferr<span class="op">,</span> <span class="st">&quot;# P2 fired at i = </span><span class="sc">%d</span><span class="st">: max|f| over cs &lt;= 0 = </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>             iter<span class="op">,</span> fsol<span class="op">);</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="p3-pressure-jump-and-spurious-currents">P3:
+                pressure jump and spurious currents</h2>
+                <p>Identical to <code>laplaceEmbedTube.c</code>: cell
+                averages of <code>p</code> well inside (<span
+                class="math inline">\(r &lt; R_d/2\)</span>) and well
+                outside (<span class="math inline">\(r &gt;
+                3R_d/2\)</span>, away from the wall) the droplet, and
+                the maximum velocity magnitude over full fluid
+                cells.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> dp_umax <span class="op">(</span><span class="dt">double</span> <span class="op">*</span> dp<span class="op">,</span> <span class="dt">double</span> <span class="op">*</span> umax<span class="op">)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> pin <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> pout <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> win <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> wout <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> un <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>pin<span class="op">)</span> reduction<span class="op">(+:</span>pout<span class="op">)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(+:</span>win<span class="op">)</span> reduction<span class="op">(+:</span>wout<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>un<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;=</span> <span class="fl">1.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> r <span class="op">=</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">));</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>r <span class="op">&lt;</span> <span class="fl">0.5</span><span class="op">*</span>Rd<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        pin <span class="op">+=</span> p<span class="op">[]*</span>dv<span class="op">();</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        win <span class="op">+=</span> dv<span class="op">();</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>r <span class="op">&gt;</span> <span class="fl">1.5</span><span class="op">*</span>Rd <span class="op">&amp;&amp;</span> y <span class="op">&lt;</span> Rtube <span class="op">-</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        pout <span class="op">+=</span> p<span class="op">[]*</span>dv<span class="op">();</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        wout <span class="op">+=</span> dv<span class="op">();</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> u2 <span class="op">=</span> sqrt <span class="op">(</span>sq<span class="op">(</span>u<span class="op">.</span>x<span class="op">[])</span> <span class="op">+</span> sq<span class="op">(</span>u<span class="op">.</span>y<span class="op">[]));</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>u2 <span class="op">&gt;</span> un<span class="op">)</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        un <span class="op">=</span> u2<span class="op">;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>dp <span class="op">=</span> <span class="op">(</span>win <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> wout <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">?</span> pin<span class="op">/</span>win <span class="op">-</span> pout<span class="op">/</span>wout <span class="op">:</span> nodata<span class="op">;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>umax <span class="op">=</span> un<span class="op">;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="adaptation">Adaptation</h2>
+                <p>The whole point of the case.
+                <code>adapt_wavelet()</code> re-prolongates
+                <code>cs</code>, <code>fs</code> and <code>f</code> with
+                no knowledge of the axisymmetric metric or of which
+                cells are solid; <code>embed_axi_metric_sync()</code>
+                and <code>vof_solid_cleanup()</code> repair both,
+                exactly as <code>simulationCases/bretherton.c</code>
+                does. The <code>SKIP_EMBED_GUARDS</code> build omits
+                them and nothing else.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>event adapt <span class="op">(</span>i<span class="op">++)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  adapt_wavelet <span class="op">((</span>scalar <span class="op">*){</span>f<span class="op">,</span> cs<span class="op">,</span> u<span class="op">.</span>x<span class="op">,</span> u<span class="op">.</span>y<span class="op">},</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                 <span class="op">(</span><span class="dt">double</span><span class="op">[]){</span>fErr<span class="op">,</span> csErr<span class="op">,</span> uErr<span class="op">,</span> uErr<span class="op">},</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                 MAXLEVEL<span class="op">,</span> MINLEVEL<span class="op">);</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#if !defined(SKIP_EMBED_GUARDS)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  embed_axi_metric_sync<span class="op">();</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  probe_couplings <span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h2 id="reporting">Reporting</h2>
+                <p><code>summarise()</code> prints every measured
+                quantity, the verdict for each probe and a bare
+                <code>PASS</code>/<code>FAIL</code> line, then exits
+                with status 1 on failure. It is called at <span
+                class="math inline">\(t = t_{end}\)</span>, and early if
+                the solution has become non-finite — in that case the
+                recorded first-firing data are still printed, which is
+                what distinguishes “failed on P1/P2” from “merely blew
+                up”.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> grid_stats <span class="op">(</span><span class="dt">long</span> <span class="op">*</span> ncells<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span> lmin<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span> lmax<span class="op">)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> n <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> lo <span class="op">=</span> <span class="dv">30</span><span class="op">,</span> hi <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>n<span class="op">)</span> reduction<span class="op">(</span>min<span class="op">:</span>lo<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>hi<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    n<span class="op">++;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>level <span class="op">&lt;</span> lo<span class="op">)</span> lo <span class="op">=</span> level<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>level <span class="op">&gt;</span> hi<span class="op">)</span> hi <span class="op">=</span> level<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>ncells <span class="op">=</span> n<span class="op">;</span> <span class="op">*</span>lmin <span class="op">=</span> lo<span class="op">;</span> <span class="op">*</span>lmax <span class="op">=</span> hi<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>The cut cells carry the embedded wall, so their count
+                and level range say directly whether the wall is
+                resolved — which is what coupling 3 of
+                <code>src-local/embed-vof-tube.h</code> asks a case to
+                monitor.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> cut_cell_stats <span class="op">(</span><span class="dt">long</span> <span class="op">*</span> ncut<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span> lmin<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span> lmax<span class="op">)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> n <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> lo <span class="op">=</span> <span class="dv">30</span><span class="op">,</span> hi <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>n<span class="op">)</span> reduction<span class="op">(</span>min<span class="op">:</span>lo<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>hi<span class="op">))</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      n<span class="op">++;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>level <span class="op">&lt;</span> lo<span class="op">)</span> lo <span class="op">=</span> level<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>level <span class="op">&gt;</span> hi<span class="op">)</span> hi <span class="op">=</span> level<span class="op">;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>ncut <span class="op">=</span> n<span class="op">;</span> <span class="op">*</span>lmin <span class="op">=</span> lo<span class="op">;</span> <span class="op">*</span>lmax <span class="op">=</span> hi<span class="op">;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> summarise <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> note<span class="op">,</span> <span class="dt">int</span> iter<span class="op">)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> dp<span class="op">,</span> umax<span class="op">;</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  dp_umax <span class="op">(&amp;</span>dp<span class="op">,</span> <span class="op">&amp;</span>umax<span class="op">);</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> dpex <span class="op">=</span> <span class="fl">2.</span><span class="op">/</span>Rd<span class="op">;</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> edp <span class="op">=</span> fabs <span class="op">(</span>dp <span class="op">-</span> dpex<span class="op">)/</span>dpex<span class="op">;</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> ncells<span class="op">,</span> ncut<span class="op">;</span> <span class="dt">int</span> lmin<span class="op">,</span> lmax<span class="op">,</span> lcmin<span class="op">,</span> lcmax<span class="op">;</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  grid_stats <span class="op">(&amp;</span>ncells<span class="op">,</span> <span class="op">&amp;</span>lmin<span class="op">,</span> <span class="op">&amp;</span>lmax<span class="op">);</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  cut_cell_stats <span class="op">(&amp;</span>ncut<span class="op">,</span> <span class="op">&amp;</span>lcmin<span class="op">,</span> <span class="op">&amp;</span>lcmax<span class="op">);</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> p1 <span class="op">=</span> <span class="op">(</span>dcmMax <span class="op">&lt;</span> TOL_METRIC <span class="op">&amp;&amp;</span> dfmMax <span class="op">&lt;</span> TOL_METRIC<span class="op">);</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> p2 <span class="op">=</span> <span class="op">(</span>fSolidMax <span class="op">==</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> p3 <span class="op">=</span> <span class="op">(</span>edp <span class="op">&lt;</span> TOL_DP <span class="op">&amp;&amp;</span> umax <span class="op">&lt;</span> TOL_U<span class="op">);</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(SKIP_EMBED_GUARDS)</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;build: SKIP_EMBED_GUARDS (negative control, &quot;</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;no post-adaptation sync/cleanup)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="pp">#else</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;build: guarded (embed_axi_metric_sync + vof_solid_cleanup &quot;</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;after every adapt_wavelet)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;stopped at: </span><span class="sc">%s</span><span class="st"> (t = </span><span class="sc">%g</span><span class="st">, i = </span><span class="sc">%d</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> note<span class="op">,</span> t<span class="op">,</span> iter<span class="op">);</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;grid: </span><span class="sc">%ld</span><span class="st"> leaves, levels </span><span class="sc">%d</span><span class="st">-</span><span class="sc">%d</span><span class="st">, finest Delta = </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>          ncells<span class="op">,</span> lmin<span class="op">,</span> lmax<span class="op">,</span> L0<span class="op">/(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> lmax<span class="op">));</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>ncut <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;cut cells (embedded wall): </span><span class="sc">%ld</span><span class="st">, levels </span><span class="sc">%d</span><span class="st">-</span><span class="sc">%d</span><span class="st">, &quot;</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Delta at wall = </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span> ncut<span class="op">,</span> lcmin<span class="op">,</span> lcmax<span class="op">,</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>            L0<span class="op">/(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> lcmax<span class="op">));</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>  else</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;cut cells (embedded wall): none</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;P1 metric consistency: max|cm - cm_ref| = </span><span class="sc">%.6e</span><span class="st">, &quot;</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;max|fm - fm_ref| = </span><span class="sc">%.6e</span><span class="st"> (tol </span><span class="sc">%.1e</span><span class="st">) -&gt; </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>          dcmMax<span class="op">,</span> dfmMax<span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_METRIC<span class="op">,</span> p1 <span class="op">?</span> <span class="st">&quot;pass&quot;</span> <span class="op">:</span> <span class="st">&quot;FAIL&quot;</span><span class="op">);</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>iFirstMetric <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  first violated at i = </span><span class="sc">%d</span><span class="st">, magnitude </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>            iFirstMetric<span class="op">,</span> vFirstMetric<span class="op">);</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;P2 dispersed phase in solid: max|f| over cs &lt;= 0 = </span><span class="sc">%.6e</span><span class="st"> &quot;</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;(required exactly 0) -&gt; </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> fSolidMax<span class="op">,</span> p2 <span class="op">?</span> <span class="st">&quot;pass&quot;</span> <span class="op">:</span> <span class="st">&quot;FAIL&quot;</span><span class="op">);</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>iFirstSolid <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;  first violated at i = </span><span class="sc">%d</span><span class="st">, magnitude </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>            iFirstSolid<span class="op">,</span> vFirstSolid<span class="op">);</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;P3 Young-Laplace: dp = </span><span class="sc">%.6e</span><span class="st"> (exact </span><span class="sc">%.6e</span><span class="st">, rel. error </span><span class="sc">%.3e</span><span class="st">, &quot;</span></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;tol </span><span class="sc">%.1e</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> dp<span class="op">,</span> dpex<span class="op">,</span> edp<span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_DP<span class="op">);</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;   max spurious velocity = </span><span class="sc">%.6e</span><span class="st"> (tol </span><span class="sc">%.1e</span><span class="st">) -&gt; </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>          umax<span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span> TOL_U<span class="op">,</span> p3 <span class="op">?</span> <span class="st">&quot;pass&quot;</span> <span class="op">:</span> <span class="st">&quot;FAIL&quot;</span><span class="op">);</span></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> ok <span class="op">=</span> p1 <span class="op">&amp;&amp;</span> p2 <span class="op">&amp;&amp;</span> p3<span class="op">;</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span>ok <span class="op">?</span> <span class="st">&quot;PASS</span><span class="sc">\n</span><span class="st">&quot;</span> <span class="op">:</span> <span class="st">&quot;FAIL</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>  fflush <span class="op">(</span>stdout<span class="op">);</span></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>ok<span class="op">)</span></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    exit <span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>Divergence guard: if the solution is no longer finite
+                there is nothing left to measure, so report what was
+                recorded and stop. This never triggers in the guarded
+                build.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">bool</span> nonfinite_state <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> bad <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>bad<span class="op">))</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>isfinite <span class="op">(</span>u<span class="op">.</span>x<span class="op">[])</span> <span class="op">||</span> <span class="op">!</span>isfinite <span class="op">(</span>u<span class="op">.</span>y<span class="op">[])</span> <span class="op">||</span> <span class="op">!</span>isfinite <span class="op">(</span>p<span class="op">[]))</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      bad <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> bad <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>event logfile <span class="op">(</span>t <span class="op">+=</span> <span class="fl">0.1</span><span class="op">;</span> t <span class="op">&lt;=</span> tend<span class="op">)</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> dp<span class="op">,</span> umax<span class="op">;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  dp_umax <span class="op">(&amp;</span>dp<span class="op">,</span> <span class="op">&amp;</span>umax<span class="op">);</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;</span><span class="sc">%g</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e</span><span class="st"> </span><span class="sc">%.6e\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>           t<span class="op">,</span> dp<span class="op">,</span> umax<span class="op">,</span> dcmMax<span class="op">,</span> dfmMax<span class="op">,</span> fSolidMax<span class="op">);</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>event sanity <span class="op">(</span>i<span class="op">++)</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>nonfinite_state<span class="op">())</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    summarise <span class="op">(</span><span class="st">&quot;non-finite solution&quot;</span><span class="op">,</span> i<span class="op">);</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>event end <span class="op">(</span>t <span class="op">=</span> tend<span class="op">)</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  summarise <span class="op">(</span><span class="st">&quot;t = tend&quot;</span><span class="op">,</span> i<span class="op">);</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/verificationCases/laplaceEmbedTubeAdapt.c" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

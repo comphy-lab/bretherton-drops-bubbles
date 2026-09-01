@@ -52,13 +52,17 @@ Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 [1000], `MAXlevel` [10], `MINlevel` [4], `Ca` [0.05], `La` [1], `muR`
 [0.01], `rhoR` [0.001], `Rtube` [0.7], `Rb0frac` [0.8], `xRear` [1.0],
 `Ldomain` [16], `travelR` [10], `tmax` [`travelR`/`Ca`],
-`tsnap` [`tmax`/200], `tRamp` [1], `dtmax` [0.01].
+`tsnap` [`tmax`/200], `tRamp` [1], `dtmax` [0.01], `bTol` [2e-3],
+`advWin` [0.25], `advMin` [1.0], `convHold` [3].
 
 `tmax` and `tsnap` derive from the capillary number by default. The
 bubble advances at $U = Ca$, so a fixed run time gives a different
 travel distance at every $Ca$, and the film only reaches its steady
 thickness after several bubble lengths of advance. `travelR` sets that
-advance in units of $R$; the domain holds about 10.4.
+advance in units of $R$; the domain holds about 10.4. In practice the
+run normally ends earlier, when the film thickness stops changing: see
+the convergence stop in `logWriting`. `tmax` is then a cap rather than
+the expected duration.
 */
 
 #include "embed.h"
@@ -92,6 +96,8 @@ condition. */
 
 double tmax = 200., tsnap = 1., tRamp = 1., travelR = 10.;
 double Rb0, Lcyl, Xb0, vol0;
+double bTol, advWin, advMin;
+int convHold;
 
 char nameOut[128], dumpFile[128], logFile[128];
 
@@ -152,6 +158,18 @@ int main (int argc, char const *argv[])
   writes a fixed number of snapshots whatever its duration rather than
   5000 of them at low $Ca$. */
 
+  /**
+  Convergence stop. The run ends when the film thickness stops changing,
+  not at an arbitrary time: `bFilm` is averaged over successive windows
+  of `advWin` radii of front-tip advance, and the run stops once
+  consecutive window means agree to within `bTol` for `convHold` windows,
+  after at least `advMin` of advance. `tmax` remains a hard cap. */
+
+  bTol     = param_double ("bTol", 2e-3);
+  advWin   = param_double ("advWin", 0.25);
+  advMin   = param_double ("advMin", 1.0);
+  convHold = param_int    ("convHold", 3);
+
   travelR = param_double ("travelR", 10.);
   tmax    = param_double ("tmax", travelR/Ca);
   tsnap   = param_double ("tsnap", tmax/200.);
@@ -179,7 +197,8 @@ int main (int argc, char const *argv[])
       rhoR <= 0. || Rtube <= 0. || Rtube >= 1. ||
       Rb0frac <= 0. || Rb0frac >= 1. || xRear <= 0. || Ldomain <= 0. ||
       tmax <= 0. || tsnap <= 0. || DT <= 0. || tRamp < 0. ||
-      travelR <= 0.) {
+      travelR <= 0. || bTol <= 0. || advWin <= 0. || advMin < 0. ||
+      convHold < 1) {
     fprintf (ferr, "ERROR: Invalid runtime parameters.\n");
     return 1;
   }
@@ -354,6 +373,53 @@ event logWriting (i++)
                "Stopping.\n", t);
     dump (file = dumpFile);
     return 1;
+  }
+
+  /**
+  ## Film-thickness convergence
+
+  The observable of interest is the steady film, so the run stops when
+  `bFilm` stops changing rather than after a prescribed time. `bFilm` is
+  accumulated over successive windows of `advWin` radii of front-tip
+  advance and consecutive window means are compared; `convHold`
+  successive agreements within `bTol` end the run.
+
+  The advance origin is the *analytic* initial front position rather
+  than the first sampled value, so the criterion behaves identically on
+  a restarted run. Windows in advance rather than time make the test
+  independent of $Ca$: a window is the same amount of interface laid
+  down at every capillary number.
+  */
+
+  static double winSum = 0., winStartAdv = 0., prevMean = -1.;
+  static long winN = 0;
+  static int holdCount = 0;
+
+  double adv = xTipF - (Xb0 + Lcyl/2. + Rb0);
+  winSum += bFilm; winN++;
+
+  if (adv - winStartAdv >= advWin && winN > 0) {
+    double mean = winSum/winN;
+    if (prevMean > 0. && adv >= advMin) {
+      double drift = fabs (mean - prevMean)/prevMean;
+      if (drift < bTol)
+        holdCount++;
+      else
+        holdCount = 0;
+      if (pid() == 0)
+        fprintf (ferr, "# film window: adv=%.3f b=%.6e drift=%.3e "
+                 "hold=%d/%d\n", adv, mean, drift, holdCount, convHold);
+      if (holdCount >= convHold) {
+        if (pid() == 0)
+          fprintf (ferr, "Film converged: b=%.6e (b/Rtube=%.6e) after "
+                   "%.3f R of advance at t=%g; drift %.3e < %.3e over "
+                   "%d windows. Stopping.\n",
+                   mean, mean/Rtube, adv, t, drift, bTol, convHold);
+        dump (file = dumpFile);
+        return 1;
+      }
+    }
+    prevMean = mean; winSum = 0.; winN = 0; winStartAdv = adv;
   }
 }
 

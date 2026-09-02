@@ -194,11 +194,8 @@ def render(item, case, limits, outdir):
         ax_full.plot([xv, xv], [-Rt * 1.06, Rt * 1.06], color="black",
                      lw=1.2, ls="--", zorder=6)
 
-    ax_full.set_title(f"full domain (vertically stretched, "
-                      f"$L = {Ld:g}$, $R_{{tube}} = {Rt:g}$)",
-                      fontsize=14, pad=5)
-    ax_win.set_title(f"travelling window, width {W:g}$R$ (true aspect)",
-                     fontsize=14, pad=5)
+    ax_full.set_title(rf"$L = {Ld:g}$", fontsize=14, pad=5)
+    ax_win.set_title(rf"window ${W:g}R$", fontsize=14, pad=5)
     fig.suptitle(rf"$Ca = {case['Ca']}$,  MAXlevel {case['MAXlevel']},  "
                  rf"$t = {tval:.2f}$", fontsize=21,
                  y=1.0 - 0.20 / fig_h)

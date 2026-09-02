@@ -53,7 +53,8 @@ Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 [0.01], `rhoR` [0.001], `Rtube` [0.7], `Rb0frac` [0.8], `xRear` [1.0],
 `Ldomain` [16], `travelR` [10], `tmax` [`travelR`/`Ca`],
 `tsnap` [`tmax`/200], `tRamp` [1], `dtmax` [0.01], `bTol` [2e-3],
-`advWin` [0.25], `advMin` [1.0], `convHold` [3].
+`advWin` [0.25], `advMin` [1.0], `convHold` [3], `uRel` [1e-2],
+`dRel` [1e-2], `csErr` [1e-2].
 
 `tmax` and `tsnap` derive from the capillary number by default. The
 bubble advances at $U = Ca$, so a fixed run time gives a different
@@ -79,8 +80,19 @@ the expected duration.
 */
 #define fErr (1e-3)   // error tolerance in f VOF
 #define KErr (1e-4)   // error tolerance in VOF curvature
-#define VelErr (1e-2) // velocity error tolerance
-#define csErr (1e-2)  // embedded-fraction tolerance (keeps the wall refined)
+
+/**
+The velocity and strain-rate tolerances are *relative to the imposed
+scales*, not absolute. The velocity scale here is $U = Ca$, which spans
+0.002 to 0.05 across the campaign, so a fixed tolerance inherited from
+problems where $U \sim 1$ is inert at the low-$Ca$ end: at $Ca = 0.005$
+an absolute `1e-2` exceeds 45% of the peak speed, and the mesh follows
+the interface alone while the bulk velocity and dissipation fields stay
+coarse. That under-resolution grows monotonically as $Ca$ falls.
+
+`uRel` is the velocity tolerance as a fraction of $U$, and `dRel` the
+strain-rate tolerance as a fraction of the bulk shear rate
+$U/R_{tube}$. */
 
 /**
 ## Global runtime variables
@@ -96,7 +108,7 @@ condition. */
 
 double tmax = 200., tsnap = 1., tRamp = 1., travelR = 10.;
 double Rb0, Lcyl, Xb0, vol0;
-double bTol, advWin, advMin;
+double bTol, advWin, advMin, uRel, dRel, VelErr, DErr, csErr;
 int convHold;
 
 char nameOut[128], dumpFile[128], logFile[128];
@@ -170,6 +182,12 @@ int main (int argc, char const *argv[])
   advMin   = param_double ("advMin", 1.0);
   convHold = param_int    ("convHold", 3);
 
+  uRel   = param_double ("uRel", 1e-2);
+  dRel   = param_double ("dRel", 1e-2);
+  csErr  = param_double ("csErr", 1e-2);
+  VelErr = uRel*Ca;
+  DErr   = dRel*Ca/Rtube;
+
   travelR = param_double ("travelR", 10.);
   tmax    = param_double ("tmax", travelR/Ca);
   tsnap   = param_double ("tsnap", tmax/200.);
@@ -198,7 +216,7 @@ int main (int argc, char const *argv[])
       Rb0frac <= 0. || Rb0frac >= 1. || xRear <= 0. || Ldomain <= 0. ||
       tmax <= 0. || tsnap <= 0. || DT <= 0. || tRamp < 0. ||
       travelR <= 0. || bTol <= 0. || advWin <= 0. || advMin < 0. ||
-      convHold < 1) {
+      convHold < 1 || uRel <= 0. || dRel <= 0. || csErr <= 0.) {
     fprintf (ferr, "ERROR: Invalid runtime parameters.\n");
     return 1;
   }
@@ -286,8 +304,25 @@ event adapt (i++)
 {
   scalar KAPPA[];
   curvature (f, KAPPA);
-  adapt_wavelet ((scalar *){f, KAPPA, cs, u.x, u.y},
-                 (double[]){fErr, KErr, csErr, VelErr, VelErr},
+
+  /**
+  The strain-rate magnitude $\sqrt{\mathbf{D}\!:\!\mathbf{D}}$ is
+  adapted on directly, so the mesh follows viscous dissipation rather
+  than only the interface and the velocity. In the film the shear is far
+  above the bulk $U/R_{tube}$, which is exactly where the resolution is
+  wanted. */
+
+  scalar Dmag[];
+  foreach() {
+    double D11 = (u.y[0,1] - u.y[0,-1])/(2.*Delta);
+    double D22 = (y > 1e-10) ? u.y[]/y : 0.;
+    double D33 = (u.x[1,0] - u.x[-1,0])/(2.*Delta);
+    double D13 = 0.5*((u.y[1,0] - u.y[-1,0] + u.x[0,1] - u.x[0,-1])/(2.*Delta));
+    Dmag[] = sqrt (sq(D11) + sq(D22) + sq(D33) + 2.*sq(D13));
+  }
+
+  adapt_wavelet ((scalar *){f, KAPPA, cs, u.x, u.y, Dmag},
+                 (double[]){fErr, KErr, csErr, VelErr, VelErr, DErr},
                  MAXlevel, MINlevel);
   embed_axi_metric_sync();
   vof_solid_cleanup (f);

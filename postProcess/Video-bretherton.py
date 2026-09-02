@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 """Render axisymmetric frames of a bretherton.c case and encode a video.
 
-The tube is drawn about its axis with a different field in each half:
-velocity magnitude above the axis, viscous dissipation below it. The
-interface is mirrored so the bubble reads as one object.
+Two rows: the whole domain on top, and a window that travels with the
+bubble below. In both, the tube is drawn about its axis with a
+different field in each half -- velocity magnitude above the axis,
+viscous dissipation below it -- and the interface is mirrored so the
+bubble reads as one object.
+
+The travelling window has a **fixed width**. That is not cosmetic: the
+embedded tube wall is rigid, so it must occupy the same pixels in every
+frame. An earlier version padded a fixed margin around the interface,
+so the window width tracked the bubble length; with ``aspect="equal"``
+matplotlib then resized the axes box frame by frame and the wall
+appeared to swell by 7% over a run. Fixed limits are what keep a rigid
+wall looking rigid.
 
 Field data comes from ``postProcess/getData`` and the interface from
 ``postProcess/getFacets``; both are Basilisk helpers built from the same
@@ -54,6 +64,17 @@ def read_header(case_dir):
     return params
 
 
+def read_ldomain(case_dir):
+    """Domain length from the case parameter file."""
+    pf = os.path.join(case_dir, "case.params")
+    if os.path.exists(pf):
+        for line in open(pf):
+            line = line.split("#")[0].strip()
+            if line.startswith("Ldomain"):
+                return float(line.split("=")[1])
+    return 16.0
+
+
 def facets(snapshot):
     """Interface segments as an (N, 2, 2) array of endpoint pairs."""
     out = sp.run([GETFACETS, snapshot], capture_output=True, text=True)
@@ -86,6 +107,48 @@ def fields(snapshot, xmin, xmax, rmax, ny, muR):
     return d
 
 
+def draw_panel(ax, d, seg, case, limits, xlo, xhi, equal):
+    """One tube panel: |u| above the axis, dissipation below."""
+    X = d[:, :, 0]
+    cs, diss, vel = d[:, :, 2], d[:, :, 4], d[:, :, 5]
+    solid = ~(cs > 0.5)
+    diss = np.where(solid, np.nan, diss)
+    vel = np.where(solid, np.nan, vel)
+
+    Rt = case["Rtube"]
+    ax.imshow(vel.T, extent=[X.min(), X.max(), 0, Rt], origin="lower",
+              aspect="auto", cmap="Blues",
+              vmin=limits["vmin"], vmax=limits["vmax"])
+    ax.imshow(np.flipud(diss.T), extent=[X.min(), X.max(), -Rt, 0],
+              origin="lower", aspect="auto", cmap="hot_r",
+              vmin=limits["dmin"], vmax=limits["dmax"])
+
+    if len(seg):
+        ax.add_collection(LineCollection(seg, colors="black", linewidths=1.8))
+        ax.add_collection(LineCollection(seg * np.array([1, -1]),
+                                         colors="black", linewidths=1.8))
+
+    # The wall is rigid: draw it at +/-Rtube, never at a data extreme.
+    for sgn in (1, -1):
+        ax.plot([xlo, xhi], [sgn * Rt] * 2, color="dimgrey", lw=5,
+                solid_capstyle="butt", zorder=5)
+    ax.axhline(0.0, color="grey", lw=0.7, ls=(0, (6, 6)), zorder=4)
+
+    # Fixed limits every frame -> fixed pixels for the wall.
+    ax.set_xlim(xlo, xhi)
+    ax.set_ylim(-Rt * 1.06, Rt * 1.06)
+    if equal:
+        # adjustable="box" keeps the limits I set and shrinks the axes
+        # box instead. Because the window width is fixed, that shrink is
+        # identical in every frame, so the wall holds its pixels.
+        # adjustable="datalim" would silently rewrite the y limits.
+        ax.set_aspect("equal", adjustable="box")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+
+
 def render(item, case, limits, outdir):
     idx, snapshot, tval = item
     dest = os.path.join(outdir, f"frame-{idx:05d}.png")
@@ -95,62 +158,63 @@ def render(item, case, limits, outdir):
     seg = facets(snapshot)
     if len(seg) == 0:
         return None
-    xlo = seg[:, :, 0].min() - 1.0
-    xhi = seg[:, :, 0].max() + 1.0
 
-    d = fields(snapshot, xlo, xhi, case["Rtube"], case["ny"], case["muR"])
-    if d is None:
+    Rt, Ld, W = case["Rtube"], case["Ldomain"], case["window"]
+
+    # Travelling window: fixed width, centred on the bubble, clamped to
+    # the domain so the width can never change at the ends.
+    centre = 0.5 * (seg[:, :, 0].min() + seg[:, :, 0].max())
+    xlo = min(max(centre - W / 2.0, 0.0), Ld - W)
+    xhi = xlo + W
+
+    d_full = fields(snapshot, 0.0, Ld, Rt, case["ny_full"], case["muR"])
+    d_win = fields(snapshot, xlo, xhi, Rt, case["ny"], case["muR"])
+    if d_full is None or d_win is None:
         return None
-    X, Y = d[:, :, 0], d[:, :, 1]
-    cs, diss, vel = d[:, :, 2], d[:, :, 4], d[:, :, 5]
 
-    # Outside the fluid there is no field to show, only the wall.
-    solid = ~(cs > 0.5)
-    diss = np.where(solid, np.nan, diss)
-    vel = np.where(solid, np.nan, vel)
+    # The lower panel holds true aspect, so its height is set by the
+    # window width; the figure is sized to that rather than leaving the
+    # shrunk axes floating in whitespace.
+    panel_w = 17.0 * (0.88 - 0.03)
+    win_h = panel_w * (2.0 * Rt * 1.06) / W
+    fig_h = win_h + 1.55 + 1.75
+    fig = plt.figure(figsize=(17, fig_h))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1.55, win_h],
+                          left=0.03, right=0.88,
+                          top=1.0 - 1.00 / fig_h, bottom=0.30 / fig_h,
+                          hspace=0.55 / max(win_h, 0.5))
+    ax_full = fig.add_subplot(gs[0])
+    ax_win = fig.add_subplot(gs[1])
 
-    fig, ax = plt.subplots(figsize=(16, 5))
-    fig.subplots_adjust(left=0.02, right=0.90, top=0.86, bottom=0.06)
-    ext = [X.min(), X.max(), 0, case["Rtube"]]
-    ax.imshow(vel.T, extent=ext, origin="lower", aspect="equal",
-              cmap="Blues", vmin=limits["vmin"], vmax=limits["vmax"])
-    ext_m = [X.min(), X.max(), -case["Rtube"], 0]
-    ax.imshow(np.flipud(diss.T), extent=ext_m, origin="lower", aspect="equal",
-              cmap="hot_r", vmin=limits["dmin"], vmax=limits["dmax"])
+    draw_panel(ax_full, d_full, seg, case, limits, 0.0, Ld, equal=False)
+    draw_panel(ax_win, d_win, seg, case, limits, xlo, xhi, equal=True)
 
-    lc = LineCollection(seg, colors="black", linewidths=2.0)
-    ax.add_collection(lc)
-    ax.add_collection(LineCollection(seg * np.array([1, -1]),
-                                     colors="black", linewidths=2.0))
+    # Mark where the travelling window sits within the whole domain.
+    for xv in (xlo, xhi):
+        ax_full.plot([xv, xv], [-Rt * 1.06, Rt * 1.06], color="black",
+                     lw=1.2, ls="--", zorder=6)
 
-    for sgn in (1, -1):
-        ax.plot([X.min(), X.max()], [sgn * case["Rtube"]] * 2,
-                color="dimgrey", lw=4, solid_capstyle="butt")
-    ax.axhline(0.0, color="grey", lw=0.8, ls=(0, (6, 6)))
-
-    ax.set_xlim(X.min(), X.max())
-    ax.set_ylim(-case["Rtube"] * 1.05, case["Rtube"] * 1.05)
-    ax.set_yticks([])
-    ax.set_xticks([])
-    for s in ax.spines.values():
-        s.set_visible(False)
-    ax.set_title(rf"$Ca = {case['Ca']}$,  MAXlevel {case['MAXlevel']},  "
-                 rf"$t = {tval:.2f}$", fontsize=22, pad=16)
+    ax_full.set_title(f"full domain (vertically stretched, "
+                      f"$L = {Ld:g}$, $R_{{tube}} = {Rt:g}$)",
+                      fontsize=14, pad=5)
+    ax_win.set_title(f"travelling window, width {W:g}$R$ (true aspect)",
+                     fontsize=14, pad=5)
+    fig.suptitle(rf"$Ca = {case['Ca']}$,  MAXlevel {case['MAXlevel']},  "
+                 rf"$t = {tval:.2f}$", fontsize=21,
+                 y=1.0 - 0.20 / fig_h)
 
     imv = plt.cm.ScalarMappable(cmap="Blues",
                                 norm=plt.Normalize(limits["vmin"], limits["vmax"]))
     imd = plt.cm.ScalarMappable(cmap="hot_r",
                                 norm=plt.Normalize(limits["dmin"], limits["dmax"]))
-    cav = fig.add_axes([0.92, 0.53, 0.014, 0.34])
-    cad = fig.add_axes([0.92, 0.13, 0.014, 0.34])
-    cbv = fig.colorbar(imv, cax=cav)
-    cbd = fig.colorbar(imd, cax=cad)
-    cbv.set_label(r"$|u|$", fontsize=18, labelpad=10)
-    cbd.set_label(r"$\log_{10}(\mu\,D\!:\!D)$", fontsize=18, labelpad=10)
+    cbv = fig.colorbar(imv, cax=fig.add_axes([0.90, 0.54, 0.012, 0.30]))
+    cbd = fig.colorbar(imd, cax=fig.add_axes([0.90, 0.14, 0.012, 0.30]))
+    cbv.set_label(r"$|u|$", fontsize=17, labelpad=9)
+    cbd.set_label(r"$\log_{10}(\mu\,D\!:\!D)$", fontsize=17, labelpad=9)
     for cb in (cbv, cbd):
-        cb.ax.tick_params(labelsize=13)
+        cb.ax.tick_params(labelsize=12)
 
-    fig.savefig(dest, dpi=110, pad_inches=0.08)
+    fig.savefig(dest, dpi=105)
     plt.close(fig)
     return dest
 
@@ -161,14 +225,21 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--cpus", type=int, default=4)
     ap.add_argument("--fps", type=int, default=20)
-    ap.add_argument("--ny", type=int, default=140)
+    ap.add_argument("--ny", type=int, default=140,
+                    help="radial samples in the travelling window")
+    ap.add_argument("--ny-full", type=int, default=90,
+                    help="radial samples across the full domain")
+    ap.add_argument("--window", type=float, default=8.0,
+                    help="travelling window width in units of R (fixed)")
     args = ap.parse_args()
 
     case_dir = os.path.abspath(args.case_dir)
     p = read_header(case_dir)
+    Ld = read_ldomain(case_dir)
     case = {"Ca": float(p["Ca"]), "Rtube": float(p["Rtube"]),
             "muR": float(p["muR"]), "MAXlevel": int(p["MAXlevel"]),
-            "ny": args.ny}
+            "ny": args.ny, "ny_full": args.ny_full,
+            "Ldomain": Ld, "window": min(args.window, Ld)}
 
     snapdir = os.path.join(case_dir, "intermediate")
     snaps = sorted(os.listdir(snapdir),
@@ -186,7 +257,10 @@ def main():
         seg = facets(snap)
         if len(seg) == 0:
             continue
-        d = fields(snap, seg[:, :, 0].min() - 1.0, seg[:, :, 0].max() + 1.0,
+        c = 0.5 * (seg[:, :, 0].min() + seg[:, :, 0].max())
+        wlo = min(max(c - case["window"] / 2.0, 0.0),
+                  case["Ldomain"] - case["window"])
+        d = fields(snap, wlo, wlo + case["window"],
                    case["Rtube"], case["ny"], case["muR"])
         if d is None:
             continue

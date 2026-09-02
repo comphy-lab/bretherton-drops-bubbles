@@ -60,7 +60,9 @@ Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 bubble advances at $U = Ca$, so a fixed run time gives a different
 travel distance at every $Ca$, and the film only reaches its steady
 thickness after several bubble lengths of advance. `travelR` sets that
-advance in units of $R$; the domain holds about 10.4. In practice the
+advance in units of $R$. The run stops when the front tip
+reaches the outlet buffer at $L_0 - 2R_{tube}$, which leaves about
+9.0 radii of usable advance, so `travelR` is capped below that. In practice the
 run normally ends earlier, when the film thickness stops changing: see
 the convergence stop in `logWriting`. `tmax` is then a cap rather than
 the expected duration.
@@ -233,7 +235,7 @@ int main (int argc, char const *argv[])
   A run asking for more advance than the domain holds would drive the
   bubble into the outlet before `tmax`. */
 
-  double room = Ldomain - (Xb0 + Lcyl/2. + Rb0);
+  double room = (Ldomain - 2.*Rtube) - (Xb0 + Lcyl/2. + Rb0);
   if (Ca*tmax > room)
     fprintf (ferr, "WARNING: requested advance %g R exceeds the %g R of "
              "travel room ahead of the front tip; the bubble reaches the "
@@ -427,14 +429,38 @@ event logWriting (i++)
   */
 
   static double winSum = 0., winStartAdv = 0., prevMean = -1.;
-  static long winN = 0;
+  static double winCov = 0., prevAdv = 0., prevB = 0.;
+  static bool winInit = false;
   static int holdCount = 0;
 
   double adv = xTipF - (Xb0 + Lcyl/2. + Rb0);
-  winSum += bFilm; winN++;
 
-  if (adv - winStartAdv >= advWin && winN > 0) {
-    double mean = winSum/winN;
+  /**
+  The window average is over *advance*, not over iterations. The time
+  step is not constant, so a plain per-iteration mean would weight the
+  slow-moving part of a window more heavily than the fast. Successive
+  samples are integrated trapezoidally in `adv` and divided by the
+  advance actually covered.
+
+  These accumulators are static, so a restored run starts them at zero
+  while `adv` is already large; the first window would then span the
+  whole run so far. `winInit` anchors them to the current state on the
+  first call instead, which costs one window after a restart and keeps
+  the criterion identical either side of it. */
+
+  if (!winInit) {
+    winInit = true; winStartAdv = adv; prevAdv = adv; prevB = bFilm;
+    winSum = 0.; winCov = 0.;
+  }
+  double dadv = adv - prevAdv;
+  if (dadv > 0.) {
+    winSum += 0.5*(bFilm + prevB)*dadv;
+    winCov += dadv;
+  }
+  prevAdv = adv; prevB = bFilm;
+
+  if (adv - winStartAdv >= advWin && winCov > 0.) {
+    double mean = winSum/winCov;
     if (prevMean > 0. && adv >= advMin) {
       double drift = fabs (mean - prevMean)/prevMean;
       if (drift < bTol)
@@ -454,7 +480,7 @@ event logWriting (i++)
         return 1;
       }
     }
-    prevMean = mean; winSum = 0.; winN = 0; winStartAdv = adv;
+    prevMean = mean; winSum = 0.; winCov = 0.; winStartAdv = adv;
   }
 }
 

@@ -55,8 +55,10 @@ int main (int argc, char const *argv[])
   int ny = atoi(argv[6]);
   double muR = atof(argv[7]);
 
-  if (ny <= 0 || xmax <= xmin || ymax <= ymin) {
-    fprintf (ferr, "ERROR: need xmax>xmin, ymax>ymin and ny>0\n");
+  /* ny and nx index a spacing of (max-min)/(n-1), so a single sample
+     would divide by zero. */
+  if (ny < 2 || xmax <= xmin || ymax <= ymin) {
+    fprintf (ferr, "ERROR: need xmax>xmin, ymax>ymin and ny>=2\n");
     return 1;
   }
 
@@ -81,8 +83,8 @@ int main (int argc, char const *argv[])
 
   double Deltay = (ymax - ymin)/(ny - 1);
   int nx = (int)((xmax - xmin)/Deltay) + 1;
-  if (nx <= 0) {
-    fprintf (ferr, "ERROR: computed nx <= 0\n");
+  if (nx < 2) {
+    fprintf (ferr, "ERROR: computed nx < 2; widen the x range or raise ny\n");
     return 1;
   }
   double Deltax = (xmax - xmin)/(nx - 1);

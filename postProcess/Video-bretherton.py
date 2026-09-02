@@ -29,6 +29,7 @@ Usage:
 """
 
 import argparse
+import glob
 import os
 import subprocess as sp
 import sys
@@ -152,8 +153,6 @@ def draw_panel(ax, d, seg, case, limits, xlo, xhi, equal):
 def render(item, case, limits, outdir):
     idx, snapshot, tval = item
     dest = os.path.join(outdir, f"frame-{idx:05d}.png")
-    if os.path.exists(dest):
-        return dest
 
     seg = facets(snapshot)
     if len(seg) == 0:
@@ -229,6 +228,10 @@ def main():
     ap.add_argument("--window", type=float, default=8.0,
                     help="travelling window width in units of R (fixed)")
     args = ap.parse_args()
+    if args.window <= 0:
+        ap.error("--window must be positive")
+    if args.ny < 2 or args.ny_full < 2:
+        ap.error("--ny and --ny-full must be at least 2")
 
     case_dir = os.path.abspath(args.case_dir)
     p = read_header(case_dir)
@@ -284,7 +287,13 @@ def main():
     print(f"colour limits: |u| 0 -> {limits['vmax']:.4g}, "
           f"log10 diss {limits['dmin']:.3g} -> {limits['dmax']:.3g}", flush=True)
 
+    # Frames are always regenerated. Reusing them silently mixes output
+    # from different colour limits, window widths or solver versions into
+    # one video.
     outdir = os.path.join(case_dir, "frames")
+    if os.path.isdir(outdir):
+        for old_frame in glob.glob(os.path.join(outdir, "frame-*.png")):
+            os.remove(old_frame)
     os.makedirs(outdir, exist_ok=True)
     with Pool(args.cpus) as pool:
         made = pool.map(partial(render, case=case, limits=limits,

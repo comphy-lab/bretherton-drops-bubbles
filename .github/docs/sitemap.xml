@@ -11,7 +11,22 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/postProcess/Video-bretherton.py.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/postProcess/bretherton_film.py.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/postProcess/bretherton_flat_film.py.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/postProcess/getData.c.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

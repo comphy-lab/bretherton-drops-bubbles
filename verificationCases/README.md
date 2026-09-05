@@ -129,6 +129,37 @@ consistent with a residual-dominated amplitude. The $10^{-5}$ and
 $10^{-6}$ rows above are one run; treat the $10^{-4}$ row as an order of
 magnitude only.
 
+## Basilisk version and the axisymmetric embed advection patch
+
+Results here were produced with Basilisk at patch **2026-07-03**.
+
+On 2026-08-03 two upstream patches fixed a defect in `src/embed.h`
+affecting `embed.h` combined with `axi.h`
+([changes](https://basilisk.fr/src/?changes=20260803152337),
+[test](https://basilisk.fr/src/test/pipe-axi-embed.c)). In
+`update_tracer()` the flux divergence was divided by `Delta` rather than
+`Delta*cm[]`; under the axisymmetric metric `cm = y*cs`, so the
+advection term acquired a spurious factor `y`. The reported symptom is a
+laminar pipe entrance length roughly six times too short. The developed
+Poiseuille state is unaffected.
+
+That combination is exactly the one this solver uses, so it was checked
+rather than assumed. `update_tracer()` is reached only from
+`advection()` in `bcg.h`, which `navier-stokes/centered.h` calls only
+inside `if (!stokes)`. `navier-stokes/conserving.h` sets `stokes = true`
+in its `defaults` event, so with momentum-conserving VOF advection that
+branch is never taken. Confirmed at runtime: a breakpoint on
+`update_tracer` was never hit over a complete run of
+`simulationCases/bretherton.c`, which then exited normally. The function
+is compiled into the binary but not executed.
+
+Independently, these runs are viscous-dominated: with `La = 1` the
+Reynolds number is `La*Ca`, so 0.005 to 0.07 across the campaign, and the
+corrupted term is the inertial one.
+
+Both points should be rechecked if the solver ever drops
+`conserving.h`, or runs at a Reynolds number where inertia matters.
+
 ## What this suite does not establish
 
 - Nothing dynamic is tested. Every case has a quiescent or

@@ -11,7 +11,8 @@ Rtube=0.7      # tube radius in units of R (< 1 for a confined drop/bubble)
 Rb0frac=0.8    # initial capsule radius as a fraction of Rtube
 xRear=1.0      # initial rear-tip distance from the inlet
 Ldomain=16     # domain size in units of R
-tmax=200
-tsnap=1
+travelR=8       # bubble advance in units of R; sets tmax = travelR/Ca
+                # capped below the ~9.0 R available before the outlet buffer
+                # tmax and tsnap derive from travelR and Ca unless set here
 tRamp=1        # inlet ramp time
 dtmax=0.01

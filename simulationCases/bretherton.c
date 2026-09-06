@@ -51,7 +51,7 @@ $b/R_{tube} = 1.34\,Ca_b^{2/3}/(1 + 2.5\cdot1.34\,Ca_b^{2/3})$.
 Runtime keys via `src-local/params.h` (defaults in brackets): `CaseNo`
 [1000], `MAXlevel` [10], `MINlevel` [4], `Ca` [0.05], `La` [1], `muR`
 [0.01], `rhoR` [0.001], `Rtube` [0.7], `Rb0frac` [0.8], `xRear` [1.0],
-`Ldomain` [16], `travelR` [10], `tmax` [`travelR`/`Ca`],
+`Ldomain` [16], `travelR` [8], `tmax` [`travelR`/`Ca`],
 `tsnap` [`tmax`/200], `tRamp` [1], `dtmax` [0.01], `bTol` [2e-3],
 `advWin` [0.25], `advMin` [1.0], `convHold` [3], `uRel` [1e-2],
 `dRel` [1e-2], `csErr` [1e-2].
@@ -190,7 +190,7 @@ int main (int argc, char const *argv[])
   VelErr = uRel*Ca;
   DErr   = dRel*Ca/Rtube;
 
-  travelR = param_double ("travelR", 10.);
+  travelR = param_double ("travelR", 8.);
   tmax    = param_double ("tmax", travelR/Ca);
   tsnap   = param_double ("tsnap", tmax/200.);
   tRamp   = param_double ("tRamp", 1.);
@@ -317,7 +317,7 @@ event adapt (i++)
   scalar Dmag[];
   foreach() {
     double D11 = (u.y[0,1] - u.y[0,-1])/(2.*Delta);
-    double D22 = (y > 1e-10) ? u.y[]/y : 0.;
+    double D22 = (y > 1e-10) ? u.y[]/y : D11;  // axis limit is du_r/dr
     double D33 = (u.x[1,0] - u.x[-1,0])/(2.*Delta);
     double D13 = 0.5*((u.y[1,0] - u.y[-1,0] + u.x[0,1] - u.x[0,-1])/(2.*Delta));
     Dmag[] = sqrt (sq(D11) + sq(D22) + sq(D33) + 2.*sq(D13));

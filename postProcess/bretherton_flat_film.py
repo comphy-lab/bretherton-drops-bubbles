@@ -118,6 +118,8 @@ def main():
         ap.error("--trim must lie in (0, 0.5)")
     if not 0.0 < args.window <= 1.0:
         ap.error("--window must lie in (0, 1]")
+    if args.cpus < 1:
+        ap.error("--cpus must be at least 1")
 
     results = [analyse(c, args.trim, args.window, args.cpus)
                for c in args.case_dirs]

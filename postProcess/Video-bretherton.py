@@ -232,6 +232,8 @@ def main():
         ap.error("--window must be positive")
     if args.ny < 2 or args.ny_full < 2:
         ap.error("--ny and --ny-full must be at least 2")
+    if args.cpus < 1:
+        ap.error("--cpus must be at least 1")
 
     case_dir = os.path.abspath(args.case_dir)
     p = read_header(case_dir)
@@ -241,10 +243,12 @@ def main():
             "ny": args.ny, "ny_full": args.ny_full,
             "Ldomain": Ld, "window": min(args.window, Ld)}
 
-    snapdir = os.path.join(case_dir, "intermediate")
-    snaps = sorted(os.listdir(snapdir),
-                   key=lambda s: float(s.split("-")[1]))
-    items = [(i, os.path.join(snapdir, s), float(s.split("-")[1]))
+    # Match only snapshot files: a stray .DS_Store or leftover dump in
+    # intermediate/ would otherwise fail the time parse and abort the
+    # whole video. bretherton_flat_film.py already globs this way.
+    snaps = sorted(glob.glob(os.path.join(case_dir, "intermediate", "snapshot-*")),
+                   key=lambda s: float(os.path.basename(s).split("-")[1]))
+    items = [(i, s, float(os.path.basename(s).split("-")[1]))
              for i, s in enumerate(snaps)]
     if not items:
         raise SystemExit("no snapshots")

@@ -34,6 +34,9 @@ $2\mu\,\mathbf{D}\!:\!\mathbf{D}$, so this is a constant $\log_{10}2$
 below it and the colourbar is labelled accordingly.
 */
 
+#include <errno.h>
+#include <math.h>
+
 #include "utils.h"
 #include "output.h"
 
@@ -50,10 +53,32 @@ int main (int argc, char const *argv[])
   }
   char filename[4096];
   snprintf (filename, sizeof(filename), "%s", argv[1]);
-  double xmin = atof(argv[2]), ymin = atof(argv[3]);
-  double xmax = atof(argv[4]), ymax = atof(argv[5]);
-  int ny = atoi(argv[6]);
-  double muR = atof(argv[7]);
+
+  /**
+  `atof` cannot distinguish "0" from unparseable text, so a mistyped
+  viscosity ratio would silently become zero and paint the whole field
+  with the continuous-phase viscosity. */
+
+  double val[6];
+  const char * names[6] = {"xmin", "ymin", "xmax", "ymax", "ny", "muR"};
+  for (int k = 0; k < 6; k++) {
+    char * end = NULL;
+    errno = 0;
+    val[k] = strtod (argv[k+2], &end);
+    if (end == argv[k+2] || *end != '\0' || errno == ERANGE ||
+        !isfinite (val[k])) {
+      fprintf (ferr, "ERROR: %s is not a finite number: '%s'\n",
+               names[k], argv[k+2]);
+      return 1;
+    }
+  }
+  double xmin = val[0], ymin = val[1], xmax = val[2], ymax = val[3];
+  int ny = (int) val[4];
+  double muR = val[5];
+  if (muR <= 0.) {
+    fprintf (ferr, "ERROR: muR must be positive, got %g\n", muR);
+    return 1;
+  }
 
   /* ny and nx index a spacing of (max-min)/(n-1), so a single sample
      would divide by zero. */
@@ -62,7 +87,14 @@ int main (int argc, char const *argv[])
     return 1;
   }
 
-  restore (file = filename);
+  /**
+  A missing or unreadable dump leaves the fields at their defaults, and
+  sampling them would emit a plausible-looking grid of zeros. */
+
+  if (!restore (file = filename)) {
+    fprintf (ferr, "ERROR: cannot restore snapshot '%s'\n", filename);
+    return 1;
+  }
 
   /**
   Axisymmetric strain-rate invariant. `D22` is the hoop term
@@ -70,7 +102,12 @@ int main (int argc, char const *argv[])
 
   foreach() {
     double D11 = (u.y[0,1] - u.y[0,-1])/(2.*Delta);
-    double D22 = (y > 1e-10) ? u.y[]/y : 0.;
+    /**
+    The hoop strain rate is $u_r/r$. On the axis $u_r \to 0$ linearly,
+    so the limit is $\partial u_r/\partial r$, which is `D11`; taking
+    zero there would drop a real contribution to $\mathbf{D}:\mathbf{D}$. */
+
+    double D22 = (y > 1e-10) ? u.y[]/y : D11;
     double D33 = (u.x[1,0] - u.x[-1,0])/(2.*Delta);
     double D13 = 0.5*((u.y[1,0] - u.y[-1,0] + u.x[0,1] - u.x[0,-1])/(2.*Delta));
     double D2 = sq(D11) + sq(D22) + sq(D33) + 2.*sq(D13);
@@ -80,6 +117,13 @@ int main (int argc, char const *argv[])
     vel[] = sqrt (sq(u.x[]) + sq(u.y[]));
     ux[] = u.x[];
   }
+
+  /**
+  `interpolate()` reads neighbours, including ghosts. Without this the
+  ghosts keep their default zero and samples near the axis and the
+  domain edges are pulled towards it. */
+
+  boundary ({D2c, vel, ux});
 
   double Deltay = (ymax - ymin)/(ny - 1);
   int nx = (int)((xmax - xmin)/Deltay) + 1;

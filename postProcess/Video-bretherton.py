@@ -79,6 +79,8 @@ def read_ldomain(case_dir):
 def facets(snapshot):
     """Interface segments as an (N, 2, 2) array of endpoint pairs."""
     out = sp.run([GETFACETS, snapshot], capture_output=True, text=True)
+    if out.returncode != 0:
+        return np.empty((0, 2, 2))
     segs, cur = [], []
     for line in out.stdout.splitlines():
         if not line.strip():
@@ -86,19 +88,47 @@ def facets(snapshot):
                 segs.append(cur)
             cur = []
             continue
-        a, b = line.split()
-        cur.append((float(a), float(b)))
+        parts = line.split()
+        if len(parts) != 2:
+            continue
+        try:
+            cur.append((float(parts[0]), float(parts[1])))
+        except ValueError:
+            cur = []
+            continue
     if len(cur) == 2:
         segs.append(cur)
     return np.array(segs) if segs else np.empty((0, 2, 2))
 
 
 def fields(snapshot, xmin, xmax, rmax, ny, muR):
-    """Sample cs, f, log10 dissipation and |u| on a uniform grid."""
+    """Sample cs, f, log10 dissipation and |u| on a uniform grid.
+
+    getData writes its grid to stderr, which is also where it reports
+    failures, so a diagnostic line and a data line arrive on the same
+    stream. A non-zero exit means there is no grid to read; beyond that,
+    only lines whose fields all parse as numbers are kept, so one
+    stray message degrades to a skipped frame rather than killing the
+    worker and with it the whole video.
+    """
     out = sp.run([GETDATA, snapshot, str(xmin), "0", str(xmax), str(rmax),
                   str(ny), str(muR)], capture_output=True, text=True)
-    rows = [r.split() for r in out.stderr.splitlines() if r.strip()]
-    if not rows:
+    if out.returncode != 0:
+        first = next((l for l in out.stderr.splitlines() if l.strip()), "")
+        print(f"  getData failed on {os.path.basename(snapshot)}: {first}",
+              file=sys.stderr)
+        return None
+
+    rows = []
+    for line in out.stderr.splitlines():
+        parts = line.split()
+        if not parts:
+            continue
+        try:
+            rows.append([float(v) for v in parts])
+        except ValueError:
+            continue
+    if not rows or len({len(r) for r in rows}) != 1:
         return None
     d = np.array(rows, dtype=float)
     ncol = d.shape[1]          # getData's column count, not a fixed literal

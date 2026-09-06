@@ -73,6 +73,17 @@ int main (int argc, char const *argv[])
     }
   }
   double xmin = val[0], ymin = val[1], xmax = val[2], ymax = val[3];
+
+  /**
+  `ny` arrives as a double, and casting a fractional or very large
+  double to `int` is undefined behaviour, so bound it before the
+  conversion rather than after. */
+
+  if (val[4] != floor (val[4]) || val[4] < 2. || val[4] > 100000.) {
+    fprintf (ferr, "ERROR: ny must be a whole number in [2, 100000], got %g\n",
+             val[4]);
+    return 1;
+  }
   int ny = (int) val[4];
   double muR = val[5];
   if (muR <= 0.) {
@@ -126,7 +137,13 @@ int main (int argc, char const *argv[])
   boundary ({D2c, vel, ux});
 
   double Deltay = (ymax - ymin)/(ny - 1);
-  int nx = (int)((xmax - xmin)/Deltay) + 1;
+  double nxd = (xmax - xmin)/Deltay + 1.;
+  if (!(nxd >= 2. && nxd <= 100000.)) {
+    fprintf (ferr, "ERROR: computed nx = %g is outside [2, 100000]; "
+             "adjust the x range or ny\n", nxd);
+    return 1;
+  }
+  int nx = (int) nxd;
   if (nx < 2) {
     fprintf (ferr, "ERROR: computed nx < 2; widen the x range or raise ny\n");
     return 1;

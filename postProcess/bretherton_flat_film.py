@@ -55,7 +55,17 @@ def measure(snapshot, Rtube, trim):
     """Return (t, xTipR, xTipF, b_global, b_flat) for one snapshot."""
     t = float(os.path.basename(snapshot).split("-")[-1])
     res = sp.run([GETFACETS, snapshot], capture_output=True, text=True)
-    pts = [l.split() for l in res.stdout.splitlines() if len(l.split()) == 2]
+    if res.returncode != 0:
+        return None
+    pts = []
+    for line in res.stdout.splitlines():
+        parts = line.split()
+        if len(parts) != 2:
+            continue
+        try:
+            pts.append([float(parts[0]), float(parts[1])])
+        except ValueError:
+            continue
     if len(pts) < 8:
         return None
     a = np.array(pts, dtype=float)

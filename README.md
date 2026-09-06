@@ -4,6 +4,10 @@ Axisymmetric Basilisk simulations of long drops and bubbles translating in
 liquid-filled capillary tubes, aimed at recovering the classical Bretherton
 film-thickness law and then comparing drop and bubble counterparts.
 
+The [Newtonian bubble validation](docs/Newtonian-Validation/README.md)
+documents the reference solutions, film-thickness comparison and
+grid-sensitivity study.
+
 ## Overview
 
 A long gas bubble or immiscible drop pushed through a liquid-filled tube

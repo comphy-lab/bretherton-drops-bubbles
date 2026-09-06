@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+      
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+      
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+    
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+        
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+        
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+    
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+      
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+      
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+    
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+    
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+    
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+    
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+    
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+    
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>postProcess/Video-bretherton.py | Bretherton drops and bubbles</title>
+  
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+      
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+      
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+      
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="Render axisymmetric frames of a bretherton.c case and encode a video. Two rows: the whole domain on top, and a window that travels with the bubble below. In ...">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="bretherton, draw_panel, facets, fields, main, read_header, read_ldomain, render, video">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "..";
+  </script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+  
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+    
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+      
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+    
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+      
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+        
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+      
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+            
+            <div class="page-content">
+                
+                                <h1 class="page-title">postProcess/Video-bretherton.py</h1>
+                
+                                
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/postProcess/Video-bretherton.py" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+                
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span></code></pre></div></div>
+                <p>Render axisymmetric frames of a bretherton.c case and
+                encode a video.</p>
+                <p>Two rows: the whole domain on top, and a window that
+                travels with the bubble below. In both, the tube is
+                drawn about its axis with a different field in each half
+                – velocity magnitude above the axis, viscous dissipation
+                below it – and the interface is mirrored so the bubble
+                reads as one object.</p>
+                <p>The travelling window has a <strong>fixed
+                width</strong>. That is not cosmetic: the embedded tube
+                wall is rigid, so it must occupy the same pixels in
+                every frame. An earlier version padded a fixed margin
+                around the interface, so the window width tracked the
+                bubble length; with <code>aspect="equal"</code>
+                matplotlib then resized the axes box frame by frame and
+                the wall appeared to swell by 7% over a run. Fixed
+                limits are what keep a rigid wall looking rigid.</p>
+                <p>Field data comes from
+                <code>postProcess/getData</code> and the interface from
+                <code>postProcess/getFacets</code>; both are Basilisk
+                helpers built from the same snapshot, so the render
+                never re-derives physics in Python.</p>
+                <p>Note on typography: this uses mathtext rather than
+                <code>text.usetex</code>. LaTeX spawns a subprocess per
+                unique string and deadlocks under
+                <code>multiprocessing</code>, which is exactly how
+                frames are generated here.</p>
+                <p>Usage: python3 postProcess/Video-bretherton.py
+                <case-dir> [–out video.mp4] [–cpus N] [–fps 20]</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> argparse</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> glob</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess <span class="im">as</span> sp</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> multiprocessing <span class="im">import</span> Pool</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>matplotlib.use(<span class="st">&quot;Agg&quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.collections <span class="im">import</span> LineCollection</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">&quot;font.family&quot;</span>] <span class="op">=</span> <span class="st">&quot;serif&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">&quot;mathtext.fontset&quot;</span>] <span class="op">=</span> <span class="st">&quot;cm&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>HERE <span class="op">=</span> os.path.dirname(os.path.abspath(<span class="va">__file__</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>GETDATA <span class="op">=</span> os.path.join(HERE, <span class="st">&quot;getData&quot;</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>GETFACETS <span class="op">=</span> os.path.join(HERE, <span class="st">&quot;getFacets&quot;</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_header(case_dir):</span></code></pre></div></div>
+                <p>Return the run parameters recorded in the case log
+                header.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    log <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> os.listdir(case_dir) <span class="cf">if</span> f.endswith(<span class="st">&quot;-log&quot;</span>)]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> log:</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="ss">f&quot;no case log in </span><span class="sc">{</span>case_dir<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(os.path.join(case_dir, log[<span class="dv">0</span>])) <span class="im">as</span> fh:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        first <span class="op">=</span> fh.readline()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> item <span class="kw">in</span> first.lstrip(<span class="st">&quot;# &quot;</span>).strip().split(<span class="st">&quot;,&quot;</span>):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        bits <span class="op">=</span> item.split()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(bits) <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            params[bits[<span class="dv">0</span>]] <span class="op">=</span> bits[<span class="dv">1</span>]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> params</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_ldomain(case_dir):</span></code></pre></div></div>
+                <p>Domain length from the case parameter file.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    pf <span class="op">=</span> os.path.join(case_dir, <span class="st">&quot;case.params&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(pf):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> line <span class="kw">in</span> <span class="bu">open</span>(pf):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>            line <span class="op">=</span> line.split(<span class="st">&quot;#&quot;</span>)[<span class="dv">0</span>].strip()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> line.startswith(<span class="st">&quot;Ldomain&quot;</span>):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="bu">float</span>(line.split(<span class="st">&quot;=&quot;</span>)[<span class="dv">1</span>])</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">16.0</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> facets(snapshot):</span></code></pre></div></div>
+                <p>Interface segments as an (N, 2, 2) array of endpoint
+                pairs.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> sp.run([GETFACETS, snapshot], capture_output<span class="op">=</span><span class="va">True</span>, text<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    segs, cur <span class="op">=</span> [], []</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> out.stdout.splitlines():</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> line.strip():</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">len</span>(cur) <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                segs.append(cur)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            cur <span class="op">=</span> []</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        a, b <span class="op">=</span> line.split()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        cur.append((<span class="bu">float</span>(a), <span class="bu">float</span>(b)))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(cur) <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        segs.append(cur)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(segs) <span class="cf">if</span> segs <span class="cf">else</span> np.empty((<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fields(snapshot, xmin, xmax, rmax, ny, muR):</span></code></pre></div></div>
+                <p>Sample cs, f, log10 dissipation and |u| on a uniform
+                grid.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> sp.run([GETDATA, snapshot, <span class="bu">str</span>(xmin), <span class="st">&quot;0&quot;</span>, <span class="bu">str</span>(xmax), <span class="bu">str</span>(rmax),</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="bu">str</span>(ny), <span class="bu">str</span>(muR)], capture_output<span class="op">=</span><span class="va">True</span>, text<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> [r.split() <span class="cf">for</span> r <span class="kw">in</span> out.stderr.splitlines() <span class="cf">if</span> r.strip()]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> rows:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> np.array(rows, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    ncol <span class="op">=</span> d.shape[<span class="dv">1</span>]          <span class="co"># getData&#39;s column count, not a fixed literal</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    nyy <span class="op">=</span> <span class="bu">len</span>(np.unique(d[:, <span class="dv">1</span>]))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    nxx <span class="op">=</span> <span class="bu">len</span>(d) <span class="op">//</span> nyy</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> d[: nxx <span class="op">*</span> nyy].reshape(nxx, nyy, ncol)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> d</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_panel(ax, d, seg, case, limits, xlo, xhi, equal):</span></code></pre></div></div>
+                <p>One tube panel: |u| above the axis, dissipation
+                below.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> d[:, :, <span class="dv">0</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    cs, diss, vel <span class="op">=</span> d[:, :, <span class="dv">2</span>], d[:, :, <span class="dv">4</span>], d[:, :, <span class="dv">5</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    solid <span class="op">=</span> <span class="op">~</span>(cs <span class="op">&gt;</span> <span class="fl">0.5</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    diss <span class="op">=</span> np.where(solid, np.nan, diss)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    vel <span class="op">=</span> np.where(solid, np.nan, vel)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    Rt <span class="op">=</span> case[<span class="st">&quot;Rtube&quot;</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    ax.imshow(vel.T, extent<span class="op">=</span>[X.<span class="bu">min</span>(), X.<span class="bu">max</span>(), <span class="dv">0</span>, Rt], origin<span class="op">=</span><span class="st">&quot;lower&quot;</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>              aspect<span class="op">=</span><span class="st">&quot;auto&quot;</span>, cmap<span class="op">=</span><span class="st">&quot;Blues&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>              vmin<span class="op">=</span>limits[<span class="st">&quot;vmin&quot;</span>], vmax<span class="op">=</span>limits[<span class="st">&quot;vmax&quot;</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    ax.imshow(np.flipud(diss.T), extent<span class="op">=</span>[X.<span class="bu">min</span>(), X.<span class="bu">max</span>(), <span class="op">-</span>Rt, <span class="dv">0</span>],</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>              origin<span class="op">=</span><span class="st">&quot;lower&quot;</span>, aspect<span class="op">=</span><span class="st">&quot;auto&quot;</span>, cmap<span class="op">=</span><span class="st">&quot;hot_r&quot;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>              vmin<span class="op">=</span>limits[<span class="st">&quot;dmin&quot;</span>], vmax<span class="op">=</span>limits[<span class="st">&quot;dmax&quot;</span>])</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(seg):</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        ax.add_collection(LineCollection(seg, colors<span class="op">=</span><span class="st">&quot;black&quot;</span>, linewidths<span class="op">=</span><span class="fl">1.8</span>))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        ax.add_collection(LineCollection(seg <span class="op">*</span> np.array([<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                                         colors<span class="op">=</span><span class="st">&quot;black&quot;</span>, linewidths<span class="op">=</span><span class="fl">1.8</span>))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The wall is rigid: draw it at +/-Rtube, never at a data extreme.</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> sgn <span class="kw">in</span> (<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        ax.plot([xlo, xhi], [sgn <span class="op">*</span> Rt] <span class="op">*</span> <span class="dv">2</span>, color<span class="op">=</span><span class="st">&quot;dimgrey&quot;</span>, lw<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                solid_capstyle<span class="op">=</span><span class="st">&quot;butt&quot;</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    ax.axhline(<span class="fl">0.0</span>, color<span class="op">=</span><span class="st">&quot;grey&quot;</span>, lw<span class="op">=</span><span class="fl">0.7</span>, ls<span class="op">=</span>(<span class="dv">0</span>, (<span class="dv">6</span>, <span class="dv">6</span>)), zorder<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fixed limits every frame -&gt; fixed pixels for the wall.</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(xlo, xhi)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="op">-</span>Rt <span class="op">*</span> <span class="fl">1.06</span>, Rt <span class="op">*</span> <span class="fl">1.06</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> equal:</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># adjustable=&quot;box&quot; keeps the limits I set and shrinks the axes</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># box instead. Because the window width is fixed, that shrink is</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># identical in every frame, so the wall holds its pixels.</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># adjustable=&quot;datalim&quot; would silently rewrite the y limits.</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        ax.set_aspect(<span class="st">&quot;equal&quot;</span>, adjustable<span class="op">=</span><span class="st">&quot;box&quot;</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks([])</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    ax.set_yticks([])</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> sp <span class="kw">in</span> ax.spines.values():</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        sp.set_visible(<span class="va">False</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> render(item, case, limits, outdir):</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    idx, snapshot, tval <span class="op">=</span> item</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    dest <span class="op">=</span> os.path.join(outdir, <span class="ss">f&quot;frame-</span><span class="sc">{</span>idx<span class="sc">:05d}</span><span class="ss">.png&quot;</span>)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    seg <span class="op">=</span> facets(snapshot)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(seg) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    Rt, Ld, W <span class="op">=</span> case[<span class="st">&quot;Rtube&quot;</span>], case[<span class="st">&quot;Ldomain&quot;</span>], case[<span class="st">&quot;window&quot;</span>]</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Travelling window: fixed width, centred on the bubble, clamped to</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the domain so the width can never change at the ends.</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    centre <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (seg[:, :, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">+</span> seg[:, :, <span class="dv">0</span>].<span class="bu">max</span>())</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    xlo <span class="op">=</span> <span class="bu">min</span>(<span class="bu">max</span>(centre <span class="op">-</span> W <span class="op">/</span> <span class="fl">2.0</span>, <span class="fl">0.0</span>), Ld <span class="op">-</span> W)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    xhi <span class="op">=</span> xlo <span class="op">+</span> W</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    d_full <span class="op">=</span> fields(snapshot, <span class="fl">0.0</span>, Ld, Rt, case[<span class="st">&quot;ny_full&quot;</span>], case[<span class="st">&quot;muR&quot;</span>])</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    d_win <span class="op">=</span> fields(snapshot, xlo, xhi, Rt, case[<span class="st">&quot;ny&quot;</span>], case[<span class="st">&quot;muR&quot;</span>])</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> d_full <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> d_win <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The lower panel holds true aspect, so its height is set by the</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># window width; the figure is sized to that rather than leaving the</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># shrunk axes floating in whitespace.</span></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>    panel_w <span class="op">=</span> <span class="fl">17.0</span> <span class="op">*</span> (<span class="fl">0.88</span> <span class="op">-</span> <span class="fl">0.03</span>)</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    win_h <span class="op">=</span> panel_w <span class="op">*</span> (<span class="fl">2.0</span> <span class="op">*</span> Rt <span class="op">*</span> <span class="fl">1.06</span>) <span class="op">/</span> W</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>    fig_h <span class="op">=</span> win_h <span class="op">+</span> <span class="fl">1.55</span> <span class="op">+</span> <span class="fl">1.75</span></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">17</span>, fig_h))</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>    gs <span class="op">=</span> fig.add_gridspec(<span class="dv">2</span>, <span class="dv">1</span>, height_ratios<span class="op">=</span>[<span class="fl">1.55</span>, win_h],</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>                          left<span class="op">=</span><span class="fl">0.03</span>, right<span class="op">=</span><span class="fl">0.88</span>,</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>                          top<span class="op">=</span><span class="fl">1.0</span> <span class="op">-</span> <span class="fl">1.00</span> <span class="op">/</span> fig_h, bottom<span class="op">=</span><span class="fl">0.30</span> <span class="op">/</span> fig_h,</span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>                          hspace<span class="op">=</span><span class="fl">0.55</span> <span class="op">/</span> <span class="bu">max</span>(win_h, <span class="fl">0.5</span>))</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>    ax_full <span class="op">=</span> fig.add_subplot(gs[<span class="dv">0</span>])</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>    ax_win <span class="op">=</span> fig.add_subplot(gs[<span class="dv">1</span>])</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>    draw_panel(ax_full, d_full, seg, case, limits, <span class="fl">0.0</span>, Ld, equal<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>    draw_panel(ax_win, d_win, seg, case, limits, xlo, xhi, equal<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mark where the travelling window sits within the whole domain.</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xv <span class="kw">in</span> (xlo, xhi):</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>        ax_full.plot([xv, xv], [<span class="op">-</span>Rt <span class="op">*</span> <span class="fl">1.06</span>, Rt <span class="op">*</span> <span class="fl">1.06</span>], color<span class="op">=</span><span class="st">&quot;black&quot;</span>,</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>                     lw<span class="op">=</span><span class="fl">1.2</span>, ls<span class="op">=</span><span class="st">&quot;--&quot;</span>, zorder<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>    ax_full.set_title(<span class="vs">rf&quot;</span><span class="dv">$</span><span class="vs">L = </span><span class="sc">{</span>Ld<span class="sc">:g}</span><span class="dv">$</span><span class="vs">&quot;</span>, fontsize<span class="op">=</span><span class="dv">14</span>, pad<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>    ax_win.set_title(<span class="vs">rf&quot;window </span><span class="dv">$</span><span class="sc">{</span>W<span class="sc">:g}</span><span class="vs">R</span><span class="dv">$</span><span class="vs">&quot;</span>, fontsize<span class="op">=</span><span class="dv">14</span>, pad<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>    fig.suptitle(<span class="vs">rf&quot;</span><span class="dv">$</span><span class="vs">Ca = </span><span class="sc">{</span>case[<span class="st">&#39;Ca&#39;</span>]<span class="sc">}</span><span class="dv">$</span><span class="vs">,  MAXlevel </span><span class="sc">{</span>case[<span class="st">&#39;MAXlevel&#39;</span>]<span class="sc">}</span><span class="vs">,  &quot;</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">rf&quot;</span><span class="dv">$</span><span class="vs">t = </span><span class="sc">{</span>tval<span class="sc">:.2f}</span><span class="dv">$</span><span class="vs">&quot;</span>, fontsize<span class="op">=</span><span class="dv">21</span>,</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>                 y<span class="op">=</span><span class="fl">1.0</span> <span class="op">-</span> <span class="fl">0.20</span> <span class="op">/</span> fig_h)</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>    imv <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">&quot;Blues&quot;</span>,</span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>                                norm<span class="op">=</span>plt.Normalize(limits[<span class="st">&quot;vmin&quot;</span>], limits[<span class="st">&quot;vmax&quot;</span>]))</span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>    imd <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">&quot;hot_r&quot;</span>,</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>                                norm<span class="op">=</span>plt.Normalize(limits[<span class="st">&quot;dmin&quot;</span>], limits[<span class="st">&quot;dmax&quot;</span>]))</span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>    cbv <span class="op">=</span> fig.colorbar(imv, cax<span class="op">=</span>fig.add_axes([<span class="fl">0.90</span>, <span class="fl">0.54</span>, <span class="fl">0.012</span>, <span class="fl">0.30</span>]))</span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>    cbd <span class="op">=</span> fig.colorbar(imd, cax<span class="op">=</span>fig.add_axes([<span class="fl">0.90</span>, <span class="fl">0.14</span>, <span class="fl">0.012</span>, <span class="fl">0.30</span>]))</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>    cbv.set_label(<span class="vs">r&quot;</span><span class="dv">$</span><span class="cf">|</span><span class="vs">u</span><span class="cf">|</span><span class="dv">$</span><span class="vs">&quot;</span>, fontsize<span class="op">=</span><span class="dv">17</span>, labelpad<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>    cbd.set_label(<span class="vs">r&quot;</span><span class="dv">$</span><span class="er">\</span><span class="vs">log_</span><span class="op">{10}</span><span class="kw">(</span><span class="dv">\m</span><span class="vs">u</span><span class="ch">\,</span><span class="vs">D</span><span class="ch">\!</span><span class="vs">:</span><span class="ch">\!</span><span class="vs">D</span><span class="kw">)</span><span class="dv">$</span><span class="vs">&quot;</span>, fontsize<span class="op">=</span><span class="dv">17</span>, labelpad<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cb <span class="kw">in</span> (cbv, cbd):</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>        cb.ax.tick_params(labelsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>    fig.savefig(dest, dpi<span class="op">=</span><span class="dv">105</span>)</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>    plt.close(fig)</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dest</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>    ap <span class="op">=</span> argparse.ArgumentParser()</span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;case_dir&quot;</span>)</span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--out&quot;</span>, default<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--cpus&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--fps&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--ny&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">140</span>,</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">help</span><span class="op">=</span><span class="st">&quot;radial samples in the travelling window&quot;</span>)</span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--ny-full&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">90</span>,</span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">help</span><span class="op">=</span><span class="st">&quot;radial samples across the full domain&quot;</span>)</span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>    ap.add_argument(<span class="st">&quot;--window&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">float</span>, default<span class="op">=</span><span class="fl">8.0</span>,</span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">help</span><span class="op">=</span><span class="st">&quot;travelling window width in units of R (fixed)&quot;</span>)</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> ap.parse_args()</span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> args.window <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>        ap.error(<span class="st">&quot;--window must be positive&quot;</span>)</span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> args.ny <span class="op">&lt;</span> <span class="dv">2</span> <span class="kw">or</span> args.ny_full <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>        ap.error(<span class="st">&quot;--ny and --ny-full must be at least 2&quot;</span>)</span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>    case_dir <span class="op">=</span> os.path.abspath(args.case_dir)</span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> read_header(case_dir)</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a>    Ld <span class="op">=</span> read_ldomain(case_dir)</span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a>    case <span class="op">=</span> {<span class="st">&quot;Ca&quot;</span>: <span class="bu">float</span>(p[<span class="st">&quot;Ca&quot;</span>]), <span class="st">&quot;Rtube&quot;</span>: <span class="bu">float</span>(p[<span class="st">&quot;Rtube&quot;</span>]),</span>
+<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;muR&quot;</span>: <span class="bu">float</span>(p[<span class="st">&quot;muR&quot;</span>]), <span class="st">&quot;MAXlevel&quot;</span>: <span class="bu">int</span>(p[<span class="st">&quot;MAXlevel&quot;</span>]),</span>
+<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;ny&quot;</span>: args.ny, <span class="st">&quot;ny_full&quot;</span>: args.ny_full,</span>
+<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Ldomain&quot;</span>: Ld, <span class="st">&quot;window&quot;</span>: <span class="bu">min</span>(args.window, Ld)}</span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a>    snapdir <span class="op">=</span> os.path.join(case_dir, <span class="st">&quot;intermediate&quot;</span>)</span>
+<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a>    snaps <span class="op">=</span> <span class="bu">sorted</span>(os.listdir(snapdir),</span>
+<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a>                   key<span class="op">=</span><span class="kw">lambda</span> s: <span class="bu">float</span>(s.split(<span class="st">&quot;-&quot;</span>)[<span class="dv">1</span>]))</span>
+<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a>    items <span class="op">=</span> [(i, os.path.join(snapdir, s), <span class="bu">float</span>(s.split(<span class="st">&quot;-&quot;</span>)[<span class="dv">1</span>]))</span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a>             <span class="cf">for</span> i, s <span class="kw">in</span> <span class="bu">enumerate</span>(snaps)]</span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> items:</span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">&quot;no snapshots&quot;</span>)</span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fixed colour limits across the video, from a sample of frames, so</span></span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a>    <span class="co"># brightness changes mean physics rather than rescaling.</span></span>
+<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a>    probe <span class="op">=</span> items[:: <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">len</span>(items) <span class="op">//</span> <span class="dv">8</span>)][:<span class="dv">8</span>]</span>
+<span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a>    vv, dd <span class="op">=</span> [], []</span>
+<span id="cb7-144"><a href="#cb7-144" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, snap, _t <span class="kw">in</span> probe:</span>
+<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a>        seg <span class="op">=</span> facets(snap)</span>
+<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(seg) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a>        c <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (seg[:, :, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">+</span> seg[:, :, <span class="dv">0</span>].<span class="bu">max</span>())</span>
+<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a>        wlo <span class="op">=</span> <span class="bu">min</span>(<span class="bu">max</span>(c <span class="op">-</span> case[<span class="st">&quot;window&quot;</span>] <span class="op">/</span> <span class="fl">2.0</span>, <span class="fl">0.0</span>),</span>
+<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a>                  case[<span class="st">&quot;Ldomain&quot;</span>] <span class="op">-</span> case[<span class="st">&quot;window&quot;</span>])</span>
+<span id="cb7-151"><a href="#cb7-151" aria-hidden="true" tabindex="-1"></a>        d <span class="op">=</span> fields(snap, wlo, wlo <span class="op">+</span> case[<span class="st">&quot;window&quot;</span>],</span>
+<span id="cb7-152"><a href="#cb7-152" aria-hidden="true" tabindex="-1"></a>                   case[<span class="st">&quot;Rtube&quot;</span>], case[<span class="st">&quot;ny&quot;</span>], case[<span class="st">&quot;muR&quot;</span>])</span>
+<span id="cb7-153"><a href="#cb7-153" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> d <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb7-154"><a href="#cb7-154" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb7-155"><a href="#cb7-155" aria-hidden="true" tabindex="-1"></a>        good <span class="op">=</span> d[:, :, <span class="dv">2</span>] <span class="op">&gt;</span> <span class="fl">0.5</span></span>
+<span id="cb7-156"><a href="#cb7-156" aria-hidden="true" tabindex="-1"></a>        vv.append(np.nanpercentile(d[:, :, <span class="dv">5</span>][good], <span class="fl">99.5</span>))</span>
+<span id="cb7-157"><a href="#cb7-157" aria-hidden="true" tabindex="-1"></a>        <span class="co"># getData writes -10 where the dissipation is identically zero.</span></span>
+<span id="cb7-158"><a href="#cb7-158" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Including that sentinel in the range would compress every real</span></span>
+<span id="cb7-159"><a href="#cb7-159" aria-hidden="true" tabindex="-1"></a>        <span class="co"># value into the top of the colormap.</span></span>
+<span id="cb7-160"><a href="#cb7-160" aria-hidden="true" tabindex="-1"></a>        dvals <span class="op">=</span> d[:, :, <span class="dv">4</span>][good]</span>
+<span id="cb7-161"><a href="#cb7-161" aria-hidden="true" tabindex="-1"></a>        dvals <span class="op">=</span> dvals[dvals <span class="op">&gt;</span> <span class="op">-</span><span class="fl">9.9</span>]</span>
+<span id="cb7-162"><a href="#cb7-162" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> dvals.size:</span>
+<span id="cb7-163"><a href="#cb7-163" aria-hidden="true" tabindex="-1"></a>            dd.append(np.nanpercentile(dvals, [<span class="dv">2</span>, <span class="fl">99.5</span>]))</span>
+<span id="cb7-164"><a href="#cb7-164" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> vv:</span>
+<span id="cb7-165"><a href="#cb7-165" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">&quot;could not establish colour limits&quot;</span>)</span>
+<span id="cb7-166"><a href="#cb7-166" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> dd:</span>
+<span id="cb7-167"><a href="#cb7-167" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">&quot;no finite dissipation values found&quot;</span>)</span>
+<span id="cb7-168"><a href="#cb7-168" aria-hidden="true" tabindex="-1"></a>    dmax <span class="op">=</span> <span class="bu">float</span>(np.<span class="bu">max</span>([x[<span class="dv">1</span>] <span class="cf">for</span> x <span class="kw">in</span> dd]))</span>
+<span id="cb7-169"><a href="#cb7-169" aria-hidden="true" tabindex="-1"></a>    dmin <span class="op">=</span> <span class="bu">float</span>(np.<span class="bu">min</span>([x[<span class="dv">0</span>] <span class="cf">for</span> x <span class="kw">in</span> dd]))</span>
+<span id="cb7-170"><a href="#cb7-170" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Five decades is enough to show the film and the caps together; more</span></span>
+<span id="cb7-171"><a href="#cb7-171" aria-hidden="true" tabindex="-1"></a>    <span class="co"># than that and the film detail washes out.</span></span>
+<span id="cb7-172"><a href="#cb7-172" aria-hidden="true" tabindex="-1"></a>    dmin <span class="op">=</span> <span class="bu">max</span>(dmin, dmax <span class="op">-</span> <span class="fl">5.0</span>)</span>
+<span id="cb7-173"><a href="#cb7-173" aria-hidden="true" tabindex="-1"></a>    limits <span class="op">=</span> {<span class="st">&quot;vmin&quot;</span>: <span class="fl">0.0</span>, <span class="st">&quot;vmax&quot;</span>: <span class="bu">float</span>(np.<span class="bu">max</span>(vv)),</span>
+<span id="cb7-174"><a href="#cb7-174" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;dmin&quot;</span>: dmin, <span class="st">&quot;dmax&quot;</span>: dmax}</span>
+<span id="cb7-175"><a href="#cb7-175" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;colour limits: |u| 0 -&gt; </span><span class="sc">{</span>limits[<span class="st">&#39;vmax&#39;</span>]<span class="sc">:.4g}</span><span class="ss">, &quot;</span></span>
+<span id="cb7-176"><a href="#cb7-176" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f&quot;log10 diss </span><span class="sc">{</span>limits[<span class="st">&#39;dmin&#39;</span>]<span class="sc">:.3g}</span><span class="ss"> -&gt; </span><span class="sc">{</span>limits[<span class="st">&#39;dmax&#39;</span>]<span class="sc">:.3g}</span><span class="ss">&quot;</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-177"><a href="#cb7-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-178"><a href="#cb7-178" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Frames are always regenerated. Reusing them silently mixes output</span></span>
+<span id="cb7-179"><a href="#cb7-179" aria-hidden="true" tabindex="-1"></a>    <span class="co"># from different colour limits, window widths or solver versions into</span></span>
+<span id="cb7-180"><a href="#cb7-180" aria-hidden="true" tabindex="-1"></a>    <span class="co"># one video.</span></span>
+<span id="cb7-181"><a href="#cb7-181" aria-hidden="true" tabindex="-1"></a>    outdir <span class="op">=</span> os.path.join(case_dir, <span class="st">&quot;frames&quot;</span>)</span>
+<span id="cb7-182"><a href="#cb7-182" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.isdir(outdir):</span>
+<span id="cb7-183"><a href="#cb7-183" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> old_frame <span class="kw">in</span> glob.glob(os.path.join(outdir, <span class="st">&quot;frame-*.png&quot;</span>)):</span>
+<span id="cb7-184"><a href="#cb7-184" aria-hidden="true" tabindex="-1"></a>            os.remove(old_frame)</span>
+<span id="cb7-185"><a href="#cb7-185" aria-hidden="true" tabindex="-1"></a>    os.makedirs(outdir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-186"><a href="#cb7-186" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> Pool(args.cpus) <span class="im">as</span> pool:</span>
+<span id="cb7-187"><a href="#cb7-187" aria-hidden="true" tabindex="-1"></a>        made <span class="op">=</span> pool.<span class="bu">map</span>(partial(render, case<span class="op">=</span>case, limits<span class="op">=</span>limits,</span>
+<span id="cb7-188"><a href="#cb7-188" aria-hidden="true" tabindex="-1"></a>                                outdir<span class="op">=</span>outdir), items)</span>
+<span id="cb7-189"><a href="#cb7-189" aria-hidden="true" tabindex="-1"></a>    made <span class="op">=</span> [m <span class="cf">for</span> m <span class="kw">in</span> made <span class="cf">if</span> m]</span>
+<span id="cb7-190"><a href="#cb7-190" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;rendered </span><span class="sc">{</span><span class="bu">len</span>(made)<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span><span class="bu">len</span>(items)<span class="sc">}</span><span class="ss"> frames&quot;</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-191"><a href="#cb7-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-192"><a href="#cb7-192" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> args.out <span class="kw">or</span> os.path.join(case_dir,</span>
+<span id="cb7-193"><a href="#cb7-193" aria-hidden="true" tabindex="-1"></a>                                   <span class="ss">f&quot;bretherton-Ca</span><span class="sc">{</span>case[<span class="st">&#39;Ca&#39;</span>]<span class="sc">}</span><span class="ss">-ml</span><span class="sc">{</span>case[<span class="st">&#39;MAXlevel&#39;</span>]<span class="sc">}</span><span class="ss">.mp4&quot;</span>)</span>
+<span id="cb7-194"><a href="#cb7-194" aria-hidden="true" tabindex="-1"></a>    cmd <span class="op">=</span> [<span class="st">&quot;ffmpeg&quot;</span>, <span class="st">&quot;-y&quot;</span>, <span class="st">&quot;-framerate&quot;</span>, <span class="bu">str</span>(args.fps),</span>
+<span id="cb7-195"><a href="#cb7-195" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;-pattern_type&quot;</span>, <span class="st">&quot;glob&quot;</span>, <span class="st">&quot;-i&quot;</span>, os.path.join(outdir, <span class="st">&quot;frame-*.png&quot;</span>),</span>
+<span id="cb7-196"><a href="#cb7-196" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;-c:v&quot;</span>, <span class="st">&quot;libx264&quot;</span>, <span class="st">&quot;-pix_fmt&quot;</span>, <span class="st">&quot;yuv420p&quot;</span>,</span>
+<span id="cb7-197"><a href="#cb7-197" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;-vf&quot;</span>, <span class="st">&quot;pad=ceil(iw/2)*2:ceil(ih/2)*2&quot;</span>, out]</span>
+<span id="cb7-198"><a href="#cb7-198" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> sp.run(cmd, capture_output<span class="op">=</span><span class="va">True</span>, text<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-199"><a href="#cb7-199" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> r.returncode <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb7-200"><a href="#cb7-200" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(r.stderr[<span class="op">-</span><span class="dv">1500</span>:], <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb7-201"><a href="#cb7-201" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">&quot;ffmpeg failed&quot;</span>)</span>
+<span id="cb7-202"><a href="#cb7-202" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;wrote </span><span class="sc">{</span>out<span class="sc">}</span><span class="ss">&quot;</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-203"><a href="#cb7-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-204"><a href="#cb7-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-205"><a href="#cb7-205" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb7-206"><a href="#cb7-206" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div></div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/postProcess/Video-bretherton.py" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

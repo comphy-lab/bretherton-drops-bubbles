@@ -146,6 +146,17 @@ if [[ ! -f "$PARAM_FILE" ]]; then
   exit 1
 fi
 
+# Run data is a separate surface from source. OUTPUT_ROOT defaults to the
+# in-tree location so existing invocations are unchanged, but a dispatched
+# campaign points it at an organised run directory on a registered volume.
+OUTPUT_ROOT="${OUTPUT_ROOT:-${SCRIPT_DIR}/simulationCases}"
+if [[ ! -d "$OUTPUT_ROOT" ]]; then
+  mkdir -p "$OUTPUT_ROOT" || {
+    echo "ERROR: cannot create output root: $OUTPUT_ROOT" >&2
+    exit 1
+  }
+fi
+
 SRC_FILE_ORIG="${SCRIPT_DIR}/simulationCases/${EXEC_CODE}"
 if [[ ! -f "$SRC_FILE_ORIG" ]]; then
   echo "ERROR: Source file not found: $SRC_FILE_ORIG" >&2
@@ -168,7 +179,7 @@ if [[ "$CASE_NO" -lt 1000 ]]; then
   exit 1
 fi
 
-CASE_DIR="${SCRIPT_DIR}/simulationCases/${CASE_NO}"
+CASE_DIR="${OUTPUT_ROOT}/${CASE_NO}"
 SRC_FILE_LOCAL="${EXEC_CODE}"
 EXECUTABLE_NAME="${EXEC_CODE%.c}"
 CASE_LOG_FILE="c${CASE_NO}-log"
@@ -185,7 +196,7 @@ if [[ $USE_OPENMP -eq 1 ]]; then
 else
   echo "Run mode: Serial"
 fi
-echo "Expected log file: ${CASE_LOG_FILE}"
+echo "Expected log file: ${CASE_DIR}/${CASE_LOG_FILE}"
 echo "========================================="
 echo ""
 
@@ -198,7 +209,7 @@ cp "$SRC_FILE_ORIG" "$CASE_DIR/$SRC_FILE_LOCAL"
 cd "$CASE_DIR"
 
 echo "Compiling ${SRC_FILE_LOCAL} ..."
-QCC_FLAGS=(-I../../src-local -O2 -Wall -disable-dimensions)
+QCC_FLAGS=(-I"${SCRIPT_DIR}/src-local" -O2 -Wall -disable-dimensions)
 if [[ $USE_OPENMP -eq 1 ]]; then
   QCC_FLAGS+=(-fopenmp)
 fi
@@ -234,9 +245,9 @@ fi
 echo ""
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "Simulation completed successfully."
-  echo "Output location: simulationCases/${CASE_NO}/"
+  echo "Output location: ${CASE_DIR}/"
   if [[ -f "${CASE_LOG_FILE}" ]]; then
-    echo "Log file: simulationCases/${CASE_NO}/${CASE_LOG_FILE}"
+    echo "Log file: ${CASE_DIR}/${CASE_LOG_FILE}"
   fi
 else
   echo "Simulation failed with exit code: $EXIT_CODE"

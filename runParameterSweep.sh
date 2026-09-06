@@ -24,6 +24,12 @@ Options:
   -n, --dry-run  Show generated parameter combinations only
   -v, --verbose  Print expanded per-case parameter details
   -h, --help     Show this help message
+
+Environment:
+  OUTPUT_ROOT    Directory holding per-case output directories, passed
+                 through to runSimulation.sh (default: simulationCases/
+                 inside the repository). Export it to keep campaign data on
+                 a registered volume rather than in the source checkout.
 EOF
 }
 
@@ -445,7 +451,7 @@ echo "========================================="
 echo "Total cases: ${COMBINATION_COUNT}"
 echo "Successful: ${SUCCESSFUL}"
 echo "Failed: ${FAILED}"
-echo "Outputs: simulationCases/"
+echo "Outputs: ${OUTPUT_ROOT:-simulationCases/}"
 echo "========================================="
 
 if [[ "$FAILED" -gt 0 ]]; then

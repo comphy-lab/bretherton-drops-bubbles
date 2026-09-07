@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!--
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>testCases/runParallelSmokeTests.py | Bretherton drops and bubbles</title>
+
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="Compare short serial and two-rank MPI solver runs and restarts. python import argparse import math import os import select import signal import shutil import...">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="copy_build, decode_output, invocation_processes, invoke, last_metrics, open_verified_group, path_is_within, runparallelsmoketests, signal_verified_group, write_params">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "..";
+  </script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+
+            <div class="page-content">
+
+                                <h1 class="page-title">testCases/runParallelSmokeTests.py</h1>
+
+
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/runParallelSmokeTests.py" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span></code></pre></div></div>
+                <p>Compare short serial and two-rank MPI solver runs and
+                restarts.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> argparse</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> select</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> signal</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> uuid</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>REPO_ROOT <span class="op">=</span> Path(<span class="va">__file__</span>).resolve().parents[<span class="dv">1</span>]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>RUNNER <span class="op">=</span> REPO_ROOT <span class="op">/</span> <span class="st">&quot;runSimulation.sh&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>SMOKE_PARAMS <span class="op">=</span> REPO_ROOT <span class="op">/</span> <span class="st">&quot;testCases&quot;</span> <span class="op">/</span> <span class="st">&quot;smoke.params&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>BUILD_FILES <span class="op">=</span> (<span class="st">&quot;bretherton&quot;</span>, <span class="st">&quot;bretherton.c&quot;</span>, <span class="st">&quot;build.meta&quot;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>INVOCATION_TAG <span class="op">=</span> <span class="st">&quot;BRETHERTON_PARALLEL_SMOKE_INVOCATION&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> decode_output(output: <span class="bu">str</span> <span class="op">|</span> <span class="bu">bytes</span> <span class="op">|</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span></code></pre></div></div>
+                <p>Normalize partial subprocess output for an on-disk
+                receipt.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> output <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(output, <span class="bu">bytes</span>):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> output.decode(<span class="st">&quot;utf-8&quot;</span>, errors<span class="op">=</span><span class="st">&quot;replace&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> invocation_processes(process_group: <span class="bu">int</span>, invocation_tag: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">set</span>[<span class="bu">int</span>]:</span></code></pre></div></div>
+                <p>Find non-zombie processes by process group or
+                inherited unique tag.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    members <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    expected_tag <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>INVOCATION_TAG<span class="sc">}</span><span class="ss">=</span><span class="sc">{</span>invocation_tag<span class="sc">}</span><span class="ss">&quot;</span>.encode()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> entry <span class="kw">in</span> Path(<span class="st">&quot;/proc&quot;</span>).iterdir():</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> entry.name.isdigit():</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        process_id <span class="op">=</span> <span class="bu">int</span>(entry.name)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            status_lines <span class="op">=</span> (entry <span class="op">/</span> <span class="st">&quot;status&quot;</span>).read_text(encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>).splitlines()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            process_state <span class="op">=</span> <span class="bu">next</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                line.split()[<span class="dv">1</span>] <span class="cf">for</span> line <span class="kw">in</span> status_lines <span class="cf">if</span> line.startswith(<span class="st">&quot;State:&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> process_state <span class="op">==</span> <span class="st">&quot;Z&quot;</span>:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>            in_process_group <span class="op">=</span> os.getpgid(process_id) <span class="op">==</span> process_group</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                process_environment <span class="op">=</span> (entry <span class="op">/</span> <span class="st">&quot;environ&quot;</span>).read_bytes().split(<span class="st">b&quot;</span><span class="ch">\0</span><span class="st">&quot;</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                has_invocation_tag <span class="op">=</span> expected_tag <span class="kw">in</span> process_environment</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">PermissionError</span>:</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                has_invocation_tag <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> in_process_group <span class="kw">or</span> has_invocation_tag:</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                members.add(process_id)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> (<span class="pp">FileNotFoundError</span>, <span class="pp">ProcessLookupError</span>, <span class="pp">PermissionError</span>, <span class="pp">StopIteration</span>):</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> members</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> path_is_within(candidate: Path, root: Path) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span></code></pre></div></div>
+                <p>Return whether candidate is root or one of its
+                descendants.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        candidate.relative_to(root)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> open_verified_group(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    process_group: <span class="bu">int</span>, work_root: Path, invocation_tag: <span class="bu">str</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">list</span>[<span class="bu">tuple</span>[<span class="bu">int</span>, <span class="bu">int</span>]], <span class="bu">list</span>[<span class="bu">str</span>]]:</span></code></pre></div></div>
+                <p>Open pidfds and prove ownership of every
+                process-group member.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    initial_members <span class="op">=</span> invocation_processes(process_group, invocation_tag)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    evidence <span class="op">=</span> [<span class="ss">f&quot;process_group=</span><span class="sc">{</span>process_group<span class="sc">}</span><span class="ss">&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;initial_members=</span><span class="sc">{</span><span class="bu">sorted</span>(initial_members)<span class="sc">}</span><span class="ss">&quot;</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> initial_members:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">&quot;no live process-group members were available for ownership proof&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    expected_uid <span class="op">=</span> os.getuid()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    expected_tag <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>INVOCATION_TAG<span class="sc">}</span><span class="ss">=</span><span class="sc">{</span>invocation_tag<span class="sc">}</span><span class="ss">&quot;</span>.encode()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    handles: <span class="bu">list</span>[<span class="bu">tuple</span>[<span class="bu">int</span>, <span class="bu">int</span>]] <span class="op">=</span> []</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> process_id <span class="kw">in</span> <span class="bu">sorted</span>(initial_members):</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            process_fd <span class="op">=</span> os.pidfd_open(process_id)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            handles.append((process_id, process_fd))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>            process_root <span class="op">=</span> Path(<span class="ss">f&quot;/proc/</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>            process_uid <span class="op">=</span> process_root.stat().st_uid</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>            process_cwd <span class="op">=</span> Path(os.readlink(process_root <span class="op">/</span> <span class="st">&quot;cwd&quot;</span>)).resolve()</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            process_environment <span class="op">=</span> (process_root <span class="op">/</span> <span class="st">&quot;environ&quot;</span>).read_bytes().split(<span class="st">b&quot;</span><span class="ch">\0</span><span class="st">&quot;</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> process_uid <span class="op">!=</span> expected_uid:</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                    <span class="ss">f&quot;pid </span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> has uid </span><span class="sc">{</span>process_uid<span class="sc">}</span><span class="ss">, expected </span><span class="sc">{</span>expected_uid<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> path_is_within(process_cwd, work_root):</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                    <span class="ss">f&quot;pid </span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> cwd </span><span class="sc">{</span>process_cwd<span class="sc">}</span><span class="ss"> is outside </span><span class="sc">{</span>work_root<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> expected_tag <span class="kw">not</span> <span class="kw">in</span> process_environment:</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f&quot;pid </span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> lacks the invocation tag&quot;</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>            evidence.append(</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;pid=</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> uid=</span><span class="sc">{</span>process_uid<span class="sc">}</span><span class="ss"> cwd=</span><span class="sc">{</span>process_cwd<span class="sc">}</span><span class="ss"> tag=verified&quot;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>        final_members <span class="op">=</span> invocation_processes(process_group, invocation_tag)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        evidence.append(<span class="ss">f&quot;final_members=</span><span class="sc">{</span><span class="bu">sorted</span>(final_members)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> final_members <span class="op">!=</span> initial_members:</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;process-group membership changed during ownership proof: &quot;</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">sorted</span>(initial_members)<span class="sc">}</span><span class="ss"> -&gt; </span><span class="sc">{</span><span class="bu">sorted</span>(final_members)<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> handles, evidence</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _, process_fd <span class="kw">in</span> handles:</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>            os.close(process_fd)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> signal_verified_group(</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    handles: <span class="bu">list</span>[<span class="bu">tuple</span>[<span class="bu">int</span>, <span class="bu">int</span>]], process_group: <span class="bu">int</span>, invocation_tag: <span class="bu">str</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span></code></pre></div></div>
+                <p>Terminate only the processes held by previously
+                verified pidfds.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    evidence <span class="op">=</span> []</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> process_id, process_fd <span class="kw">in</span> handles:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                signal.pidfd_send_signal(process_fd, signal.SIGTERM)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                evidence.append(<span class="ss">f&quot;pid=</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> signal=TERM&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ProcessLookupError</span>:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                evidence.append(<span class="ss">f&quot;pid=</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> exited_before_TERM&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        pending_fds <span class="op">=</span> {process_fd <span class="cf">for</span> _, process_fd <span class="kw">in</span> handles}</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        term_deadline <span class="op">=</span> time.monotonic() <span class="op">+</span> <span class="fl">5.0</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> pending_fds <span class="kw">and</span> time.monotonic() <span class="op">&lt;</span> term_deadline:</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>            readable, _, _ <span class="op">=</span> select.select(</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                <span class="bu">list</span>(pending_fds), [], [], <span class="bu">max</span>(<span class="fl">0.0</span>, term_deadline <span class="op">-</span> time.monotonic())</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            pending_fds.difference_update(readable)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> process_id, process_fd <span class="kw">in</span> handles:</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> process_fd <span class="kw">not</span> <span class="kw">in</span> pending_fds:</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                signal.pidfd_send_signal(process_fd, signal.SIGKILL)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                evidence.append(<span class="ss">f&quot;pid=</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> signal=KILL&quot;</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ProcessLookupError</span>:</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                evidence.append(<span class="ss">f&quot;pid=</span><span class="sc">{</span>process_id<span class="sc">}</span><span class="ss"> exited_before_KILL&quot;</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        deadline <span class="op">=</span> time.monotonic() <span class="op">+</span> <span class="fl">5.0</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> (invocation_processes(process_group, invocation_tag) <span class="kw">and</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>               time.monotonic() <span class="op">&lt;</span> deadline):</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>            time.sleep(<span class="fl">0.05</span>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        survivors <span class="op">=</span> invocation_processes(process_group, invocation_tag)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        evidence.append(<span class="ss">f&quot;survivors=</span><span class="sc">{</span><span class="bu">sorted</span>(survivors)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> survivors:</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f&quot;verified process-group members survived: </span><span class="sc">{</span><span class="bu">sorted</span>(survivors)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> evidence</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _, process_fd <span class="kw">in</span> handles:</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>            os.close(process_fd)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> write_params(destination: Path, case_no: <span class="bu">int</span>, <span class="op">**</span>updates: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span></code></pre></div></div>
+                <p>Write a smoke parameter file with selected key
+                replacements.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> {<span class="st">&quot;CaseNo&quot;</span>: <span class="bu">str</span>(case_no), <span class="op">**</span>{key: <span class="bu">str</span>(value) <span class="cf">for</span> key, value <span class="kw">in</span> updates.items()}}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> []</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    replaced <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> SMOKE_PARAMS.read_text(encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>).splitlines():</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        stripped <span class="op">=</span> line.strip()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stripped <span class="kw">and</span> <span class="kw">not</span> stripped.startswith(<span class="st">&quot;#&quot;</span>) <span class="kw">and</span> <span class="st">&quot;=&quot;</span> <span class="kw">in</span> stripped:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            key <span class="op">=</span> stripped.split(<span class="st">&quot;=&quot;</span>, <span class="dv">1</span>)[<span class="dv">0</span>].strip()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> key <span class="kw">in</span> values:</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                lines.append(<span class="ss">f&quot;</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">=</span><span class="sc">{</span>values[key]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                replaced.add(key)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        lines.append(line)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    lines.extend(<span class="ss">f&quot;</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">=</span><span class="sc">{</span>value<span class="sc">}</span><span class="ss">&quot;</span> <span class="cf">for</span> key, value <span class="kw">in</span> values.items() <span class="cf">if</span> key <span class="kw">not</span> <span class="kw">in</span> replaced)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    destination.write_text(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(lines) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> invoke(params: Path, output_root: Path, extra: <span class="bu">list</span>[<span class="bu">str</span>], timeout: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span></code></pre></div></div>
+                <p>Run the case runner and return its combined
+                diagnostic stream.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    command <span class="op">=</span> [<span class="st">&quot;bash&quot;</span>, <span class="bu">str</span>(RUNNER), <span class="bu">str</span>(params), <span class="op">*</span>extra]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    work_root <span class="op">=</span> output_root.parent.resolve(strict<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    invocation_tag <span class="op">=</span> uuid.uuid4().<span class="bu">hex</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    environment <span class="op">=</span> os.environ.copy()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    environment[<span class="st">&quot;OUTPUT_ROOT&quot;</span>] <span class="op">=</span> <span class="bu">str</span>(output_root)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    environment[INVOCATION_TAG] <span class="op">=</span> invocation_tag</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    stage <span class="op">=</span> <span class="st">&quot;build&quot;</span> <span class="cf">if</span> <span class="st">&quot;--build-only&quot;</span> <span class="kw">in</span> extra <span class="cf">else</span> <span class="st">&quot;run&quot;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    receipt <span class="op">=</span> output_root.parent <span class="op">/</span> <span class="ss">f&quot;</span><span class="sc">{</span>output_root<span class="sc">.</span>name<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>params<span class="sc">.</span>stem<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>stage<span class="sc">}</span><span class="ss">.log&quot;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    process <span class="op">=</span> subprocess.Popen(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        command,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        cwd<span class="op">=</span>work_root,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        env<span class="op">=</span>environment,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        stdout<span class="op">=</span>subprocess.PIPE,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        stderr<span class="op">=</span>subprocess.STDOUT,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        text<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        start_new_session<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        output, _ <span class="op">=</span> process.communicate(timeout<span class="op">=</span>timeout <span class="op">+</span> <span class="dv">30</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> subprocess.TimeoutExpired <span class="im">as</span> timeout_error:</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        partial_output <span class="op">=</span> decode_output(timeout_error.output)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        timeout_evidence <span class="op">=</span> [</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;&quot;</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;# Harness timeout ownership evidence&quot;</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;invocation_tag=</span><span class="sc">{</span>invocation_tag<span class="sc">}</span><span class="ss">&quot;</span>,</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;launcher_pid=</span><span class="sc">{</span>process<span class="sc">.</span>pid<span class="sc">}</span><span class="ss">&quot;</span>,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;work_root=</span><span class="sc">{</span>work_root<span class="sc">}</span><span class="ss">&quot;</span>,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            handles, ownership_evidence <span class="op">=</span> open_verified_group(</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                process.pid, work_root, invocation_tag</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            timeout_evidence.extend(ownership_evidence)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> ownership_error:</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            timeout_evidence.append(<span class="ss">f&quot;ownership_proof=FAILED: </span><span class="sc">{</span>ownership_error<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            receipt.write_text(</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                partial_output <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(timeout_evidence) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;runner timed out; ownership proof failed, so no process was signalled; &quot;</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;evidence retained in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>            ) <span class="im">from</span> timeout_error</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>            timeout_evidence.extend(</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>                signal_verified_group(handles, process.pid, invocation_tag)</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>            output, _ <span class="op">=</span> process.communicate(timeout<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> cleanup_error:</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>            timeout_evidence.append(<span class="ss">f&quot;verified_cleanup=FAILED: </span><span class="sc">{</span>cleanup_error<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>            receipt.write_text(</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>                partial_output <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(timeout_evidence) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>                encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>,</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;runner timed out; verified cleanup did not complete; &quot;</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;evidence retained in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>            ) <span class="im">from</span> timeout_error</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>        receipt.write_text(</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>            decode_output(output) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(timeout_evidence) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>            encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>,</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;runner exceeded </span><span class="sc">{</span>timeout <span class="op">+</span> <span class="dv">30</span><span class="sc">}</span><span class="ss"> seconds; its verified processes were &quot;</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;terminated and evidence was retained in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        ) <span class="im">from</span> timeout_error</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    receipt.write_text(output, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>)</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> process.returncode <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;command failed with status </span><span class="sc">{</span>process<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(command)<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span>output<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;CFL must be &lt;=&quot;</span> <span class="kw">in</span> output:</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;VOF CFL warning in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> copy_build(source_case: Path, destination_case: Path) <span class="op">-&gt;</span> <span class="va">None</span>:</span></code></pre></div></div>
+                <p>Copy a verified case-local build without copying
+                runtime output.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    destination_case.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> BUILD_FILES:</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        shutil.copy2(source_case <span class="op">/</span> name, destination_case <span class="op">/</span> name)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> last_metrics(case_dir: Path) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span></code></pre></div></div>
+                <p>Return the final numerical log row and require a
+                single header.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    log_files <span class="op">=</span> <span class="bu">list</span>(case_dir.glob(<span class="st">&quot;c*-log&quot;</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(log_files) <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;expected one case log in </span><span class="sc">{</span>case_dir<span class="sc">}</span><span class="ss">, found </span><span class="sc">{</span>log_files<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> log_files[<span class="dv">0</span>].read_text(encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>).splitlines()</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">sum</span>(line.startswith(<span class="st">&quot;# CaseNo&quot;</span>) <span class="cf">for</span> line <span class="kw">in</span> lines) <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;expected one log header in </span><span class="sc">{</span>log_files[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> [line <span class="cf">for</span> line <span class="kw">in</span> lines <span class="cf">if</span> line <span class="kw">and</span> <span class="kw">not</span> line.startswith(<span class="st">&quot;#&quot;</span>)]</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> rows:</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;no numerical rows in </span><span class="sc">{</span>log_files[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="bu">float</span>(value) <span class="cf">for</span> value <span class="kw">in</span> rows[<span class="op">-</span><span class="dv">1</span>].split()[:<span class="dv">8</span>]]</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> assert_metrics_close(serial: <span class="bu">list</span>[<span class="bu">float</span>], mpi: <span class="bu">list</span>[<span class="bu">float</span>], label: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span></code></pre></div></div>
+                <p>Compare state columns while allowing reduction-order
+                roundoff.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> index, name <span class="kw">in</span> ((<span class="dv">2</span>, <span class="st">&quot;t&quot;</span>), (<span class="dv">3</span>, <span class="st">&quot;ke&quot;</span>), (<span class="dv">4</span>, <span class="st">&quot;volume&quot;</span>),</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                        (<span class="dv">5</span>, <span class="st">&quot;front&quot;</span>), (<span class="dv">6</span>, <span class="st">&quot;rear&quot;</span>), (<span class="dv">7</span>, <span class="st">&quot;film&quot;</span>)):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> math.isclose(serial[index], mpi[index], rel_tol<span class="op">=</span><span class="fl">5e-4</span>, abs_tol<span class="op">=</span><span class="fl">1e-7</span>):</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">AssertionError</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> mismatch: serial=</span><span class="sc">{</span>serial[index]<span class="sc">:.9g}</span><span class="ss">, &quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;mpi=</span><span class="sc">{</span>mpi[index]<span class="sc">:.9g}</span><span class="ss">&quot;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main() <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    parser <span class="op">=</span> argparse.ArgumentParser(description<span class="op">=</span>__doc__)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&quot;--rankfile&quot;</span>, required<span class="op">=</span><span class="va">True</span>, <span class="bu">type</span><span class="op">=</span>Path,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">help</span><span class="op">=</span><span class="st">&quot;Open MPI rankfile containing at least ranks 0 and 1&quot;</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&quot;--work-root&quot;</span>, <span class="bu">type</span><span class="op">=</span>Path,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">help</span><span class="op">=</span><span class="st">&quot;retain test cases beneath this directory&quot;</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    parser.add_argument(<span class="st">&quot;--timeout&quot;</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>, default<span class="op">=</span><span class="dv">600</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">help</span><span class="op">=</span><span class="st">&quot;timeout in seconds for each runner invocation&quot;</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (sys.platform <span class="op">!=</span> <span class="st">&quot;linux&quot;</span> <span class="kw">or</span> <span class="kw">not</span> <span class="bu">hasattr</span>(os, <span class="st">&quot;pidfd_open&quot;</span>) <span class="kw">or</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">not</span> <span class="bu">hasattr</span>(signal, <span class="st">&quot;pidfd_send_signal&quot;</span>)):</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        parser.error(<span class="st">&quot;guarded timeout handling requires Linux pidfd support&quot;</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    rankfile <span class="op">=</span> args.rankfile.expanduser().resolve(strict<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> args.timeout <span class="op">&lt;</span> <span class="dv">1</span>:</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>        parser.error(<span class="st">&quot;--timeout must be positive&quot;</span>)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    temporary_root <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> args.work_root:</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>        work_root <span class="op">=</span> args.work_root.expanduser().resolve()</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> work_root.exists() <span class="kw">and</span> <span class="bu">any</span>(work_root.iterdir()):</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>            parser.error(<span class="st">&quot;--work-root must be empty; retain old test evidence separately&quot;</span>)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>        work_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>        temporary_root <span class="op">=</span> Path(tempfile.mkdtemp(prefix<span class="op">=</span><span class="st">&quot;bretherton-parallel-smoke-&quot;</span>))</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>        work_root <span class="op">=</span> temporary_root</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    serial_output <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;serial-cases&quot;</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    mpi_output <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-cases&quot;</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    stop_output_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-stop-cases&quot;</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    params_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;params&quot;</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    serial_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    mpi_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>    stop_output_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    params_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    serial_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial.params&quot;</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>    mpi_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi.params&quot;</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    write_params(serial_params, <span class="dv">9901</span>)</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_params, <span class="dv">9901</span>)</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--build-only&quot;</span>], args.timeout)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile), <span class="st">&quot;--build-only&quot;</span>],</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>                         last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>), <span class="st">&quot;fresh run&quot;</span>)</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> case_dir <span class="kw">in</span> (serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>):</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="kw">not</span> (case_dir <span class="op">/</span> <span class="st">&quot;restart&quot;</span>).is_file() <span class="kw">or</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>                <span class="kw">not</span> <span class="bu">list</span>((case_dir <span class="op">/</span> <span class="st">&quot;intermediate&quot;</span>).glob(<span class="st">&quot;snapshot-*&quot;</span>))):</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;missing restart or snapshot output in </span><span class="sc">{</span>case_dir<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>    serial_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial-restart.params&quot;</span></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>    mpi_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-restart.params&quot;</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>    write_params(serial_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>    shutil.copy2(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>,</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>                 mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>    invoke(serial_restart_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_restart_params, mpi_output,</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>                         last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>), <span class="st">&quot;restart&quot;</span>)</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>    stop_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-collective-stop.params&quot;</span></span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>    write_params(stop_params, <span class="dv">9902</span>, Ldomain<span class="op">=</span><span class="st">&quot;7&quot;</span>)</span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>    copy_build(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>    stop_output <span class="op">=</span> invoke(</span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>        stop_params,</span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>        stop_output_root,</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>        [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>        args.timeout,</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;Front tip reached the outlet buffer&quot;</span> <span class="kw">not</span> <span class="kw">in</span> stop_output:</span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="st">&quot;MPI early-stop case did not exercise the outlet guard&quot;</span>)</span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>    last_metrics(stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;PASS: serial/MPI fresh run, restart, outputs, and collective early stop&quot;</span>)</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;work root: </span><span class="sc">{</span>work_root<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> temporary_root <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>        shutil.rmtree(temporary_root)</span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">SystemExit</span>(main())</span></code></pre></div></div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/runParallelSmokeTests.py" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+
+        // Add the button to the container
+        container.appendChild(button);
+
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

@@ -13,6 +13,7 @@ The scientific report is in `docs/Newtonian-Validation/`: `main.tex`,
   installation; the validation campaign uses `v2026-08-30`.
 - Bash, a C compiler and `qcc`. The runners load `.project_config` when present.
 - OpenMP for `--threads N`; Python with NumPy for flat-film post-processing.
+- Open MPI (`mpicc` and `mpirun`) for `--ranks N`.
 
 ## Run a case or sweep
 
@@ -22,6 +23,9 @@ bash runTests.sh --smoke
 
 # Run a single case with the bubble defaults.
 bash runSimulation.sh default.params --threads 4
+
+# MPI: the rankfile must map ranks to the allocated physical cores.
+bash runSimulation.sh default.params --ranks 4 --rankfile /path/to/rankfile
 
 # Inspect the eight-case grid study, then run it.
 bash runParameterSweep.sh grid-sensitivity.params --dry-run
@@ -39,6 +43,13 @@ Case output defaults to `simulationCases/<CaseNo>/`. Set `OUTPUT_ROOT` to a
 separate run directory for production calculations. Each case contains its
 parameters, source, executable, diagnostic log, `restart` dump and
 `intermediate/snapshot-*` files. An existing restart resumes that case.
+
+For a single-node MPI allocation, `--pe-list 0,1,2,3` can replace the rankfile
+when those are the allocated Open MPI core indices. Set `MPIEXEC` to select
+another launcher executable. `--build-only` compiles without running;
+`--no-build` reuses an executable after checking its source, local headers,
+Basilisk lock and binary checksums. `--openmp --threads 1` retains an OpenMP
+build for one-thread tests.
 
 ## Analysis and numerical checks
 

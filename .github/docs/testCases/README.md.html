@@ -202,7 +202,7 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="This directory holds the repository's smoke test and nothing else. A smoke test proves that simulationCases/bretherton.c compiles and integrates a few dozen ...">
+  <meta name="description" content="This directory holds a serial smoke test and a serial/MPI integration check. The serial smoke test checks that simulationCases/bretherton.c compiles and inte...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
   <meta name="keywords" content="readme">
@@ -433,10 +433,10 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                     </a>
                 </div>
                 
-                <h1 id="smoke-test">Smoke test</h1>
-                <p>This directory holds the repository’s smoke test and
-                nothing else.</p>
-                <p>A smoke test proves that
+                <h1 id="execution-checks">Execution checks</h1>
+                <p>This directory holds a serial smoke test and a
+                serial/MPI integration check.</p>
+                <p>The serial smoke test checks that
                 <code>simulationCases/bretherton.c</code> compiles and
                 integrates a few dozen time steps at coarse resolution
                 without producing a truncated log or blowing up. It
@@ -467,6 +467,11 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <td><code>runSmokeTests.sh</code></td>
                 <td>builds and runs the case, then checks the log</td>
                 </tr>
+                <tr>
+                <td><code>runParallelSmokeTests.py</code></td>
+                <td>compares serial and two-rank MPI runs and
+                restarts</td>
+                </tr>
                 </tbody>
                 </table>
                 <p>Cases that compare against an exact solution live in
@@ -488,6 +493,22 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh                  <span class="co"># verification cases, then this</span></span></code></pre></div></div>
                 <p>The build goes to <code>simulationCases/9999/</code>,
                 which is gitignored.</p>
+                <p>The parallel integration check needs Linux with
+                Python pidfd support, <code>qcc</code>,
+                <code>mpicc</code>, and an Open MPI rankfile naming two
+                allocated cores. It builds serial and MPI modes once,
+                compares short fresh and restarted runs, checks their
+                logs and snapshots, and exercises collective early
+                termination. Run it only inside the corresponding
+                reserved CPU set with a healthy MPI toolchain:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> testCases/runParallelSmokeTests.py <span class="at">--rankfile</span> /absolute/path/to/rankfile <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--work-root</span> /absolute/path/to/empty-test-directory</span></code></pre></div></div>
+                <p>The check retains command logs and stops on failed
+                execution, VOF CFL warnings or disagreement beyond its
+                stated tolerances. It checks parallel execution and
+                restart consistency; performance and mesh convergence
+                require separate tests.</p>
             </div>
         </main>
 

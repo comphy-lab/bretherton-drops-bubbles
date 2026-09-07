@@ -449,6 +449,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 load <code>.project_config</code> when present.</li>
                 <li>OpenMP for <code>--threads N</code>; Python with
                 NumPy for flat-film post-processing.</li>
+                <li>Open MPI (<code>mpicc</code> and
+                <code>mpirun</code>) for <code>--ranks N</code>.</li>
                 </ul>
                 <h2 id="run-a-case-or-sweep">Run a case or sweep</h2>
                 <div class="code-block-container"><div class="code-block-container"><pre
@@ -458,9 +460,12 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a single case with the bubble defaults.</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runSimulation.sh default.params <span class="at">--threads</span> 4</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the eight-case grid study, then run it.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity.params <span class="at">--dry-run</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity.params <span class="at">--threads</span> 4 <span class="at">--parallel</span> 2</span></code></pre></div></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># MPI: the rankfile must map ranks to the allocated physical cores.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runSimulation.sh default.params <span class="at">--ranks</span> 4 <span class="at">--rankfile</span> /path/to/rankfile</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the eight-case grid study, then run it.</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity.params <span class="at">--dry-run</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity.params <span class="at">--threads</span> 4 <span class="at">--parallel</span> 2</span></code></pre></div></div>
                 <p><a
                 href="default.params.html"><code>default.params</code></a>
                 defines the physical inputs and numerical controls.
@@ -479,6 +484,15 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <code>restart</code> dump and
                 <code>intermediate/snapshot-*</code> files. An existing
                 restart resumes that case.</p>
+                <p>For a single-node MPI allocation,
+                <code>--pe-list 0,1,2,3</code> can replace the rankfile
+                when those are the allocated Open MPI core indices. Set
+                <code>MPIEXEC</code> to select another launcher
+                executable. <code>--build-only</code> compiles without
+                running; <code>--no-build</code> reuses an executable
+                after checking its source, local headers, Basilisk lock
+                and binary checksums. <code>--openmp --threads 1</code>
+                retains an OpenMP build for one-thread tests.</p>
                 <h2 id="analysis-and-numerical-checks">Analysis and
                 numerical checks</h2>
                 <p><a
@@ -596,6 +610,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <ul>
                 <li><a
                 href="testCases/README.md.html">testCases/README.md</a></li>
+                <li><a
+                href="testCases/runParallelSmokeTests.py.html">testCases/runParallelSmokeTests.py</a></li>
                 <li><a
                 href="testCases/runSmokeTests.sh.html">testCases/runSmokeTests.sh</a></li>
                 <li><a

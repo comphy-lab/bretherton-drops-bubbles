@@ -259,8 +259,7 @@ def parse_git_remote() -> Tuple[str, str]:
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent.parent
 SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess',
-               'verificationCases', 'testCases', 'docs']
-DOCUMENTATION_ASSET_EXTENSIONS = {'.csv', '.png'}
+               'verificationCases', 'testCases']
 DOCS_DIR = REPO_ROOT / '.github' / 'docs'
 DOCS_RELATIVE_PATH = DOCS_DIR.relative_to(REPO_ROOT).as_posix()
 DOCS_URL_FRAGMENT = f"/{DOCS_RELATIVE_PATH.strip('/')}/"
@@ -422,7 +421,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
     valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params', '.md'}
     valid_names = {'Makefile'}
-    internal_names = {'AGENTS.md', 'CLAUDE.md', 'OPERATIONAL-NOTES.md'}
+    non_site_names = {'AGENTS.md', 'CLAUDE.md', 'OPERATIONAL-NOTES.md'}
     # Exclude 4-digit numeric case folders (e.g., simulationCases/1000/)
     numeric_case_pattern = re.compile(r'/\d{4}/')
     # Exclude transient compile-and-run directories (e.g.
@@ -435,7 +434,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
         src_path = root_dir / dir_name
         if src_path.is_dir():
             for f in src_path.rglob('*'):
-                if f.is_file() and not f.is_symlink() and f.name not in internal_names:
+                if f.is_file() and not f.is_symlink() and f.name not in non_site_names:
                     # Skip files in numeric case folders
                     if numeric_case_pattern.search(str(f)):
                         continue
@@ -447,34 +446,15 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
                     elif f.suffix in valid_exts and not f.name.endswith('.dat'):
                         files.add(f)
 
-    # Search supported source files in the root, excluding internal instructions.
+    # Search supported source files in the root, excluding agent instructions and operational notes.
     for f in root_dir.iterdir():
-        if f.is_file() and not f.is_symlink() and f.name not in internal_names:
+        if f.is_file() and not f.is_symlink() and f.name not in non_site_names:
             if f.name in valid_names:
                 files.add(f)
             elif f.suffix in valid_exts and not f.name.endswith('.dat'):
                 files.add(f)
 
     return sorted(files)
-
-def copy_documentation_assets(source_dir: Path, destination_dir: Path) -> bool:
-    """Copy approved companion assets while preserving their relative paths."""
-    if not source_dir.is_dir():
-        return True
-
-    try:
-        for source_file in source_dir.rglob('*'):
-            if (not source_file.is_file() or source_file.is_symlink() or
-                    source_file.suffix.lower() not in DOCUMENTATION_ASSET_EXTENSIONS):
-                continue
-            destination = destination_dir / source_file.relative_to(source_dir)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source_file, destination)
-            debug_print(f"Copied documentation asset to {destination}")
-        return True
-    except (OSError, ValueError) as e:
-        print(f"Error copying documentation assets from {source_dir}: {e}")
-        return False
 
 def process_markdown_file(file_path: Path) -> str:
     """
@@ -1730,7 +1710,11 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             full_dir_path = f"{parent_path}/{dir_name}" if parent_path else dir_name
             full_dir_path = full_dir_path.lstrip('/')
             
-            if full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
+            if full_dir_path == "docs" or full_dir_path.startswith("docs/"):
+                # Scientific report sources are separate from this code site.
+                report_url = f"https://github.com/{GITHUB_ORG}/{REPO_NAME}/tree/main/{full_dir_path}"
+                item_html += f"**[{path}]({report_url})** - {description}"
+            elif full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
                 # For basilisk/src directories, link to basilisk.fr or just show as text
                 if full_dir_path == "basilisk/src":
                     item_html += f"**[{path}](https://basilisk.fr/src/)** - {description}"
@@ -2418,11 +2402,6 @@ def main():
             print("Failed to copy assets.")
             return
 
-        # Keep relative image and data links in authored Markdown valid.
-        if not copy_documentation_assets(REPO_ROOT / 'docs', DOCS_DIR / 'docs'):
-            print("Failed to copy documentation assets.")
-            return
-        
         # Find source files
         source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
         if not source_files:

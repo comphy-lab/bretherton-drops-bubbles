@@ -440,11 +440,11 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 circular tube. Runtime parameter files control the case;
                 the current validation programme concerns Newtonian
                 bubbles.</p>
-                <p>The <a
-                href="docs/Newtonian-Validation/README.md.html">Newtonian
-                validation report</a> contains the physical definitions,
-                reference solutions, film-thickness results and
-                grid-sensitivity study.</p>
+                <p>The scientific report is in
+                <code>docs/Newtonian-Validation/</code>:
+                <code>main.tex</code>, <code>references.bib</code>,
+                figures, compact comparison data and the compiled
+                <code>main.pdf</code>.</p>
                 <h2 id="requirements">Requirements</h2>
                 <ul>
                 <li>A project-local <a
@@ -512,12 +512,22 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 ├── postProcess/ - interface extraction, film analysis and videos
 ├── verificationCases/ - exact-solution numerical checks
 ├── testCases/ - smoke test
-└── docs/Newtonian-Validation/ - validation report, figure and comparison data</code></pre></div>
-                <h2 id="build-and-preview-the-documentation">Build and
-                preview the documentation</h2>
+└── docs/Newtonian-Validation/ - LaTeX report, bibliography, figures and PDF</code></pre></div>
+                <h2 id="compile-the-scientific-report">Compile the
+                scientific report</h2>
+                <p>Requires <code>latexmk</code>, a LaTeX distribution
+                and BibTeX:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> .github/scripts/build.sh</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> .github/scripts/deploy.sh</span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-C</span> docs/Newtonian-Validation</span></code></pre></div></div>
+                <p>This produces
+                <code>docs/Newtonian-Validation/main.pdf</code>. The
+                folder’s <code>README.md</code> lists its sources and
+                the optional figure-regeneration command.</p>
+                <h2 id="build-and-preview-the-code-documentation">Build
+                and preview the code documentation</h2>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> .github/scripts/build.sh</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> .github/scripts/deploy.sh</span></code></pre></div></div>
                 <p>The build generates the site in
                 <code>.github/docs/</code>; <code>deploy.sh</code>
                 starts a local preview. See <a

@@ -4,9 +4,8 @@ Axisymmetric Basilisk solver for a gas bubble or immiscible drop translating
 through a liquid-filled circular tube. Runtime parameter files control the
 case; the current validation programme concerns Newtonian bubbles.
 
-The [Newtonian validation report](docs/Newtonian-Validation/README.md) contains
-the physical definitions, reference solutions, film-thickness results and
-grid-sensitivity study.
+The scientific report is in `docs/Newtonian-Validation/`: `main.tex`,
+`references.bib`, figures, compact comparison data and the compiled `main.pdf`.
 
 ## Requirements
 
@@ -68,10 +67,21 @@ short-time execution.
 ├── postProcess/ - interface extraction, film analysis and videos
 ├── verificationCases/ - exact-solution numerical checks
 ├── testCases/ - smoke test
-└── docs/Newtonian-Validation/ - validation report, figure and comparison data
+└── docs/Newtonian-Validation/ - LaTeX report, bibliography, figures and PDF
 ```
 
-## Build and preview the documentation
+## Compile the scientific report
+
+Requires `latexmk`, a LaTeX distribution and BibTeX:
+
+```bash
+make -C docs/Newtonian-Validation
+```
+
+This produces `docs/Newtonian-Validation/main.pdf`. The folder's `README.md`
+lists its sources and the optional figure-regeneration command.
+
+## Build and preview the code documentation
 
 ```bash
 bash .github/scripts/build.sh

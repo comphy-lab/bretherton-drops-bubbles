@@ -259,7 +259,8 @@ def parse_git_remote() -> Tuple[str, str]:
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent.parent
 SOURCE_DIRS = ['src-local', 'simulationCases', 'postProcess',
-               'verificationCases', 'testCases']
+               'verificationCases', 'testCases', 'docs']
+DOCUMENTATION_ASSET_EXTENSIONS = {'.csv', '.png'}
 DOCS_DIR = REPO_ROOT / '.github' / 'docs'
 DOCS_RELATIVE_PATH = DOCS_DIR.relative_to(REPO_ROOT).as_posix()
 DOCS_URL_FRAGMENT = f"/{DOCS_RELATIVE_PATH.strip('/')}/"
@@ -410,7 +411,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
     Finds all supported source files in the specified directories and root directory.
 
-    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb, .params) or named 'Makefile', excluding files ending with '.dat'.
+    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb, .params, .md) or named 'Makefile', excluding files ending with '.dat'.
 
     Args:
         root_dir: The root directory to search for source files.
@@ -419,8 +420,9 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     Returns:
         A sorted list of Paths to the discovered source files.
     """
-    valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params'}
+    valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params', '.md'}
     valid_names = {'Makefile'}
+    internal_names = {'AGENTS.md', 'CLAUDE.md', 'OPERATIONAL-NOTES.md'}
     # Exclude 4-digit numeric case folders (e.g., simulationCases/1000/)
     numeric_case_pattern = re.compile(r'/\d{4}/')
     # Exclude transient compile-and-run directories (e.g.
@@ -433,7 +435,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
         src_path = root_dir / dir_name
         if src_path.is_dir():
             for f in src_path.rglob('*'):
-                if f.is_file():
+                if f.is_file() and not f.is_symlink() and f.name not in internal_names:
                     # Skip files in numeric case folders
                     if numeric_case_pattern.search(str(f)):
                         continue
@@ -445,15 +447,34 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
                     elif f.suffix in valid_exts and not f.name.endswith('.dat'):
                         files.add(f)
 
-    # Search for .sh files and Makefiles in root directory
+    # Search supported source files in the root, excluding internal instructions.
     for f in root_dir.iterdir():
-        if f.is_file():
+        if f.is_file() and not f.is_symlink() and f.name not in internal_names:
             if f.name in valid_names:
                 files.add(f)
             elif f.suffix in valid_exts and not f.name.endswith('.dat'):
                 files.add(f)
 
     return sorted(files)
+
+def copy_documentation_assets(source_dir: Path, destination_dir: Path) -> bool:
+    """Copy approved companion assets while preserving their relative paths."""
+    if not source_dir.is_dir():
+        return True
+
+    try:
+        for source_file in source_dir.rglob('*'):
+            if (not source_file.is_file() or source_file.is_symlink() or
+                    source_file.suffix.lower() not in DOCUMENTATION_ASSET_EXTENSIONS):
+                continue
+            destination = destination_dir / source_file.relative_to(source_dir)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_file, destination)
+            debug_print(f"Copied documentation asset to {destination}")
+        return True
+    except (OSError, ValueError) as e:
+        print(f"Error copying documentation assets from {source_dir}: {e}")
+        return False
 
 def process_markdown_file(file_path: Path) -> str:
     """
@@ -1146,24 +1167,24 @@ def post_process_python_shell_html(html_content: str) -> str:
         """
         Appends '.html' to local documentation links in HTML anchor tags if missing.
         
-        This function is intended for use as a replacement callback in regular expression operations. It modifies anchor tags so that links to source files (with extensions .c, .h, .py, .sh, .md) are updated to point to their corresponding HTML documentation, unless the link is already external, an anchor, or already ends with '.html'.
+        This function is intended for use as a replacement callback in regular expression operations. It modifies anchor tags so that links to rendered source files (including .c, .h, .py, .sh, .md, and .params) are updated to point to their corresponding HTML documentation, unless the link is already external, an anchor, or already ends with '.html'.
         """
         link_tag = match.group(0)
         href_match = re.search(r'href="([^"]+)"', link_tag)
         
         if href_match:
             href = href_match.group(1)
-            if (href.startswith('http') or href.startswith('https') or 
-                href.startswith('#') or href.endswith('.html')):
+            if (re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:', href) or
+                    href.startswith(('#', '//')) or href.endswith('.html')):
                 return link_tag
                 
-            if re.search(r'\.(c|h|py|sh|sbatch|md)$', href):
-                return re.sub(r'href="([^"]+)"', f'href="{href}.html"', link_tag)
+            if re.search(r'\.(c|h|py|sh|sbatch|md|params)$', href):
+                return re.sub(r'href="([^"]+)"', lambda _: f'href="{href}.html"', link_tag)
         
         return link_tag
     
     processed_html = re.sub(
-        r'<a[^>]+href="[^"]+">[^<]+</a>',
+        r'<a\b[^>]*\bhref="[^"]+"[^>]*>',
         fix_doc_links,
         processed_html
     )
@@ -2395,6 +2416,11 @@ def main():
         assets_dir = REPO_ROOT / '.github' / 'assets'
         if not copy_assets(assets_dir, DOCS_DIR):
             print("Failed to copy assets.")
+            return
+
+        # Keep relative image and data links in authored Markdown valid.
+        if not copy_documentation_assets(REPO_ROOT / 'docs', DOCS_DIR / 'docs'):
+            print("Failed to copy documentation assets.")
             return
         
         # Find source files

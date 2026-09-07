@@ -171,7 +171,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>default.params | Bretherton drops and bubbles</title>
+  <title>Docs | Documentation</title>
   
   <!-- Critical CSS for fastest paint -->
   <style>
@@ -202,25 +202,25 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="CaseNo=1000 MAXlevel=10 MINlevel=4 Ca=0.05 imposed mean inlet capillary number muc U / sigma La=1 Laplace number rhoc sigma R / muc^2 muR=0.01 viscosity rati...">
+  <meta name="description" content="Documentation for the CoMPhy-Lab computational fluid dynamics framework.">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="default">
+  <meta name="keywords" content="fluid dynamics, CFD, Basilisk, docs, documentation">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
 
   <!-- Preload critical resources -->
-  <link rel="preload" href="./assets/js/main.js" as="script">
-  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
-  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
 
   <!-- Base stylesheets -->
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="stylesheet" href="./assets/css/custom_styles.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css">
-  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
-  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Font optimization -->
@@ -233,28 +233,28 @@
   </style>
 
   <!-- Favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
-  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
-  <link rel="manifest" href="./assets/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
 
   <!-- Scripts with proper loading attributes -->
   <script>
-    window.ASSET_PATH_PREFIX = ".";
+    window.ASSET_PATH_PREFIX = "..";
   </script>
-  <script src="./assets/js/jquery.min.js"></script>
-  <script src="./assets/js/jquery-ui.packed.js"></script>
-  <script src="./assets/js/plots.js"></script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <!-- Config script must load before other scripts -->
-  <script src="./assets/js/config.js"></script>
-  <script defer src="./assets/js/html-sanitizer.js"></script>
-  <script defer src="./assets/js/search-helper.js"></script>
-  <script defer src="./assets/js/command-palette.js"></script>
-  <script defer src="./assets/js/command-data.js"></script>
-  <script defer src="./assets/js/main.js"></script>
-  <script defer src="./assets/js/theme-toggle.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
   
   <!-- Optimize page load performance -->
@@ -299,7 +299,7 @@
         link.href = href;
         link.crossOrigin = 'anonymous';
         link.onerror = (e) => {
-          console.error(`Failed to load stylesheet: `, e);
+          console.error(`Failed to load stylesheet: ${href}`, e);
           console.log('Trying alternative Font Awesome source...');
         };
         document.head.appendChild(link);
@@ -340,12 +340,6 @@
   </script>
 </head>
 <body id="top">
-<script>
-window.repoName = "bretherton-drops-bubbles";
-window.githubOrg = "comphy-lab";
-window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
-</script>
-
 
     <!-- Preloader with theme variables applied -->
     <div id="preloader">
@@ -362,7 +356,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
         <header class="s-header">
             <div class="s-header__logo">
                 <a class="logo" href="/">
-                    <img src="./assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
                 <a class="documentation-button" href="/bretherton-drops-bubbles">
                     <i class="fa-solid fa-book-open"></i>
@@ -422,53 +416,28 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
         <!-- Main content -->
         <main class="content">
             
+
             <div class="page-content">
-                
-                                <h1 class="page-title">default.params</h1>
-                
-                                
-                                <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/default.params" class="raw-file-button" target="_blank" rel="noopener noreferrer">
-                        <i class="fa-brands fa-github"></i> See raw file
-                    </a>
-                </div>
-                
-                <h1 id="default.params">default.params</h1>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base parameters for simulationCases/bretherton.c</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Code units: sigma = mu_c = R (volume-equivalent drop/bubble radius) = 1</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">CaseNo</span><span class="ot">=</span><span class="dv">1000</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">MAXlevel</span><span class="ot">=</span><span class="dv">10</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">MINlevel</span><span class="ot">=</span><span class="dv">4</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Ca</span><span class="ot">=</span><span class="st">0.05        # imposed mean inlet capillary number mu_c U / sigma</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">La</span><span class="ot">=</span><span class="st">1           # Laplace number rho_c sigma R / mu_c^2</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">muR</span><span class="ot">=</span><span class="st">0.01       # viscosity ratio mu_d / mu_c (0.01 = bubble)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">rhoR</span><span class="ot">=</span><span class="st">0.001     # density ratio rho_d / rho_c (0.001 = bubble)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">Rtube</span><span class="ot">=</span><span class="st">0.7      # tube radius in units of R (&lt; 1 for a confined drop/bubble)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Rb0frac</span><span class="ot">=</span><span class="st">0.8    # initial capsule radius as a fraction of Rtube</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">xRear</span><span class="ot">=</span><span class="st">1.0      # initial rear-tip distance from the inlet</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dt">Ldomain</span><span class="ot">=</span><span class="st">16     # domain size in units of R</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dt">travelR</span><span class="ot">=</span><span class="st">8       # bubble advance in units of R; sets tmax = travelR/Ca</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># capped below the ~9.0 R available before the outlet buffer</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># tmax and tsnap derive from travelR and Ca unless set here</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">tRamp</span><span class="ot">=</span><span class="st">1        # inlet ramp time</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">dtmax</span><span class="ot">=</span><span class="fl">0.01</span></span></code></pre></div></div>
-            </div>
+<h1>Docs</h1>
+
+<p>No documentation files found in this directory.</p>
+
+</div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-left">
               <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
               </a>
               <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
               </a>
               <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
               </a>
             </div>
             <div class="footer-center">
@@ -494,8 +463,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/default.params" class="edit-link" aria-label="Edit this page on GitHub">
-                <i class="fa-brands fa-github"></i> Edit this page
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> View repository
               </a>
             </div>
           </footer>
@@ -515,75 +484,5 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
         </div>
     </div>
 
-
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    // Add copy button to each code block container
-    const codeBlocks = document.querySelectorAll('.code-block-container pre');
-    codeBlocks.forEach(function(codeBlock, index) {
-        // Create button element
-        const button = document.createElement('button');
-        button.className = 'copy-button';
-        button.textContent = 'Copy';
-        button.setAttribute('aria-label', 'Copy code to clipboard');
-        button.setAttribute('data-copy-state', 'copy');
-        
-        // Get the code block container (parent of the pre)
-        const container = codeBlock.parentNode;
-        
-        // Add the button to the container
-        container.appendChild(button);
-        
-        // Set up click event
-        button.addEventListener('click', async function() {
-            const codeText = codeBlock.textContent;
-            
-            try {
-                // Try to use the modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(codeText);
-                    updateButtonState(button, 'success');
-                } else {
-                    // Fall back to the deprecated execCommand method
-                    const textarea = document.createElement('textarea');
-                    textarea.value = codeText;
-                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    
-                    const successful = document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    
-                    if (successful) {
-                        updateButtonState(button, 'success');
-                    } else {
-                        updateButtonState(button, 'error');
-                    }
-                }
-            } catch (err) {
-                console.error('Copy failed:', err);
-                updateButtonState(button, 'error');
-            }
-        });
-    });
-    
-    // Function to update button state
-    function updateButtonState(button, state) {
-        if (state === 'success') {
-            button.textContent = 'Copied!';
-            button.classList.add('copied');
-        } else if (state === 'error') {
-            button.textContent = 'Error!';
-            button.classList.add('error');
-        }
-        
-        // Reset button state after 2 seconds
-        setTimeout(function() {
-            button.textContent = 'Copy';
-            button.classList.remove('copied', 'error');
-        }, 2000);
-    }
-});
-</script>
-        </body>
+</body>
 </html>

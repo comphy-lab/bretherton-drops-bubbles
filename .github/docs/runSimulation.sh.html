@@ -583,101 +583,114 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
 <span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
 <span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="va">SRC_FILE_ORIG</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/simulationCases/</span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
-<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: Source file not found: </span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
-<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_NO</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">(get_param_value &quot;</span>CaseNo<span class="st">&quot; &quot;</span><span class="dt">\$</span>PARAM_FILE<span class="st">&quot;)&quot;</span></span>
-<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo not found in parameter file: </span><span class="dt">\$</span><span class="st">PARAM_FILE&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
-<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="ot">=~</span> <span class="pp">^</span><span class="op">[</span><span class="ss">0</span><span class="op">-</span><span class="ss">9</span><span class="op">]</span><span class="pp">+</span><span class="dt">\$</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo must be numeric, got: </span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="co"># Run data is a separate surface from source. OUTPUT_ROOT defaults to the</span></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="co"># in-tree location so existing invocations are unchanged, but a dispatched</span></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="co"># campaign points it at an organised run directory on a registered volume.</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="va">OUTPUT_ROOT</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{OUTPUT_ROOT:-</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/simulationCases}&quot;</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">OUTPUT_ROOT&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">OUTPUT_ROOT&quot;</span> <span class="kw">||</span> <span class="kw">{</span></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;ERROR: cannot create output root: </span><span class="dt">\$</span><span class="st">OUTPUT_ROOT&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="va">SRC_FILE_ORIG</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/simulationCases/</span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: Source file not found: </span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
 <span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
 <span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
 <span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="ot">-lt</span> 1000 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo must be &gt;= 1000 for consistent sorting, got: </span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
-<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/simulationCases/</span><span class="dt">\$</span><span class="st">{CASE_NO}&quot;</span></span>
-<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="va">SRC_FILE_LOCAL</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
-<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="va">EXECUTABLE_NAME</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{EXEC_CODE%.c}&quot;</span></span>
-<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_LOG_FILE</span><span class="op">=</span><span class="st">&quot;c</span><span class="dt">\$</span><span class="st">{CASE_NO}-log&quot;</span></span>
-<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;=========================================&quot;</span></span>
-<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;bretherton-drops-bubbles - Case Runner&quot;</span></span>
-<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;=========================================&quot;</span></span>
-<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Source file: </span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Parameter file: </span><span class="dt">\$</span><span class="st">{PARAM_FILE}&quot;</span></span>
-<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;CaseNo: </span><span class="dt">\$</span><span class="st">{CASE_NO}&quot;</span></span>
-<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Case directory: </span><span class="dt">\$</span><span class="st">{CASE_DIR}&quot;</span></span>
-<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Run mode: OpenMP (threads=</span><span class="dt">\$</span><span class="st">{OMP_THREADS})&quot;</span></span>
-<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Run mode: Serial&quot;</span></span>
-<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Expected log file: </span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_NO</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">(get_param_value &quot;</span>CaseNo<span class="st">&quot; &quot;</span><span class="dt">\$</span>PARAM_FILE<span class="st">&quot;)&quot;</span></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo not found in parameter file: </span><span class="dt">\$</span><span class="st">PARAM_FILE&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="ot">=~</span> <span class="pp">^</span><span class="op">[</span><span class="ss">0</span><span class="op">-</span><span class="ss">9</span><span class="op">]</span><span class="pp">+</span><span class="dt">\$</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo must be numeric, got: </span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="ot">-lt</span> 1000 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;ERROR: CaseNo must be &gt;= 1000 for consistent sorting, got: </span><span class="dt">\$</span><span class="st">CASE_NO&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{OUTPUT_ROOT}/</span><span class="dt">\$</span><span class="st">{CASE_NO}&quot;</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="va">SRC_FILE_LOCAL</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a><span class="va">EXECUTABLE_NAME</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{EXEC_CODE%.c}&quot;</span></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="va">CASE_LOG_FILE</span><span class="op">=</span><span class="st">&quot;c</span><span class="dt">\$</span><span class="st">{CASE_NO}-log&quot;</span></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;=========================================&quot;</span></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;bretherton-drops-bubbles - Case Runner&quot;</span></span>
 <span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;=========================================&quot;</span></span>
-<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR&quot;</span></span>
-<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">PARAM_FILE&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR/case.params&quot;</span></span>
-<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR/</span><span class="dt">\$</span><span class="st">SRC_FILE_LOCAL&quot;</span></span>
-<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR&quot;</span></span>
-<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Compiling </span><span class="dt">\$</span><span class="st">{SRC_FILE_LOCAL} ...&quot;</span></span>
-<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="va">QCC_FLAGS</span><span class="op">=</span><span class="va">(</span>-I../../src-local -O2 -Wall -disable-dimensions<span class="va">)</span></span>
-<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>  <span class="va">QCC_FLAGS</span><span class="op">+=</span><span class="va">(</span>-fopenmp<span class="va">)</span></span>
-<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ot">! </span><span class="ex">qcc</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{QCC_FLAGS[@]}&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_LOCAL&quot;</span> <span class="at">-o</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> <span class="at">-lm</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;ERROR: OpenMP build failed. Re-run with --threads 1 for serial mode.&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
-<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
-<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Compilation successful: </span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span></span>
-<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-f</span> <span class="st">&quot;restart&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Restart file found - simulation will resume from checkpoint.&quot;</span></span>
-<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Running: OMP_NUM_THREADS=</span><span class="dt">\$</span><span class="st">{OMP_THREADS} ./</span><span class="dt">\$</span><span class="st">{EXECUTABLE_NAME} case.params&quot;</span></span>
-<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">OMP_NUM_THREADS</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">OMP_THREADS&quot;</span> <span class="ex">./</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> case.params<span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span>0</span>
-<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span><span class="dt">\$</span><span class="pp">?</span></span>
-<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
-<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Running (serial): ./</span><span class="dt">\$</span><span class="st">{EXECUTABLE_NAME} case.params&quot;</span></span>
-<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="ex">./</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> case.params<span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span>0</span>
-<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span><span class="dt">\$</span><span class="pp">?</span></span>
-<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
-<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>EXIT_CODE <span class="ot">-eq</span> 0 <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Simulation completed successfully.&quot;</span></span>
-<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Output location: simulationCases/</span><span class="dt">\$</span><span class="st">{CASE_NO}/&quot;</span></span>
-<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
-<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Log file: simulationCases/</span><span class="dt">\$</span><span class="st">{CASE_NO}/</span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span></span>
-<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
-<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Simulation failed with exit code: </span><span class="dt">\$</span><span class="st">EXIT_CODE&quot;</span></span>
-<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXIT_CODE&quot;</span></span></code></pre></div></div>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Source file: </span><span class="dt">\$</span><span class="st">{EXEC_CODE}&quot;</span></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Parameter file: </span><span class="dt">\$</span><span class="st">{PARAM_FILE}&quot;</span></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;CaseNo: </span><span class="dt">\$</span><span class="st">{CASE_NO}&quot;</span></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Case directory: </span><span class="dt">\$</span><span class="st">{CASE_DIR}&quot;</span></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Run mode: OpenMP (threads=</span><span class="dt">\$</span><span class="st">{OMP_THREADS})&quot;</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Run mode: Serial&quot;</span></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Expected log file: </span><span class="dt">\$</span><span class="st">{CASE_DIR}/</span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;=========================================&quot;</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR&quot;</span></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">PARAM_FILE&quot;</span> <span class="ot">!=</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR/case.params&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cp</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">PARAM_FILE&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR/case.params&quot;</span></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_ORIG&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR/</span><span class="dt">\$</span><span class="st">SRC_FILE_LOCAL&quot;</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">CASE_DIR&quot;</span></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Compiling </span><span class="dt">\$</span><span class="st">{SRC_FILE_LOCAL} ...&quot;</span></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="va">QCC_FLAGS</span><span class="op">=</span><span class="va">(</span>-I<span class="st">&quot;</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/src-local&quot;</span> -O2 -Wall -disable-dimensions<span class="va">)</span></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>  <span class="va">QCC_FLAGS</span><span class="op">+=</span><span class="va">(</span>-fopenmp<span class="va">)</span></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ot">! </span><span class="ex">qcc</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{QCC_FLAGS[@]}&quot;</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">SRC_FILE_LOCAL&quot;</span> <span class="at">-o</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> <span class="at">-lm</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;ERROR: OpenMP build failed. Re-run with --threads 1 for serial mode.&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Compilation successful: </span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-f</span> <span class="st">&quot;restart&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Restart file found - simulation will resume from checkpoint.&quot;</span></span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>USE_OPENMP <span class="ot">-eq</span> 1 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Running: OMP_NUM_THREADS=</span><span class="dt">\$</span><span class="st">{OMP_THREADS} ./</span><span class="dt">\$</span><span class="st">{EXECUTABLE_NAME} case.params&quot;</span></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">OMP_NUM_THREADS</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">OMP_THREADS&quot;</span> <span class="ex">./</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> case.params<span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span>0</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span><span class="dt">\$</span><span class="pp">?</span></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Running (serial): ./</span><span class="dt">\$</span><span class="st">{EXECUTABLE_NAME} case.params&quot;</span></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="ex">./</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXECUTABLE_NAME&quot;</span> case.params<span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span>0</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>    <span class="va">EXIT_CODE</span><span class="op">=</span><span class="dt">\$</span><span class="pp">?</span></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="dt">\$</span>EXIT_CODE <span class="ot">-eq</span> 0 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Simulation completed successfully.&quot;</span></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Output location: </span><span class="dt">\$</span><span class="st">{CASE_DIR}/&quot;</span></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Log file: </span><span class="dt">\$</span><span class="st">{CASE_DIR}/</span><span class="dt">\$</span><span class="st">{CASE_LOG_FILE}&quot;</span></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Simulation failed with exit code: </span><span class="dt">\$</span><span class="st">EXIT_CODE&quot;</span></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">EXIT_CODE&quot;</span></span></code></pre></div></div>
             </div>
         </main>
 

@@ -171,7 +171,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>default.params | Bretherton drops and bubbles</title>
+  <title>testCases/README.md | Bretherton drops and bubbles</title>
   
   <!-- Critical CSS for fastest paint -->
   <style>
@@ -202,25 +202,25 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="CaseNo=1000 MAXlevel=10 MINlevel=4 Ca=0.05 imposed mean inlet capillary number muc U / sigma La=1 Laplace number rhoc sigma R / muc^2 muR=0.01 viscosity rati...">
+  <meta name="description" content="This directory holds the repository's smoke test and nothing else. A smoke test proves that simulationCases/bretherton.c compiles and integrates a few dozen ...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="default">
+  <meta name="keywords" content="readme">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
 
   <!-- Preload critical resources -->
-  <link rel="preload" href="./assets/js/main.js" as="script">
-  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
-  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
 
   <!-- Base stylesheets -->
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <link rel="stylesheet" href="./assets/css/custom_styles.css">
-  <link rel="stylesheet" href="./assets/css/command-palette.css">
-  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
-  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <!-- Font optimization -->
@@ -233,28 +233,28 @@
   </style>
 
   <!-- Favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
-  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
-  <link rel="manifest" href="./assets/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
 
   <!-- Scripts with proper loading attributes -->
   <script>
-    window.ASSET_PATH_PREFIX = ".";
+    window.ASSET_PATH_PREFIX = "..";
   </script>
-  <script src="./assets/js/jquery.min.js"></script>
-  <script src="./assets/js/jquery-ui.packed.js"></script>
-  <script src="./assets/js/plots.js"></script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <!-- Config script must load before other scripts -->
-  <script src="./assets/js/config.js"></script>
-  <script defer src="./assets/js/html-sanitizer.js"></script>
-  <script defer src="./assets/js/search-helper.js"></script>
-  <script defer src="./assets/js/command-palette.js"></script>
-  <script defer src="./assets/js/command-data.js"></script>
-  <script defer src="./assets/js/main.js"></script>
-  <script defer src="./assets/js/theme-toggle.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
   
   <!-- Optimize page load performance -->
@@ -362,7 +362,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
         <header class="s-header">
             <div class="s-header__logo">
                 <a class="logo" href="/">
-                    <img src="./assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
                 </a>
                 <a class="documentation-button" href="/bretherton-drops-bubbles">
                     <i class="fa-solid fa-book-open"></i>
@@ -424,51 +424,86 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
             
             <div class="page-content">
                 
-                                <h1 class="page-title">default.params</h1>
+                                <h1 class="page-title">testCases/README.md</h1>
                 
                                 
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/default.params" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/README.md" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
                 
-                <h1 id="default.params">default.params</h1>
+                <h1 id="smoke-test">Smoke test</h1>
+                <p>This directory holds the repository’s smoke test and
+                nothing else.</p>
+                <p>A smoke test proves that
+                <code>simulationCases/bretherton.c</code> compiles and
+                integrates a few dozen time steps at coarse resolution
+                without producing a truncated log or blowing up. It
+                compares against <strong>nothing</strong>, so it
+                supports no claim about the discretisation or about the
+                physics. Its value is that it fails loudly and in
+                seconds when a change breaks the build or the parameter
+                path.</p>
+                <table>
+                <colgroup>
+                <col style="width: 50%" />
+                <col style="width: 50%" />
+                </colgroup>
+                <thead>
+                <tr>
+                <th>File</th>
+                <th>Role</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                <td><code>smoke.params</code></td>
+                <td>coarse, short-run parameters
+                (<code>MAXlevel = 9</code>,
+                <code>tmax = 0.05</code>)</td>
+                </tr>
+                <tr>
+                <td><code>runSmokeTests.sh</code></td>
+                <td>builds and runs the case, then checks the log</td>
+                </tr>
+                </tbody>
+                </table>
+                <p>Cases that compare against an exact solution live in
+                <a
+                href="../verificationCases/"><code>../verificationCases/</code></a>
+                and are driven by
+                <code>../verificationCases/runVerification.sh</code>.
+                The campaign that compares against independent
+                experimental data — Taylor (1961) and Aussillous &amp;
+                Quéré (2000) — is configured by
+                <code>sweep.params</code> and
+                <code>sweep-drop.params</code> at the repository root
+                and is meant for production hardware. Those three
+                evidence sources support three different claims and are
+                deliberately kept apart.</p>
+                <h2 id="running">Running</h2>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base parameters for simulationCases/bretherton.c</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Code units: sigma = mu_c = R (volume-equivalent drop/bubble radius) = 1</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">CaseNo</span><span class="ot">=</span><span class="dv">1000</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">MAXlevel</span><span class="ot">=</span><span class="dv">10</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">MINlevel</span><span class="ot">=</span><span class="dv">4</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Ca</span><span class="ot">=</span><span class="st">0.05        # imposed mean inlet capillary number mu_c U / sigma</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">La</span><span class="ot">=</span><span class="st">1           # Laplace number rho_c sigma R / mu_c^2</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">muR</span><span class="ot">=</span><span class="st">0.01       # viscosity ratio mu_d / mu_c (0.01 = bubble)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">rhoR</span><span class="ot">=</span><span class="st">0.001     # density ratio rho_d / rho_c (0.001 = bubble)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">Rtube</span><span class="ot">=</span><span class="st">0.7      # tube radius in units of R (&lt; 1 for a confined drop/bubble)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Rb0frac</span><span class="ot">=</span><span class="st">0.8    # initial capsule radius as a fraction of Rtube</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">xRear</span><span class="ot">=</span><span class="st">1.0      # initial rear-tip distance from the inlet</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dt">Ldomain</span><span class="ot">=</span><span class="st">16     # domain size in units of R</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dt">travelR</span><span class="ot">=</span><span class="st">8       # bubble advance in units of R; sets tmax = travelR/Ca</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># capped below the ~9.0 R available before the outlet buffer</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># tmax and tsnap derive from travelR and Ca unless set here</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">tRamp</span><span class="ot">=</span><span class="st">1        # inlet ramp time</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">dtmax</span><span class="ot">=</span><span class="fl">0.01</span></span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> testCases/runSmokeTests.sh   <span class="co"># this directory only</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh                  <span class="co"># verification cases, then this</span></span></code></pre></div></div>
+                <p>The build goes to <code>simulationCases/9999/</code>,
+                which is gitignored.</p>
             </div>
         </main>
 
         <footer class="site-footer">
             <div class="footer-left">
               <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
               </a>
               <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
               </a>
               <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
               </a>
               <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
               </a>
             </div>
             <div class="footer-center">
@@ -494,7 +529,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/default.params" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/README.md" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

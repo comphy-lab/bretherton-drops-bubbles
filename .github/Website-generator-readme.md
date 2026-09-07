@@ -39,12 +39,17 @@ This directory contains all the necessary files and scripts for generating and d
 
 The website generation process is handled by the `generate_docs.py` script, which converts source code files into HTML documentation. The process involves several steps:
 
-1. **Source File Discovery**: The script scans the repository for source files in specified directories (`src-local`, `simulationCases`, `postProcess`).
+1. **Source File Discovery**: The script scans the repository for source files in specified directories (`src-local`, `simulationCases`, `postProcess`, `verificationCases`, `testCases`, and `docs`).
 2. **File Processing**: Each file is processed based on its type (C/C++, Python, Shell, Markdown).
 3. **HTML Generation**: The processed content is converted to HTML using Pandoc with a custom template.
 4. **Post-Processing**: The generated HTML is enhanced with additional features like code highlighting and navigation.
 5. **Index Generation**: An index page is created from the README.md file.
 6. **SEO Optimization**: Robots.txt and sitemap.xml files are generated for search engines.
+
+Markdown files under `docs/` are rendered at the same relative path beneath
+`.github/docs/`. Companion PNG and CSV files are copied alongside the rendered
+page, so relative image and download links continue to work.
+Agent instructions and operational notes are excluded from the generated site.
 
 ### Key Components
 

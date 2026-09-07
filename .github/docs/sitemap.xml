@@ -6,7 +6,27 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/README.md.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/default.params.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/docs/Newtonian-Validation/README.md.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/grid-sensitivity-fine.params.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/grid-sensitivity.params.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -81,12 +101,22 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/README.md.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/runSmokeTests.sh.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/smoke.params.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/verificationCases/README.md.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

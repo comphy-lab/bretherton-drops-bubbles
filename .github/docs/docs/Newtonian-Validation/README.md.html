@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+      
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+      
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+    
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+        
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+        
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+    
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+      
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+      
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+    
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+    
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+    
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+    
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+    
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+    
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>docs/Newtonian-Validation/README.md | Bretherton drops and bubbles</title>
+  
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+      
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+      
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+      
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="A long gas bubble translating through a wetting liquid leaves an annular film between its interface and the tube wall. Viscous stress draws liquid into this ...">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="readme">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../../assets/js/main.js" as="script">
+  <link rel="preload" href="../../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <link rel="stylesheet" href="../../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "../..";
+  </script>
+  <script src="../../assets/js/jquery.min.js"></script>
+  <script src="../../assets/js/jquery-ui.packed.js"></script>
+  <script src="../../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../../assets/js/config.js"></script>
+  <script defer src="../../assets/js/html-sanitizer.js"></script>
+  <script defer src="../../assets/js/search-helper.js"></script>
+  <script defer src="../../assets/js/command-palette.js"></script>
+  <script defer src="../../assets/js/command-data.js"></script>
+  <script defer src="../../assets/js/main.js"></script>
+  <script defer src="../../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+  
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+    
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+      
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+    
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+      
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+        
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+      
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+            
+            <div class="page-content">
+                
+                                <h1 class="page-title">docs/Newtonian-Validation/README.md</h1>
+                
+                                
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/docs/Newtonian-Validation/README.md" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+                
+                <h1 id="newtonian-bubbles-in-circular-tubes">Newtonian
+                bubbles in circular tubes</h1>
+                <p>A long gas bubble translating through a wetting
+                liquid leaves an annular film between its interface and
+                the tube wall. Viscous stress draws liquid into this
+                film, while surface tension connects the nearly
+                cylindrical film to the curved menisci. This balance
+                gives the classical Bretherton law at small capillary
+                number and a thicker, geometrically confined film as the
+                bubble speed increases.</p>
+                <p>This document assesses the present axisymmetric
+                simulations against those two limits. The four available
+                calculations agree within 2% with a commonly used
+                finite-capillary-number correlation when the
+                <strong>flat film</strong> is measured. This is
+                promising, but preliminary: the four points share one
+                maximum refinement level and therefore do not establish
+                mesh independence, the limiting Bretherton coefficient,
+                or the accuracy of other observables such as the
+                pressure drop and rear-meniscus shape.</p>
+                <h2
+                id="physical-quantities-and-reference-solutions">Physical
+                quantities and reference solutions</h2>
+                <p>Let <span class="math inline">\(R_t\)</span> be the
+                tube radius, <span class="math inline">\(R_v\)</span>
+                the volume-equivalent bubble radius, <span
+                class="math inline">\(U_b\)</span> the bubble speed, and
+                <span class="math inline">\(\overline U\)</span> the
+                imposed mean liquid speed. The film thickness and the
+                two capillary numbers are</p>
+                <p><span class="math display">\[
+                H=\frac{b_{\mathrm{flat}}}{R_t}, \qquad
+                Ca_b=\frac{\mu_c U_b}{\sigma}, \qquad
+                Ca_{\mathrm{in}}=\frac{\mu_c\overline U}{\sigma},
+                \]</span></p>
+                <p>where <span class="math inline">\(\mu_c\)</span> is
+                the continuous-phase viscosity and <span
+                class="math inline">\(\sigma\)</span> is the surface
+                tension. The bubble speed is measured from the motion of
+                the front tip. Consequently, <span
+                class="math inline">\(Ca_b\)</span> is the appropriate
+                horizontal coordinate for the reference curves; <span
+                class="math inline">\(Ca_{\mathrm{in}}\)</span> remains
+                an independently reported input.</p>
+                <p>For a long bubble of negligible viscosity moving at
+                small Reynolds number, Bretherton matched the viscous
+                dynamic meniscus to the capillary outer shape and
+                obtained</p>
+                <p><span class="math display">\[
+                H_B\simeq0.643(3Ca_b)^{2/3}\simeq1.337Ca_b^{2/3}.
+                \]</span></p>
+                <p>The rounded coefficient 1.34 is conventional. A
+                convincing limiting-case test must show that <span
+                class="math inline">\(H/Ca_b^{2/3}\)</span> approaches
+                1.337 as <span class="math inline">\(Ca_b\)</span>
+                decreases. Agreement at moderate <span
+                class="math inline">\(Ca_b\)</span> with a line of slope
+                <span class="math inline">\(2/3\)</span> is insufficient
+                because the thin-film assumption itself is then
+                weakening. Bretherton also predicts the relative speed
+                excess</p>
+                <p><span class="math display">\[
+                W=\frac{U_b-\overline U}{U_b}
+                  \simeq 1.29(3Ca_b)^{2/3}.
+                \]</span></p>
+                <p>For a stationary uniform film, volume conservation
+                gives the related check</p>
+                <p><span class="math display">\[
+                \frac{\overline U}{U_b}=(1-H)^2, \qquad
+                W=1-(1-H)^2.
+                \]</span></p>
+                <p>The liquid flux in the simulated film should be
+                measured before treating this identity as exact. A
+                finite gas viscosity, interaction between the menisci,
+                or motion within the deposited film can alter the
+                relation.</p>
+                <p>Pressure coefficients require an explicit convention.
+                With positive excess pressure defined from the liquid
+                behind the bubble to the liquid ahead of it,
+                Bretherton’s summed front-and-rear dynamic contribution
+                is</p>
+                <p><span class="math display">\[
+                \Delta p_{\mathrm{bubble}}
+                \simeq 4.52\frac{\sigma}{R_t}(3Ca_b)^{2/3}.
+                \]</span></p>
+                <p>The coefficient 3.58, also quoted in Bretherton’s
+                abstract, is the dynamic correction associated with the
+                leading meniscus. It should not be substituted for 4.52
+                when comparing the pressure difference across a complete
+                long bubble. Any numerical comparison must sample
+                pressures outside both dynamic menisci and retain the
+                same sign and radius convention.</p>
+                <p>At finite capillary number, Aussillous and Quéré
+                represented Taylor’s circular- tube data by</p>
+                <p><span class="math display">\[
+                H_T=\frac{1.34Ca_b^{2/3}}{1+3.35Ca_b^{2/3}}.
+                \]</span></p>
+                <p>This expression is an empirical rational fit
+                introduced by Aussillous and Quéré; it is not an
+                equation proposed by Taylor. It approaches the
+                Bretherton law as <span
+                class="math inline">\(Ca_b\to0\)</span> and limits the
+                film thickness as confinement becomes important. Taylor
+                measured the fraction of liquid left on the wall by a
+                gas finger advancing through a liquid-filled circular
+                tube. Those measurements are useful independent data
+                after conversion through <span
+                class="math inline">\(m=1-(1-H)^2\)</span>. Aussillous
+                and Quéré’s high-speed experiments, including their
+                figure 3, instead concern a finite liquid column
+                displaced by air. Their inertial thresholds <span
+                class="math inline">\(Ca^*\)</span> and <span
+                class="math inline">\(Ca^{**}\)</span> are therefore not
+                universal transition values for a finite gas bubble and
+                are not reproduction targets here.</p>
+                <h2 id="numerical-model-and-provenance">Numerical model
+                and provenance</h2>
+                <p>The calculation solves the axisymmetric,
+                incompressible two-phase Navier–Stokes equations. A
+                volume-of-fluid field tracks the gas–liquid interface,
+                surface tension supplies the capillary stress, and an
+                embedded boundary represents the circular tube wall. The
+                wall is no-slip and fully wetted by the continuous
+                phase. A Poiseuille profile drives the liquid at the
+                inlet, while the bubble translates without contacting
+                the wall.</p>
+                <p>Surface tension, continuous-phase viscosity, and
+                <span class="math inline">\(R_v\)</span> define the
+                repeating scales. The reported calculations use</p>
+                <p><span class="math display">\[
+                R_t/R_v=0.7,\qquad \mu_g/\mu_c=0.01,\qquad
+                \rho_g/\rho_c=0.001,
+                \]</span></p>
+                <p>with the volume-radius Laplace number</p>
+                <p><span class="math display">\[
+                La_v=\frac{\rho_c\sigma R_v}{\mu_c^2}=1.
+                \]</span></p>
+                <p>For tube-based comparisons,</p>
+                <p><span class="math display">\[
+                La_t=0.7La_v,\qquad Re_t=La_tCa_b,\qquad
+                We_t=La_tCa_b^2.
+                \]</span></p>
+                <p>Thus inertia becomes a quantity to measure as the
+                sweep approaches <span
+                class="math inline">\(Ca_b=1\)</span>; it cannot be
+                removed by calling the liquid Newtonian. The simulations
+                and numerical checks use the project-pinned Basilisk
+                release <code>v2026-08-30</code>. This version
+                identifier, the solver source, all dimensionless inputs,
+                compiler options, and analysis definitions form the
+                minimum provenance needed for an independent
+                reproduction.</p>
+                <h2
+                id="preliminary-film-thickness-comparison">Preliminary
+                film-thickness comparison</h2>
+                <figure>
+                <img src="film-thickness-vs-ca.png"
+                alt="Flat-film thickness against the measured bubble capillary number. Symbols show the four simulations, the solid curve is the Aussillous–Quéré representation of Taylor’s data, and the dashed curve is the small-capillary-number Bretherton asymptote. The right panel shows the ratio to the finite-capillary-number correlation. The reference curve extends beyond the range of completed simulations." />
+                <figcaption aria-hidden="true">Flat-film thickness
+                against the measured bubble capillary number. Symbols
+                show the four simulations, the solid curve is the
+                Aussillous–Quéré representation of Taylor’s data, and
+                the dashed curve is the small-capillary-number
+                Bretherton asymptote. The right panel shows the ratio to
+                the finite-capillary-number correlation. The reference
+                curve extends beyond the range of completed
+                simulations.</figcaption>
+                </figure>
+                <p>The numerical values used in the figure are available
+                in <a
+                href="baseline-film.csv"><code>baseline-film.csv</code></a>.</p>
+                <table>
+                <thead>
+                <tr>
+                <th style="text-align: right;"><span
+                class="math inline">\(Ca_{\mathrm{in}}\)</span></th>
+                <th style="text-align: right;"><span
+                class="math inline">\(Ca_b\)</span></th>
+                <th style="text-align: right;"><span
+                class="math inline">\(H\)</span></th>
+                <th style="text-align: right;"><span
+                class="math inline">\(H_T\)</span></th>
+                <th style="text-align: right;"><span
+                class="math inline">\(100(H/H_T-1)\)</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                <td style="text-align: right;">0.005</td>
+                <td style="text-align: right;">0.00538868</td>
+                <td style="text-align: right;">0.0366354</td>
+                <td style="text-align: right;">0.0373420</td>
+                <td style="text-align: right;">-1.892%</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.010</td>
+                <td style="text-align: right;">0.0112414</td>
+                <td style="text-align: right;">0.0567910</td>
+                <td style="text-align: right;">0.0575664</td>
+                <td style="text-align: right;">-1.347%</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.020</td>
+                <td style="text-align: right;">0.0239374</td>
+                <td style="text-align: right;">0.0861486</td>
+                <td style="text-align: right;">0.0870712</td>
+                <td style="text-align: right;">-1.060%</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.050</td>
+                <td style="text-align: right;">0.0680939</td>
+                <td style="text-align: right;">0.143663</td>
+                <td style="text-align: right;">0.143363</td>
+                <td style="text-align: right;">+0.209%</td>
+                </tr>
+                </tbody>
+                </table>
+                <p>The flat-film estimator removes 30% of the bubble
+                extent at each end, takes the median interface radius
+                over the remaining central region, and averages the
+                result over the final quarter of the usable snapshots. A
+                linear fit to the front-tip position over the same
+                temporal window gives <span
+                class="math inline">\(U_b\)</span>. The estimator is
+                designed to exclude both dynamic menisci, but the
+                presence of a spatial plateau and its sensitivity to the
+                trimming and averaging windows have not yet been
+                quantified.</p>
+                <p>The minimum film near the rear meniscus is a
+                different observable. Relative to <span
+                class="math inline">\(H_T\)</span>, the four minimum
+                values differ by approximately -32.3%, -25.9%, -23.7%,
+                and -18.4%. These deviations do not contradict the
+                flat-film comparison: capillary waves at the rear
+                meniscus can produce a local minimum below the uniform
+                film. A stopping criterion based on a steady minimum
+                also does not prove that the flat film, pressure drop,
+                bubble length, and complete travelling shape are
+                stationary.</p>
+                <p>All four results currently use maximum level 10 in a
+                domain of length <span
+                class="math inline">\(16R_v\)</span>, for which the
+                smallest possible cell is <span
+                class="math inline">\(\Delta_{\min}=0.015625R_v\)</span>.
+                The measured flat films correspond to only 1.64, 2.54,
+                3.86, and 6.44 such cells. These figures are geometric
+                upper bounds on resolution: adaptive refinement must be
+                inspected to establish the actual cells present across
+                each film. There is currently no refinement sequence for
+                any of the four points. The reported agreement must
+                therefore remain a comparison at one numerical
+                resolution rather than an accuracy claim.</p>
+                <h2 id="grid-sensitivity-study">Grid-sensitivity
+                study</h2>
+                <p>The grid study keeps the four existing input values
+                <span class="math inline">\(Ca_{\mathrm{in}}=0.005,
+                0.01, 0.02, 0.05\)</span> and changes only spatial
+                resolution in its first stage. Each input is being
+                considered at maximum levels 9, 10, 11, and 12; level 10
+                is the existing result and level 12 is a conditional
+                follow-up. Selected points may then require finer stages
+                if the sequence has not entered an asymptotic range,
+                with the lowest-capillary-number case the most likely
+                candidate because its film is thinnest. This is the
+                matrix under investigation, not a completed convergence
+                dataset.</p>
+                <table>
+                <colgroup>
+                <col style="width: 13%" />
+                <col style="width: 17%" />
+                <col style="width: 17%" />
+                <col style="width: 17%" />
+                <col style="width: 17%" />
+                <col style="width: 17%" />
+                </colgroup>
+                <thead>
+                <tr>
+                <th style="text-align: right;"><span
+                class="math inline">\(Ca_{\mathrm{in}}\)</span></th>
+                <th style="text-align: center;">Level 9</th>
+                <th style="text-align: center;">Level 10</th>
+                <th style="text-align: center;">Level 11</th>
+                <th style="text-align: center;">Level 12</th>
+                <th style="text-align: center;">Selected finer
+                stage</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                <td style="text-align: right;">0.005</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">existing</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">conditional</td>
+                <td style="text-align: center;">conditional</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.010</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">existing</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">conditional</td>
+                <td style="text-align: center;">conditional</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.020</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">existing</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">conditional</td>
+                <td style="text-align: center;">conditional</td>
+                </tr>
+                <tr>
+                <td style="text-align: right;">0.050</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">existing</td>
+                <td style="text-align: center;">planned</td>
+                <td style="text-align: center;">conditional</td>
+                <td style="text-align: center;">conditional</td>
+                </tr>
+                </tbody>
+                </table>
+                <p>The same inlet capillary number and all other
+                physical inputs are held fixed across the grid sequence.
+                Both <span class="math inline">\(H\)</span> and the
+                resulting <span class="math inline">\(Ca_b\)</span> must
+                converge; the inlet speed is not retuned to conceal a
+                change in the bubble speed. The reference correlation is
+                evaluated at each measured <span
+                class="math inline">\(Ca_b\)</span>. The primary
+                quantities are <span class="math inline">\(H\)</span>,
+                <span class="math inline">\(U_b\)</span>, bubble volume,
+                bubble length, and the spatial and temporal variation of
+                the flat film. A third solution in the asymptotic range
+                is needed before estimating a convergence order.
+                Time-step and pressure-solver tolerances, domain length,
+                boundary clearance, bubble length, and gas viscosity
+                ratio must subsequently be varied separately so that
+                spatial error is not confused with time error or model
+                dependence.</p>
+                <p>Adaptive refinement presently follows interface,
+                curvature, velocity and strain-rate indicators. A
+                possible extension is to prescribe a minimum number of
+                cells across the liquid film. For a measured gap <span
+                class="math inline">\(b\)</span>, a target of <span
+                class="math inline">\(n_f\)</span> cells would
+                require</p>
+                <p><span class="math display">\[
+                L_f\ge\left\lceil\log_2\frac{n_f
+                L_{\mathrm{domain}}}{b}\right\rceil.
+                \]</span></p>
+                <p>The feature-to-level construction is used for a
+                shrinking cavity and jet in the <a
+                href="https://github.com/comphy-lab/Bursting-Bubble/blob/2f4d8b77df875a7c5fd991922f00ebbbce78688d/simulationCases/burstingBubble-drillResolution.c">Bursting-Bubble
+                solver</a>. There it sets a local refinement ceiling. A
+                film-resolution guarantee instead requires a refinement
+                floor throughout the wall–interface gap: a larger
+                allowed maximum does not force wavelet adaptation to
+                refine a nearly uniform film. A moving refinement band
+                would also need to preserve the embedded-wall metrics,
+                phase volume and restart behaviour. This extension is
+                separate from the first grid study, whose refinement
+                criteria remain unchanged.</p>
+                <p>The first stage is specified in <a
+                href="../../grid-sensitivity.params.html"><code>grid-sensitivity.params</code></a>:
+                levels 9 and 11 for all four input capillary numbers.
+                The level-12 follow-up is in <a
+                href="../../grid-sensitivity-fine.params.html"><code>grid-sensitivity-fine.params</code></a>.
+                Both use the existing parameter-sweep runner. The dry
+                run enumerates the exact case list before a
+                calculation:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity.params <span class="at">--dry-run</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runParameterSweep.sh grid-sensitivity-fine.params <span class="at">--dry-run</span></span></code></pre></div></div>
+                <h2 id="validation-observables">Validation
+                observables</h2>
+                <p>Film thickness is the first test, not the whole
+                validation. At small <span
+                class="math inline">\(Ca_b\)</span>, the calculation
+                should recover both the Bretherton film coefficient and
+                speed excess. At finite <span
+                class="math inline">\(Ca_b\)</span>, the deposited
+                fraction, bubble radius, nose profile, and front
+                pressure response can be compared with the axisymmetric
+                Stokes solutions of Reinelt and Saffman. Giavedoni and
+                Saita’s front-displacement and rear-meniscus
+                calculations provide complementary tests of the meniscus
+                shapes, rear undulations, streamline topology, and
+                pressure jumps. Front, rear, and total pressure
+                differences require stated signs and reference
+                pressures; no pressure coefficient is inferred from the
+                present film table.</p>
+                <p>The present evidence therefore supports one bounded
+                statement: four level-10 simulations of Newtonian gas
+                bubbles reproduce the flat-film value of the
+                finite-capillary-number reference correlation within 2%
+                over <span class="math inline">\(0.0054\lesssim
+                Ca_b\lesssim0.068\)</span>. Establishing numerical
+                convergence, the <span
+                class="math inline">\(Ca_b\to0\)</span> asymptote, and
+                bubble behaviour up to <span
+                class="math inline">\(Ca_b=1\)</span> remains the
+                subject of the staged validation study.</p>
+                <h2 id="references">References</h2>
+                <ul>
+                <li>F. P. Bretherton, <a
+                href="https://doi.org/10.1017/S0022112061000160"><em>The
+                motion of long bubbles in tubes</em></a>, <em>Journal of
+                Fluid Mechanics</em> <strong>10</strong>, 166–188
+                (1961).</li>
+                <li>G. I. Taylor, <a
+                href="https://doi.org/10.1017/S0022112061000159"><em>Deposition
+                of a viscous fluid on the wall of a tube</em></a>,
+                <em>Journal of Fluid Mechanics</em> <strong>10</strong>,
+                161–165 (1961).</li>
+                <li>D. A. Reinelt and P. G. Saffman, <a
+                href="https://doi.org/10.1137/0906038"><em>The
+                penetration of a finger into a viscous fluid in a
+                channel and tube</em></a>, <em>SIAM Journal on
+                Scientific and Statistical Computing</em>
+                <strong>6</strong>, 542–561 (1985).</li>
+                <li>M. D. Giavedoni and F. A. Saita, <a
+                href="https://doi.org/10.1063/1.869360"><em>The
+                axisymmetric and plane cases of a gas phase steadily
+                displacing a Newtonian liquid: a simultaneous solution
+                of the governing equations</em></a>, <em>Physics of
+                Fluids</em> <strong>9</strong>, 2420–2428 (1997).</li>
+                <li>M. D. Giavedoni and F. A. Saita, <a
+                href="https://doi.org/10.1063/1.869951"><em>The rear
+                meniscus of a long bubble steadily displacing a
+                Newtonian liquid in a capillary tube</em></a>,
+                <em>Physics of Fluids</em> <strong>11</strong>, 786–794
+                (1999).</li>
+                <li>P. Aussillous and D. Quéré, <a
+                href="https://doi.org/10.1063/1.1289396"><em>Quick
+                deposition of a fluid on the wall of a tube</em></a>,
+                <em>Physics of Fluids</em> <strong>12</strong>,
+                2367–2371 (2000).</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/docs/Newtonian-Validation/README.md" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

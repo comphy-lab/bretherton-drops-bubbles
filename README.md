@@ -1,155 +1,83 @@
 # Bretherton drops and bubbles
 
-Axisymmetric Basilisk simulations of long drops and bubbles translating in
-liquid-filled capillary tubes, aimed at recovering the classical Bretherton
-film-thickness law and then comparing drop and bubble counterparts.
+Axisymmetric Basilisk solver for a gas bubble or immiscible drop translating
+through a liquid-filled circular tube. Runtime parameter files control the
+case; the current validation programme concerns Newtonian bubbles.
 
-The [Newtonian bubble validation](docs/Newtonian-Validation/README.md)
-documents the reference solutions, film-thickness comparison and
+The [Newtonian validation report](docs/Newtonian-Validation/README.md) contains
+the physical definitions, reference solutions, film-thickness results and
 grid-sensitivity study.
-
-## Overview
-
-A long gas bubble or immiscible drop pushed through a liquid-filled tube
-never touches the wall: it rides on a thin film of the continuous phase
-deposited by its front meniscus. For a bubble at small capillary number
-$\mathrm{Ca}_b = \mu_c U_b/\sigma$, lubrication theory
-([Bretherton, 1961](https://doi.org/10.1017/S0022112061000160)) gives
-
-$$\frac{b}{R_{tube}} \simeq 1.34\,\mathrm{Ca}_b^{2/3}, \qquad
-W = \frac{U_b - U}{U_b} \simeq 1.29\,(3\,\mathrm{Ca}_b)^{2/3},$$
-
-where $b$ is the film thickness, $U$ the mean speed of the carrying
-liquid and $U_b$ the bubble speed. At moderate $\mathrm{Ca}_b$ the
-Aussillous & Quéré (2000) fit
-$b/R_{tube} = 1.34\,\mathrm{Ca}_b^{2/3}/(1 + 3.35\,\mathrm{Ca}_b^{2/3})$
-describes Taylor's data.
-
-The tube wall is an **embedded boundary** (`embed.h`), fully wetted by
-the continuous phase, and the interface is tracked with **VOF**
-(`two-phase.h`). The solver is the axisymmetric incompressible
-Navier–Stokes solver (`axi.h` + `navier-stokes/centered.h`) with surface
-tension (`tension.h`) and momentum-conserving VOF advection
-(`navier-stokes/conserving.h`).
-
-## Non-dimensionalisation
-
-Repeating variables: surface tension $\sigma$, continuous-phase dynamic
-viscosity $\mu_c$ and the volume-equivalent drop/bubble radius
-$R = (3V/4\pi)^{1/3}$. Hence lengths are in units of $R$, velocities in
-units of the visco-capillary velocity $\sigma/\mu_c$, time in units of
-$\mu_c R/\sigma$ and pressure in units of $\sigma/R$. A dimensionless
-velocity **is** a capillary number, so the measured tip velocity of the
-drop/bubble is directly $\mathrm{Ca}_b$.
-
-Runtime control parameters (see `default.params`):
-
-| Key | Meaning | Bubble default |
-|-----|---------|----------------|
-| `Ca` | imposed mean inlet capillary number $\mu_c U/\sigma$ | 0.05 |
-| `La` | Laplace number $\rho_c\sigma R/\mu_c^2$ (keep $La\,Ca \ll 1$ for the visco-capillary regime) | 1 |
-| `muR` | viscosity ratio $\mu_d/\mu_c$ | 0.01 |
-| `rhoR` | density ratio $\rho_d/\rho_c$ | 0.001 |
-| `Rtube` | tube radius in units of $R$ ($<1$ confines the drop/bubble) | 0.7 |
-| `MAXlevel` | finest grid level (the film needs several cells: $b \gtrsim 4\,L_{domain}/2^{MAXlevel}$) | 10 |
-
-## Embedded boundaries + VOF: the incompatibility and its handling
-
-`embed.h` and `two-phase.h` are not fully compatible out of the box.
-The couplings and their treatment (all collected in
-`src-local/embed-vof-tube.h`) are:
-
-1. **Stale axi+embed metric** (upstream test `src/test/missing_metric.c`):
-   with `AXI` and `EMBED` the metric is $c_m = y\,c_s$, $f_m = y\,f_s$,
-   but `axi.h` computes it once at startup. Every `solid()` call and
-   every `adapt_wavelet()` must be followed by
-   `cm_update()`/`fm_update()`/`restriction()` —
-   wrapped here as `embed_axi_metric_sync()`.
-2. **VOF fraction leaking into the solid**: grid adaptation prolongates
-   `f` without knowledge of `cs`, and the height-function curvature
-   used by `tension.h` is not embed-aware, so spurious `f` inside the
-   wall corrupts the film curvature. `vof_solid_cleanup()` resets `f`
-   to the continuous-phase value in full-solid cells after adaptation.
-3. **Interface–wall separation**: `heights.h`/`curvature.h` ignore
-   `cs`, so the wetting film must stay resolved by several cells. Note
-   that adapting on `cs` cannot refine the wall: `embed.h` prolongates
-   `cs` with `fraction_refine`, which is exact for a planar interface, so
-   a straight tube wall carries identically zero wavelet error. The film
-   is refined by the `f` and curvature criteria, and the case logs a
-   warning if it thins below four fine cells.
-
-Surface tension itself is embed-safe (`iforce.h` skips faces with
-$f_m = 0$), and `vof.h` carries explicit `EMBED` branches for the
-advection. Both couplings are verified in `verificationCases/`.
 
 ## Requirements
 
-- [Basilisk C](http://basilisk.fr) (`qcc` in `PATH`), e.g. from
-  [comphy-lab/basilisk-C](https://github.com/comphy-lab/basilisk-C)
-- `bash`, `awk`, `python3` (post-processing)
-- OpenMP optional (`--threads N`)
+- A project-local [Basilisk C](https://github.com/comphy-lab/basilisk-C)
+  installation; the validation campaign uses `v2026-08-30`.
+- Bash, a C compiler and `qcc`. The runners load `.project_config` when present.
+- OpenMP for `--threads N`; Python with NumPy for flat-film post-processing.
 
-## Quick start
+## Run a case or sweep
 
 ```bash
-# verification cases, then the smoke test
-bash runTests.sh                          # serial; the static-film case dominates
-VERIFICATION_THREADS=16 bash runTests.sh  # same, with OpenMP
-bash runTests.sh --smoke                  # smoke test alone (~1 minute)
+# Compile and run the coarse smoke test.
+bash runTests.sh --smoke
 
-# single case with the defaults (bubble, Ca = 0.05)
-bash runSimulation.sh
+# Run a single case with the bubble defaults.
+bash runSimulation.sh default.params --threads 4
 
-# single case, custom parameter file, 4 OpenMP threads
-bash runSimulation.sh myCase.params --threads 4
-
-# bubble validation sweep (5 cases across Ca; production hardware)
-bash runParameterSweep.sh --dry-run     # inspect first
-bash runParameterSweep.sh --threads 4
-
-# drop counterpart sweep
-bash runParameterSweep.sh sweep-drop.params --threads 4
-
-# film thickness and Ca_b against Bretherton / Aussillous-Quere
-python3 postProcess/bretherton_film.py simulationCases/10?? --out film.csv
+# Inspect the eight-case grid study, then run it.
+bash runParameterSweep.sh grid-sensitivity.params --dry-run
+bash runParameterSweep.sh grid-sensitivity.params --threads 4 --parallel 2
 ```
 
-## Repository structure
+[`default.params`](default.params) defines the physical inputs and numerical
+controls. `Ca` is the imposed mean inlet capillary number; the bubble speed is
+measured from the output. [`grid-sensitivity.params`](grid-sensitivity.params)
+repeats the four inlet values at maximum levels 9 and 11. The separate
+[`grid-sensitivity-fine.params`](grid-sensitivity-fine.params) specifies the
+level-12 follow-up.
+
+Case output defaults to `simulationCases/<CaseNo>/`. Set `OUTPUT_ROOT` to a
+separate run directory for production calculations. Each case contains its
+parameters, source, executable, diagnostic log, `restart` dump and
+`intermediate/snapshot-*` files. An existing restart resumes that case.
+
+## Analysis and numerical checks
+
+[`postProcess/bretherton_flat_film.py`](postProcess/bretherton_flat_film.py)
+extracts the flat film and bubble speed from saved interfaces; it uses the
+compiled [`getFacets.c`](postProcess/getFacets.c) helper.
+[`postProcess/bretherton_film.py`](postProcess/bretherton_film.py) instead reads
+the minimum film reported in the case log. The validation report explains the
+difference between these measurements.
+
+```bash
+# Exact-solution checks followed by the smoke test.
+bash runTests.sh
+```
+
+The [verification cases](verificationCases/README.md) state their comparators
+and tolerances. The [smoke test](testCases/README.md) checks compilation and
+short-time execution.
+
+## Source layout
 
 ```
-├── simulationCases/bretherton.c - axisymmetric drop/bubble in an embedded tube (main case)
-├── src-local/embed-vof-tube.h - embed + axi + VOF compatibility layer
-├── src-local/params.h - typed runtime-parameter accessors with defaults
-├── src-local/parse_params.h - low-level key=value parameter parser
-├── verificationCases/embedAxiVofAdvection.c - embed+axi+VOF advection vs exact solution
-├── verificationCases/laplaceEmbedTube.c - Young-Laplace in an embedded tube; refinement sequence
-├── verificationCases/laplaceEmbedTubeAdapt.c - the same on an adapted tree, with a negative control
-├── verificationCases/staticFilmTube.c - near-wall gap sweep at production property ratios
-├── verificationCases/runVerification.sh - exact-solution case driver
-├── verificationCases/README.md - comparators, reference results and limits
-├── testCases/runSmokeTests.sh - smoke-test driver
-├── testCases/smoke.params - coarse short-run parameters for the smoke test
-├── testCases/README.md - what a smoke test does and does not establish
-├── runTests.sh - entry point: verification cases, then the smoke test
-├── postProcess/getFacets.c - extract interface facets from a snapshot
-├── postProcess/bretherton_film.py - film thickness and Ca_b from case logs
-├── default.params - baseline runtime parameters (bubble)
-├── sweep.params - bubble validation sweep over Ca
-├── sweep-drop.params - drop counterpart sweep over Ca
-├── runSimulation.sh - compile and run one case in simulationCases/<CaseNo>/
-└── runParameterSweep.sh - Cartesian SWEEP_* runner built on runSimulation.sh
+├── simulationCases/bretherton.c - production solver
+├── src-local/embed-vof-tube.h - embedded-wall and VOF compatibility functions
+├── src-local/params.h - typed runtime parameters
+├── postProcess/ - interface extraction, film analysis and videos
+├── verificationCases/ - exact-solution numerical checks
+├── testCases/ - smoke test
+└── docs/Newtonian-Validation/ - validation report, figure and comparison data
 ```
 
-## Outputs
+## Build and preview the documentation
 
-Each case writes to `simulationCases/<CaseNo>/`:
+```bash
+bash .github/scripts/build.sh
+bash .github/scripts/deploy.sh
+```
 
-- `c<CaseNo>-log`: per-step diagnostics
-  (`i dt t ke dVol/Vol0 xTipF xTipR bFilm`),
-- `intermediate/snapshot-*`: time-stamped dumps,
-- `restart`: checkpoint for resuming.
-
-`postProcess/bretherton_film.py` fits the front-tip velocity (which is
-$\mathrm{Ca}_b$ in code units) and the steady film thickness over the
-trailing time window and compares them with the Bretherton and
-Aussillous–Quéré predictions.
+The build generates the site in `.github/docs/`; `deploy.sh` starts a local
+preview. See [the documentation workflow](.github/Website-generator-readme.md)
+for source discovery and GitHub Pages publication.

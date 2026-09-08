@@ -10,17 +10,26 @@ The geometric integrals omit the common azimuthal factor of $2\pi$.
 #include "axi.h"
 #include "run.h"
 #include "embed-vof-tube.h"
+#include <errno.h>
 
 static const double RT = 0.7;
 static int MAXLEVEL = 9, failed = 0;
 
 int main (int argc, char ** argv)
 {
-  if (argc > 1)
-    MAXLEVEL = atoi (argv[1]);
-  if (MAXLEVEL < 6 || MAXLEVEL > 13) {
-    fprintf (stderr, "FAIL invalid maximum level %d\n", MAXLEVEL);
+  if (argc > 2) {
+    fprintf (stderr, "FAIL expected at most one maximum-level argument\n");
     return 2;
+  }
+  if (argc > 1) {
+    char * end;
+    errno = 0;
+    long value = strtol (argv[1], &end, 10);
+    if (errno || end == argv[1] || *end != '\0' || value < 6 || value > 13) {
+      fprintf (stderr, "FAIL maximum level must be an integer between 6 and 13\n");
+      return 2;
+    }
+    MAXLEVEL = (int) value;
   }
   size (16.);
   origin (0., 0.);

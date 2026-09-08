@@ -61,8 +61,10 @@ Organization: CoMPhy Lab, Durham University
 import ast
 import inspect
 import os, subprocess, re, shutil, argparse, html, json
+import posixpath
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+from urllib.parse import quote, unquote, urlsplit, urlunsplit
 try:
     from nbconvert import HTMLExporter
     NBCONVERT_AVAILABLE = True
@@ -422,8 +424,8 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params', '.md'}
     valid_names = {'Makefile'}
     non_site_names = {'AGENTS.md', 'CLAUDE.md', 'OPERATIONAL-NOTES.md'}
-    # Exclude 4-digit numeric case folders (e.g., simulationCases/1000/)
-    numeric_case_pattern = re.compile(r'/\d{4}/')
+    # Case numbers start at 1000 and may have more than four digits.
+    numeric_case_pattern = re.compile(r'/\d{4,}/')
     # Exclude transient compile-and-run directories (e.g.
     # verificationCases/build-laplaceEmbedTube/), which hold copies of
     # sources that are documented from their real location.
@@ -435,11 +437,12 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
         if src_path.is_dir():
             for f in src_path.rglob('*'):
                 if f.is_file() and not f.is_symlink() and f.name not in non_site_names:
+                    relative_path = '/' + f.relative_to(root_dir).as_posix()
                     # Skip files in numeric case folders
-                    if numeric_case_pattern.search(str(f)):
+                    if numeric_case_pattern.search(relative_path):
                         continue
                     # Skip files in transient build directories
-                    if build_dir_pattern.search(str(f)):
+                    if build_dir_pattern.search(relative_path):
                         continue
                     if f.name in valid_names:
                         files.add(f)
@@ -1089,7 +1092,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     
     return process.stdout
 
-def post_process_python_shell_html(html_content: str) -> str:
+def post_process_python_shell_html(html_content: str, source_path: Optional[Path] = None) -> str:
     """
     Enhances HTML generated from Python or shell files for improved display and navigation.
     
@@ -1099,6 +1102,7 @@ def post_process_python_shell_html(html_content: str) -> str:
     
     Args:
         html_content: The HTML content to be post-processed.
+        source_path: Original source file, used to resolve relative report links.
     
     Returns:
         The processed HTML content with enhanced formatting and navigation.
@@ -1153,13 +1157,29 @@ def post_process_python_shell_html(html_content: str) -> str:
         href_match = re.search(r'href="([^"]+)"', link_tag)
         
         if href_match:
-            href = href_match.group(1)
+            href = html.unescape(href_match.group(1))
             if (re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:', href) or
-                    href.startswith(('#', '//')) or href.endswith('.html')):
+                    href.startswith(('#', '//'))):
+                return link_tag
+
+            # Scientific reports are kept in the repository, outside this site.
+            parts = urlsplit(href)
+            source_dir = (source_path or README_PATH).parent.relative_to(REPO_ROOT)
+            report_path = posixpath.normpath(posixpath.join(source_dir.as_posix(), unquote(parts.path)))
+            if report_path == 'docs' or report_path.startswith('docs/'):
+                view = 'blob' if (REPO_ROOT / report_path).is_file() else 'tree'
+                path = '/'.join((quote(GITHUB_ORG, safe=''), quote(GITHUB_REPO, safe=''),
+                                 view, 'main', quote(report_path, safe='/')))
+                target = urlunsplit(('https', 'github.com', '/' + path, parts.query, parts.fragment))
+                return re.sub(r'href="([^"]+)"',
+                              lambda _: f'href="{html.escape(target, quote=True)}"', link_tag)
+
+            if href.endswith('.html'):
                 return link_tag
                 
             if re.search(r'\.(c|h|py|sh|sbatch|md|params)$', href):
-                return re.sub(r'href="([^"]+)"', lambda _: f'href="{href}.html"', link_tag)
+                return re.sub(r'href="([^"]+)"',
+                              lambda _: f'href="{html.escape(href + ".html", quote=True)}"', link_tag)
         
         return link_tag
     
@@ -1619,7 +1639,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
-            processed_html = post_process_python_shell_html(html_content)
+            processed_html = post_process_python_shell_html(html_content, file_path)
             
             with open(output_html_path, 'w', encoding='utf-8') as f:
                 f.write(processed_html)
@@ -2012,7 +2032,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         with open(index_path, 'r', encoding='utf-8') as f_in:
             index_html_content = f_in.read()
         
-        processed_html = post_process_python_shell_html(index_html_content)
+        processed_html = post_process_python_shell_html(index_html_content, README_PATH)
         
         with open(index_path, 'w', encoding='utf-8') as f_out:
             f_out.write(processed_html)

@@ -130,11 +130,11 @@ couplings 1–3 being handled correctly.
 
 ## Negative control
 
-Compile with `-DSKIP_EMBED_GUARDS` to omit the post-adaptation
-`embed_axi_metric_sync()` and `vof_solid_cleanup()` calls — and only
-those; the `init` event still synchronises through `tube_solid()`, so
-the initial state is identical in both builds and the control isolates
-the *adaptation* coupling.
+Compile with `-DSKIP_EMBED_GUARDS` to use active-cell metric
+initialisation without the complete stored-tree tube reconstruction,
+and to omit the post-adaptation `embed_axi_metric_sync()` and
+`vof_solid_cleanup()` calls. The control tests the complete tube
+compatibility pathway; it does not isolate the contribution of each call.
 
 ~~~bash
 qcc -I../src-local -O2 -Wall -disable-dimensions \
@@ -150,32 +150,10 @@ corrupted state, and the first firing iteration and magnitude are
 recorded and printed. If the guard-less build were to pass, that would
 be a finding about the header — not a reason to weaken this case.
 
-Observed behaviour (this machine, serial, Basilisk as of writing):
-
-- the guard-less build **fails, on P1**, at the very first adaptation
-  (`i = 0`), with $\max|f_m - f_m^{ref}| = 6.25\times10^{-4}$ against a
-  local $f_m \approx 0.28$, i.e. a relative metric error of about
-  $2\times10^{-3}$. $\max|c_m - c_m^{ref}|$ stays exactly zero: `cm`
-  has a dedicated axisymmetric prolongation (`refine_cm_axi`) and its
-  restriction happens to be exact for a planar wall, whereas the
-  $x$-face metric is not restored;
-- the violation persists, unchanged in magnitude, for all 921 steps;
-- **P2 never fires** (see the limits below);
-- **P3 is bit-identical between the two builds**: same $\Delta p$, same
-  $\max|\mathbf{u}|$ to all printed digits, same step count, same leaf
-  count. Instrumenting the offending face shows why: in this geometry
-  the only stale face is the one on the outflow boundary $x = L_0$ in
-  the wall cut-cell row, where the default no-flux condition makes the
-  face flux zero regardless of $f_m$.
-
-So the negative control does fail for the reason the header claims —
-the metric is left inconsistent by adaptation — but in *this*
-configuration that inconsistency has no measurable dynamical
-consequence. The case therefore establishes that
-`embed_axi_metric_sync()` is doing something real and necessary for
-metric consistency; it does **not** establish that omitting it would
-corrupt a production Bretherton run. That would need a configuration in
-which stale interior faces carry non-zero flux.
+The control retains valid active-cell geometry at initialisation, so
+its failure must come from a measured consistency violation rather than
+an invalid starting PDE state. It does not measure the dynamical error
+caused by omitting a particular synchronisation call.
 
 ## Outputs
 
@@ -282,15 +260,22 @@ int main()
 
 Refine the interface and the wall to `MAXLEVEL` *before* embedding the
 solid and initialising `f`, so that both are laid down on the mesh they
-will be carried on. `tube_solid()` synchronises the metric; this
-happens in both builds, so the two differ only in what they do after
-`adapt_wavelet()`.
+will be carried on. The guarded build reconstructs geometry throughout
+the stored tree. The negative control initialises only the active-cell
+metrics required to start integration and omits the complete tube pathway.
 */
 event init (t = 0)
 {
   refine (fabs (sqrt (sq(x - Xd) + sq(y)) - Rd) < 0.1 && level < MAXLEVEL);
   refine (fabs (y - Rtube) < 0.1 && level < MAXLEVEL);
+#if defined(SKIP_EMBED_GUARDS)
+  solid (cs, fs, Rtube - y);
+  cm_update (cm, cs, fs);
+  fm_update (fm, cs, fs);
+  restriction ({cs, fs, cm, fm});
+#else
   tube_solid (Rtube);
+#endif
   fraction (f, Rd - sqrt (sq(x - Xd) + sq(y)));
   vof_solid_cleanup (f);
 }
@@ -447,7 +432,8 @@ The whole point of the case. `adapt_wavelet()` re-prolongates `cs`,
 `fs` and `f` with no knowledge of the axisymmetric metric or of which
 cells are solid; `embed_axi_metric_sync()` and `vof_solid_cleanup()`
 repair both, exactly as `simulationCases/bretherton.c` does. The
-`SKIP_EMBED_GUARDS` build omits them and nothing else.
+`SKIP_EMBED_GUARDS` build omits these calls and uses the limited
+initialisation described above.
 */
 event adapt (i++)
 {
@@ -518,7 +504,7 @@ static void summarise (const char * note, int iter, bool fatal)
 
 #if defined(SKIP_EMBED_GUARDS)
   printf ("build: SKIP_EMBED_GUARDS (negative control, "
-          "no post-adaptation sync/cleanup)\n");
+          "active-cell initialisation; no post-adaptation sync/cleanup)\n");
 #else
   printf ("build: guarded (embed_axi_metric_sync + vof_solid_cleanup "
           "after every adapt_wavelet)\n");

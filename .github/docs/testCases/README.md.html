@@ -59,20 +59,20 @@
       --color-primary: #0066cc;
       --color-secondary: #036;
       --color-accent: #0099ff;
-
+      
       /* UI elements */
       --color-header-bg: #f5f5f5;
       --color-footer-bg: #2d2e33;
       --color-border: #e0e0e0;
       --color-input-bg: #f9f9f9;
-
+      
       /* Component colors */
       --color-preloader-bg: #ffffff;
       --color-loader: #0066cc;
       --color-card-bg: #ffffff;
       --color-code-bg: #f5f5f5;
     }
-
+    
     /* Dark theme variables applied via media query when JS is disabled */
     @media (prefers-color-scheme: dark) {
       :root:not(.theme-set) {
@@ -82,13 +82,13 @@
         --color-primary: #4d9fff;
         --color-secondary: #88ccff;
         --color-accent: #00bfff;
-
+        
         /* UI elements - dark mode */
         --color-header-bg: #121212;
         --color-footer-bg: #121212;
         --color-border: #333;
         --color-input-bg: #2d2d2d;
-
+        
         /* Component colors - dark mode */
         --color-preloader-bg: #1a1a1a;
         --color-loader: #4d9fff;
@@ -96,7 +96,7 @@
         --color-code-bg: #2d2d2d;
       }
     }
-
+    
     /* When JS sets the theme explicitly via data attribute */
     [data-theme="dark"] {
       /* Base colors - dark mode */
@@ -105,36 +105,36 @@
       --color-primary: #4d9fff;
       --color-secondary: #88ccff;
       --color-accent: #00bfff;
-
+      
       /* UI elements - dark mode */
       --color-header-bg: #121212;
       --color-footer-bg: #121212;
       --color-border: #333;
       --color-input-bg: #2d2d2d;
-
+      
       /* Component colors - dark mode */
       --color-preloader-bg: #1a1a1a;
       --color-loader: #4d9fff;
       --color-card-bg: #222;
       --color-code-bg: #2d2d2d;
     }
-
+    
     /* Prevent transition flashes during initial load */
     html:not(.transitions-enabled) * {
       transition: none !important;
     }
-
+    
     /* Apply theme to preloader and early elements */
     #preloader {
       background-color: var(--color-preloader-bg);
       color: var(--color-text);
     }
-
+    
     #loader {
       border-color: var(--color-loader);
       border-top-color: transparent;
     }
-
+    
     /* Noscript warning */
     .noscript-warning {
       background-color: var(--color-primary);
@@ -147,7 +147,7 @@
       right: 0;
       z-index: 1000;
     }
-
+    
     /* Theme indicator for no-JS */
     .theme-indicator {
       padding: 5px 10px;
@@ -156,12 +156,12 @@
       color: var(--color-text);
       text-align: center;
     }
-
+    
     /* Hide JS-only elements when no JS */
     .no-js .js-only {
       display: none !important;
     }
-
+    
     /* Show no-JS alternatives */
     .js .no-js-only {
       display: none !important;
@@ -171,8 +171,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>src-local/embed-vof-tube.h | Bretherton drops and bubbles</title>
-
+  <title>testCases/README.md | Bretherton drops and bubbles</title>
+  
   <!-- Critical CSS for fastest paint -->
   <style>
       .s-intro__title {
@@ -182,19 +182,19 @@
       .s-header {
           visibility: visible;
       }
-
+      
       /* Ensure theme toggle properly styled immediately */
       .theme-toggle {
           background-color: var(--color-background);
           color: var(--color-text);
       }
-
+      
       /* Control SVG visibility based on theme */
       [data-theme="dark"] .theme-toggle-icon.sun,
       :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
           display: block;
       }
-
+      
       [data-theme="dark"] .theme-toggle-icon.moon,
       :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
           display: none;
@@ -202,10 +202,10 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="Compatibility layer for combining embedded boundaries (embed.h) with axisymmetric Volume-Of-Fluid two-phase flow (axi.h + two-phase.h).">
+  <meta name="description" content="This directory holds a serial smoke test and a serial/MPI integration check. The serial smoke test checks that simulationCases/bretherton.c compiles and inte...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="curvature, embed, embed_vof_tube_h, tube">
+  <meta name="keywords" content="readme">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
@@ -256,7 +256,7 @@
   <script defer src="../assets/js/main.js"></script>
   <script defer src="../assets/js/theme-toggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
-
+  
   <!-- Optimize page load performance -->
   <script>
     // Preconnect to critical domains
@@ -264,21 +264,21 @@
       'https://cdnjs.cloudflare.com',
       'https://cdn.jsdelivr.net'
     ];
-
+    
     preconnectDomains.forEach(domain => {
       const link = document.createElement('link');
       link.rel = 'preconnect';
       link.href = domain;
       link.crossOrigin = 'anonymous';
       document.head.appendChild(link);
-
+      
       // Also add DNS prefetch as fallback
       const dnsLink = document.createElement('link');
       dnsLink.rel = 'dns-prefetch';
       dnsLink.href = domain;
       document.head.appendChild(dnsLink);
     });
-
+    
     // Detect when document is fully loaded to remove preloader
     window.addEventListener('load', function() {
       const preloader = document.getElementById('preloader');
@@ -305,11 +305,11 @@
         document.head.appendChild(link);
         return link;
       }
-
+      
       // Check if we're on localhost
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Use hardcoded version numbers for reliable loading
-
+        
         // Load Font Awesome using multiple CDNs to maximize reliability for local development
         loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
         // Backup CDN if the first one fails
@@ -330,7 +330,7 @@
       // Mark page as JS-enabled and manage transitions
       document.documentElement.classList.remove('no-js');
       document.documentElement.classList.add('js');
-
+      
       // Allow CSS transitions after initial load to prevent transition flashes
       window.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
@@ -421,192 +421,94 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 
         <!-- Main content -->
         <main class="content">
-
+            
             <div class="page-content">
-
-                                <h1 class="page-title">src-local/embed-vof-tube.h</h1>
-
-
+                
+                                <h1 class="page-title">testCases/README.md</h1>
+                
+                                
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/src-local/embed-vof-tube.h" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/README.md" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
-
-                <h1 id="embed-vof-tube.h">embed-vof-tube.h</h1>
-                <p>Compatibility layer for combining embedded boundaries
-                (<code>embed.h</code>) with axisymmetric Volume-Of-Fluid
-                two-phase flow (<code>axi.h</code> +
-                <code>two-phase.h</code>).</p>
-                <h2 id="why-this-header-exists">Why this header
-                exists</h2>
-                <p>Basilisk’s embedded boundaries and VOF advection are
-                <em>almost</em> compatible out of the box, but three
-                couplings must be handled by the case:</p>
-                <ol type="1">
-                <li><p><strong>Missing axi metric after
-                <code>solid()</code> and after adaptation.</strong> With
-                both <code>AXI</code> and <code>EMBED</code> defined,
-                the metric fields must satisfy <span
-                class="math inline">\(c_m = y\,c_s\)</span> and <span
-                class="math inline">\(f_m = y\,f_s\)</span>.
-                <code>axi.h</code> computes them once in its
-                <code>metric</code> event (when <code>cs = 1</code>
-                everywhere), so every later call to <code>solid()</code>
-                — and every <code>adapt_wavelet()</code> on trees, which
-                re-prolongates <code>cs</code>/<code>fs</code> — leaves
-                <code>cm</code>/<code>fm</code> stale.
-                <code>axi.h</code> provides <code>cm_update()</code> and
-                <code>fm_update()</code> for exactly this purpose and
-                the upstream test <a
-                href="http://basilisk.fr/src/test/missing_metric.c"><code>src/test/missing_metric.c</code></a>
-                guards the coupling.
-                <code>embed_axi_metric_sync()</code> wraps the required
-                calls.</p></li>
-                <li><p><strong>VOF fraction inside the solid.</strong>
-                <code>vof.h</code> only updates cells with
-                <code>cs &gt; 0</code>, but grid adaptation prolongates
-                <code>f</code> without knowledge of <code>cs</code>, so
-                refined solid cells can inherit non-zero <code>f</code>
-                from fluid neighbours. The height-function curvature
-                used by <code>tension.h</code> is not embed-aware: any
-                spurious <code>f</code> inside the solid corrupts height
-                columns near the wall and hence the film curvature.
-                <code>vof_solid_cleanup()</code> resets <code>f</code>
-                to the continuous-phase value (here <code>f = 0</code>)
-                in all full-solid cells. This is consistent with a wall
-                perfectly wetted by the continuous phase.</p></li>
-                <li><p><strong>Interface–wall separation.</strong>
-                <code>heights.h</code>/<code>curvature.h</code> have no
-                knowledge of <code>cs</code>, so the wetting film
-                between the interface and the embedded wall must stay
-                resolved by several cells. This header cannot enforce
-                that; cases must refine the wall region (e.g. by
-                adapting on <code>cs</code>) and monitor the film
-                thickness.</p></li>
-                </ol>
-                <p>Surface tension itself is safe: <code>iforce.h</code>
-                guards its face loop with <code>fm.x[] &gt; 0</code>, so
-                no force is applied on embedded faces.</p>
-                <h2 id="public-api">Public API</h2>
-                <ul>
-                <li><code>embed_axi_metric_sync()</code>: recompute
-                <code>cm</code>/<code>fm</code> and restrict
-                <code>{cs, fs, cm, fm}</code>; call after
-                <code>solid()</code> and after
-                <code>adapt_wavelet()</code>.</li>
-                <li><code>tube_solid(Rtube)</code>: embed a cylindrical
-                tube wall of radius <code>Rtube</code> (fluid at
-                <code>y &lt; Rtube</code>) and synchronise the
-                metric.</li>
-                <li><code>vof_solid_cleanup(f)</code>: clamp
-                <code>f</code> and reset it to the continuous phase in
-                full-solid cells; call after
-                <code>adapt_wavelet()</code>.</li>
-                </ul>
+                
+                <h1 id="execution-checks">Execution checks</h1>
+                <p>This directory holds a serial smoke test and a
+                serial/MPI integration check.</p>
+                <p>The serial smoke test checks that
+                <code>simulationCases/bretherton.c</code> compiles and
+                integrates a few dozen time steps at coarse resolution
+                without producing a truncated log or blowing up. It
+                compares against <strong>nothing</strong>, so it
+                supports no claim about the discretisation or about the
+                physics. Its value is that it fails loudly and in
+                seconds when a change breaks the build or the parameter
+                path.</p>
+                <table>
+                <colgroup>
+                <col style="width: 50%" />
+                <col style="width: 50%" />
+                </colgroup>
+                <thead>
+                <tr>
+                <th>File</th>
+                <th>Role</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                <td><code>smoke.params</code></td>
+                <td>coarse, short-run parameters
+                (<code>MAXlevel = 9</code>,
+                <code>tmax = 0.05</code>)</td>
+                </tr>
+                <tr>
+                <td><code>runSmokeTests.sh</code></td>
+                <td>builds and runs the case, then checks the log</td>
+                </tr>
+                <tr>
+                <td><code>runParallelSmokeTests.py</code></td>
+                <td>compares serial and two-rank MPI runs and
+                restarts</td>
+                </tr>
+                </tbody>
+                </table>
+                <p>Cases that compare against an exact solution live in
+                <a
+                href="../verificationCases/"><code>../verificationCases/</code></a>
+                and are driven by
+                <code>../verificationCases/runVerification.sh</code>.
+                The campaign that compares against independent
+                experimental data — Taylor (1961) and Aussillous &amp;
+                Quéré (2000) — is configured by
+                <code>sweep.params</code> and
+                <code>sweep-drop.params</code> at the repository root
+                and is meant for production hardware. Those three
+                evidence sources support three different claims and are
+                deliberately kept apart.</p>
+                <h2 id="running">Running</h2>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifndef EMBED_VOF_TUBE_H</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define EMBED_VOF_TUBE_H</span><span class="dv">52</span><span class="pp"></span><span class="dv">53</span><span class="pp"></span></span></code></pre></div></div>
-                <h3
-                id="embed_axi_metric_sync">embed_axi_metric_sync()</h3>
-                <p>Recomputes the metric fields from the current
-                <code>cs</code>/<code>fs</code> and restricts all four
-                fields on trees. With <code>EMBED</code> but no
-                <code>AXI</code>, only the restriction is needed (the
-                metric is the solid fraction itself, handled by
-                <code>embed.h</code>). After <code>tube_solid()</code>
-                registers a fixed cylindrical wall, the fractions and
-                metrics are reconstructed from that geometry at every
-                stored tree level, including MPI neighbour cells. This
-                specialisation assumes the wall remains a straight tube
-                of the registered radius.</p>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> testCases/runSmokeTests.sh   <span class="co"># this directory only</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh                  <span class="co"># verification cases, then this</span></span></code></pre></div></div>
+                <p>The build goes to <code>simulationCases/9999/</code>,
+                which is gitignored.</p>
+                <p>The parallel integration check needs Linux with
+                Python pidfd support, <code>qcc</code>,
+                <code>mpicc</code>, and an Open MPI rankfile naming two
+                allocated cores. It builds serial and MPI modes once,
+                compares short fresh and restarted runs, checks their
+                logs and snapshots, and exercises collective early
+                termination. Run it only inside the corresponding
+                reserved CPU set with a healthy MPI toolchain:</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE &amp;&amp; AXI &amp;&amp; EMBED</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> tube_metric_radius<span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Integral of the radius over the fluid portion of a radial cell interval,</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">// divided by its width. This is both cm and the axial-face metric of a tube.</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> tube_axial_face_metric <span class="op">(</span><span class="dt">double</span> r<span class="op">,</span> <span class="dt">double</span> d<span class="op">)</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> lo <span class="op">=</span> r <span class="op">-</span> d<span class="op">/</span><span class="fl">2.</span><span class="op">,</span> hi <span class="op">=</span> min<span class="op">(</span>r <span class="op">+</span> d<span class="op">/</span><span class="fl">2.</span><span class="op">,</span> tube_metric_radius<span class="op">);</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> hi <span class="op">&gt;</span> lo <span class="op">?</span> <span class="op">(</span>hi<span class="op">*</span>hi <span class="op">-</span> lo<span class="op">*</span>lo<span class="op">)/(</span><span class="fl">2.</span><span class="op">*</span>d<span class="op">)</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> embed_axi_metric_sync <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(AXI) &amp;&amp; defined(EMBED)</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  cm_update <span class="op">(</span>cm<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  fm_update <span class="op">(</span>fm<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// A stationary tube has an exact geometric description at every level.</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Populate inactive parents and MPI neighbour storage as well as leaves:</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">// face restriction can read either side of a partition boundary.</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>tube_metric_radius <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    foreach_cell<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      cs<span class="op">[]</span> <span class="op">=</span> clamp<span class="op">((</span>tube_metric_radius <span class="op">-</span> y<span class="op">)/</span>Delta <span class="op">+</span> <span class="fl">.5</span><span class="op">,</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      fs<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> cs<span class="op">[];</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>allocated<span class="op">(</span><span class="dv">1</span><span class="op">))</span> fs<span class="op">.</span>x<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> cs<span class="op">[];</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      fs<span class="op">.</span>y<span class="op">[]</span> <span class="op">=</span> y <span class="op">-</span> Delta<span class="op">/</span><span class="fl">2.</span> <span class="op">&lt;</span> tube_metric_radius <span class="op">?</span> <span class="fl">1.</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>allocated<span class="op">(</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">))</span> fs<span class="op">.</span>y<span class="op">[</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> y <span class="op">+</span> Delta<span class="op">/</span><span class="fl">2.</span> <span class="op">&lt;</span> tube_metric_radius <span class="op">?</span> <span class="fl">1.</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      cm<span class="op">[]</span> <span class="op">=</span> tube_axial_face_metric<span class="op">(</span>y<span class="op">,</span> Delta<span class="op">);</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      fm<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> tube_axial_face_metric<span class="op">(</span>y<span class="op">,</span> Delta<span class="op">);</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>allocated<span class="op">(</span><span class="dv">1</span><span class="op">))</span> fm<span class="op">.</span>x<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> tube_axial_face_metric<span class="op">(</span>y<span class="op">,</span> Delta<span class="op">);</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> r <span class="op">=</span> y <span class="op">-</span> Delta<span class="op">/</span><span class="fl">2.</span><span class="op">;</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      fm<span class="op">.</span>y<span class="op">[]</span> <span class="op">=</span> r <span class="op">&lt;</span> tube_metric_radius <span class="op">?</span> max<span class="op">(</span>r<span class="op">,</span><span class="fl">1e-20</span><span class="op">)</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      r <span class="op">=</span> y <span class="op">+</span> Delta<span class="op">/</span><span class="fl">2.</span><span class="op">;</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>allocated<span class="op">(</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">))</span> fm<span class="op">.</span>y<span class="op">[</span><span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> r <span class="op">&lt;</span> tube_metric_radius <span class="op">?</span> max<span class="op">(</span>r<span class="op">,</span><span class="fl">1e-20</span><span class="op">)</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(EMBED) &amp;&amp; TREE</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">// foreach_cell() does not perform automatic boundary-state tracking.</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>scalar s in <span class="op">{</span>cs<span class="op">,</span> fs<span class="op">,</span> cm<span class="op">,</span> fm<span class="op">})</span> set_dirty_stencil<span class="op">(</span>s<span class="op">);</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  restriction <span class="op">({</span>cs<span class="op">,</span> fs<span class="op">,</span> cm<span class="op">,</span> fm<span class="op">});</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
-                <h3 id="tube_solid">tube_solid()</h3>
-                <p>Embeds the tube wall: solid for <span
-                class="math inline">\(y &gt; R_{tube}\)</span>, fluid
-                below.</p>
-                <h4 id="parameters">Parameters</h4>
-                <ul>
-                <li><code>Rtube</code>: tube radius in code units.</li>
-                </ul>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> tube_solid <span class="op">(</span><span class="dt">double</span> Rtube<span class="op">)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE &amp;&amp; AXI &amp;&amp; EMBED</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  tube_metric_radius <span class="op">=</span> Rtube<span class="op">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  solid <span class="op">(</span>cs<span class="op">,</span> fs<span class="op">,</span> Rtube <span class="op">-</span> y<span class="op">);</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  embed_axi_metric_sync<span class="op">();</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
-                <h3 id="vof_solid_cleanup">vof_solid_cleanup()</h3>
-                <p>Enforces the continuous-phase value
-                <code>f = 0</code> in full-solid cells and clamps
-                <code>f</code> elsewhere. Cut cells
-                (<code>0 &lt; cs &lt; 1</code>) are left untouched:
-                their volume fraction is a valid fluid quantity.</p>
-                <h4 id="parameters-1">Parameters</h4>
-                <ul>
-                <li><code>c</code>: VOF volume fraction field (dispersed
-                phase at <code>c = 1</code>).</li>
-                </ul>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> vof_solid_cleanup <span class="op">(</span>scalar c<span class="op">)</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(EMBED)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&lt;=</span> <span class="fl">0.</span><span class="op">)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    else</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> clamp <span class="op">(</span>c<span class="op">[],</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div></div>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> testCases/runParallelSmokeTests.py <span class="at">--rankfile</span> /absolute/path/to/rankfile <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--work-root</span> /absolute/path/to/empty-test-directory</span></code></pre></div></div>
+                <p>The check retains command logs and stops on failed
+                execution, VOF CFL warnings or disagreement beyond its
+                stated tolerances. It checks parallel execution and
+                restart consistency; performance and mesh convergence
+                require separate tests.</p>
             </div>
         </main>
 
@@ -648,7 +550,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/src-local/embed-vof-tube.h" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/README.md" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

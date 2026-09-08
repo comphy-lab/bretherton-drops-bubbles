@@ -61,8 +61,10 @@ Organization: CoMPhy Lab, Durham University
 import ast
 import inspect
 import os, subprocess, re, shutil, argparse, html, json
+import posixpath
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+from urllib.parse import quote, unquote, urlsplit, urlunsplit
 try:
     from nbconvert import HTMLExporter
     NBCONVERT_AVAILABLE = True
@@ -410,7 +412,7 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     """
     Finds all supported source files in the specified directories and root directory.
 
-    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb, .params) or named 'Makefile', excluding files ending with '.dat'.
+    Searches recursively within each source directory and non-recursively in the root directory for files with supported extensions (.c, .h, .py, .sh, .ipynb, .params, .md) or named 'Makefile', excluding files ending with '.dat'.
 
     Args:
         root_dir: The root directory to search for source files.
@@ -419,10 +421,11 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
     Returns:
         A sorted list of Paths to the discovered source files.
     """
-    valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params'}
+    valid_exts = {'.c', '.h', '.py', '.sh', '.sbatch', '.ipynb', '.params', '.md'}
     valid_names = {'Makefile'}
-    # Exclude 4-digit numeric case folders (e.g., simulationCases/1000/)
-    numeric_case_pattern = re.compile(r'/\d{4}/')
+    non_site_names = {'AGENTS.md', 'CLAUDE.md', 'OPERATIONAL-NOTES.md'}
+    # Case numbers start at 1000 and may have more than four digits.
+    numeric_case_pattern = re.compile(r'/\d{4,}/')
     # Exclude transient compile-and-run directories (e.g.
     # verificationCases/build-laplaceEmbedTube/), which hold copies of
     # sources that are documented from their real location.
@@ -433,21 +436,22 @@ def find_source_files(root_dir: Path, source_dirs: List[str]) -> List[Path]:
         src_path = root_dir / dir_name
         if src_path.is_dir():
             for f in src_path.rglob('*'):
-                if f.is_file():
+                if f.is_file() and not f.is_symlink() and f.name not in non_site_names:
+                    relative_path = '/' + f.relative_to(root_dir).as_posix()
                     # Skip files in numeric case folders
-                    if numeric_case_pattern.search(str(f)):
+                    if numeric_case_pattern.search(relative_path):
                         continue
                     # Skip files in transient build directories
-                    if build_dir_pattern.search(str(f)):
+                    if build_dir_pattern.search(relative_path):
                         continue
                     if f.name in valid_names:
                         files.add(f)
                     elif f.suffix in valid_exts and not f.name.endswith('.dat'):
                         files.add(f)
 
-    # Search for .sh files and Makefiles in root directory
+    # Search supported source files in the root, excluding agent instructions and operational notes.
     for f in root_dir.iterdir():
-        if f.is_file():
+        if f.is_file() and not f.is_symlink() and f.name not in non_site_names:
             if f.name in valid_names:
                 files.add(f)
             elif f.suffix in valid_exts and not f.name.endswith('.dat'):
@@ -1088,7 +1092,7 @@ def run_pandoc(pandoc_input: str, output_html_path: Path, template_path: Path,
     
     return process.stdout
 
-def post_process_python_shell_html(html_content: str) -> str:
+def post_process_python_shell_html(html_content: str, source_path: Optional[Path] = None) -> str:
     """
     Enhances HTML generated from Python or shell files for improved display and navigation.
     
@@ -1098,6 +1102,7 @@ def post_process_python_shell_html(html_content: str) -> str:
     
     Args:
         html_content: The HTML content to be post-processed.
+        source_path: Original source file, used to resolve relative report links.
     
     Returns:
         The processed HTML content with enhanced formatting and navigation.
@@ -1146,24 +1151,41 @@ def post_process_python_shell_html(html_content: str) -> str:
         """
         Appends '.html' to local documentation links in HTML anchor tags if missing.
         
-        This function is intended for use as a replacement callback in regular expression operations. It modifies anchor tags so that links to source files (with extensions .c, .h, .py, .sh, .md) are updated to point to their corresponding HTML documentation, unless the link is already external, an anchor, or already ends with '.html'.
+        This function is intended for use as a replacement callback in regular expression operations. It modifies anchor tags so that links to rendered source files (including .c, .h, .py, .sh, .md, and .params) are updated to point to their corresponding HTML documentation, unless the link is already external, an anchor, or already ends with '.html'.
         """
         link_tag = match.group(0)
         href_match = re.search(r'href="([^"]+)"', link_tag)
         
         if href_match:
-            href = href_match.group(1)
-            if (href.startswith('http') or href.startswith('https') or 
-                href.startswith('#') or href.endswith('.html')):
+            href = html.unescape(href_match.group(1))
+            if (re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:', href) or
+                    href.startswith(('#', '//'))):
+                return link_tag
+
+            # Scientific reports are kept in the repository, outside this site.
+            parts = urlsplit(href)
+            source_dir = (source_path or README_PATH).parent.relative_to(REPO_ROOT)
+            report_path = posixpath.normpath(posixpath.join(source_dir.as_posix(), unquote(parts.path)))
+            if report_path == 'docs' or report_path.startswith('docs/'):
+                view = 'blob' if (REPO_ROOT / report_path).is_file() else 'tree'
+                path = '/'.join((quote(GITHUB_ORG, safe=''), quote(GITHUB_REPO, safe=''),
+                                 view, 'main', quote(report_path, safe='/')))
+                target = urlunsplit(('https', 'github.com', '/' + path, parts.query, parts.fragment))
+                return re.sub(r'href="([^"]+)"',
+                              lambda _: f'href="{html.escape(target, quote=True)}"', link_tag)
+
+            if parts.path.endswith('.html'):
                 return link_tag
                 
-            if re.search(r'\.(c|h|py|sh|sbatch|md)$', href):
-                return re.sub(r'href="([^"]+)"', f'href="{href}.html"', link_tag)
+            if re.search(r'\.(c|h|py|sh|sbatch|md|params)$', parts.path):
+                target = urlunsplit(parts._replace(path=parts.path + '.html'))
+                return re.sub(r'href="([^"]+)"',
+                              lambda _: f'href="{html.escape(target, quote=True)}"', link_tag)
         
         return link_tag
     
     processed_html = re.sub(
-        r'<a[^>]+href="[^"]+">[^<]+</a>',
+        r'<a\b[^>]*\bhref="[^"]+"[^>]*>',
         fix_doc_links,
         processed_html
     )
@@ -1618,7 +1640,7 @@ def process_file_with_page2html_logic(file_path: Path, output_html_path: Path, r
             with open(output_html_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
-            processed_html = post_process_python_shell_html(html_content)
+            processed_html = post_process_python_shell_html(html_content, file_path)
             
             with open(output_html_path, 'w', encoding='utf-8') as f:
                 f.write(processed_html)
@@ -1709,7 +1731,11 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             full_dir_path = f"{parent_path}/{dir_name}" if parent_path else dir_name
             full_dir_path = full_dir_path.lstrip('/')
             
-            if full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
+            if full_dir_path == "docs" or full_dir_path.startswith("docs/"):
+                # Scientific report sources are separate from this code site.
+                report_url = f"https://github.com/{GITHUB_ORG}/{GITHUB_REPO}/tree/main/{full_dir_path}"
+                item_html += f"**[{path}]({report_url})** - {description}"
+            elif full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
                 # For basilisk/src directories, link to basilisk.fr or just show as text
                 if full_dir_path == "basilisk/src":
                     item_html += f"**[{path}](https://basilisk.fr/src/)** - {description}"
@@ -2007,7 +2033,7 @@ def generate_index(readme_path: Path, index_path: Path, generated_files: Dict[Pa
         with open(index_path, 'r', encoding='utf-8') as f_in:
             index_html_content = f_in.read()
         
-        processed_html = post_process_python_shell_html(index_html_content)
+        processed_html = post_process_python_shell_html(index_html_content, README_PATH)
         
         with open(index_path, 'w', encoding='utf-8') as f_out:
             f_out.write(processed_html)
@@ -2396,7 +2422,7 @@ def main():
         if not copy_assets(assets_dir, DOCS_DIR):
             print("Failed to copy assets.")
             return
-        
+
         # Find source files
         source_files = find_source_files(REPO_ROOT, SOURCE_DIRS)
         if not source_files:

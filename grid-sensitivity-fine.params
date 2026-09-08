@@ -1,0 +1,8 @@
+# Follow-up grid, to run after assessing the level-9/10/11 sequence.
+# These cases are separate so a first-stage launch cannot queue them silently.
+BASE_CONFIG=default.params
+CASE_START=1200
+CASE_END=1203
+
+SWEEP_MAXlevel=12
+SWEEP_Ca=0.005,0.01,0.02,0.05

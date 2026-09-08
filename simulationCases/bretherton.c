@@ -76,6 +76,8 @@ the expected duration.
 #include "tension.h"
 #include "params.h"
 #include "embed-vof-tube.h"
+#include <errno.h>
+#include <sys/stat.h>
 
 /**
 ## Adaptivity controls
@@ -112,6 +114,7 @@ double tmax = 200., tsnap = 1., tRamp = 1., travelR = 10.;
 double Rb0, Lcyl, Xb0, vol0;
 double bTol, advWin, advMin, uRel, dRel, VelErr, DErr, csErr;
 int convHold;
+int runFailed = 0;
 
 char nameOut[128], dumpFile[128], logFile[128];
 
@@ -244,7 +247,22 @@ int main (int argc, char const *argv[])
   L0 = Ldomain;
   init_grid (1 << MINlevel);
 
-  system ("mkdir -p intermediate");
+  int directoryError = 0;
+  if (pid() == 0 && mkdir ("intermediate", 0777) != 0) {
+    int mkdirError = errno;
+    struct stat status;
+    if (mkdirError != EEXIST || stat ("intermediate", &status) != 0 ||
+        !S_ISDIR(status.st_mode)) {
+      errno = mkdirError;
+      perror ("intermediate");
+      directoryError = 1;
+    }
+  }
+#if _MPI
+  mpi_all_reduce (directoryError, MPI_INT, MPI_MAX);
+#endif
+  if (directoryError)
+    return 1;
   sprintf (dumpFile, "restart");
   sprintf (logFile, "c%d-log", CaseNo);
 
@@ -269,6 +287,7 @@ int main (int argc, char const *argv[])
   }
 
   run();
+  return runFailed ? 1 : 0;
 }
 
 /**
@@ -291,8 +310,19 @@ event init (t = 0)
                              + sq(y)));
     vof_solid_cleanup (f);
   }
-  else
-    embed_axi_metric_sync();
+  else {
+    // Dumps contain cell fields, not the embedded face fractions. Rebuild
+    // the stationary wall before the solver initializes face fluxes.
+    tube_solid (Rtube);
+#if TREE && AXI
+    // VOF's face scan also visits inactive full-fluid parent cells.
+    // Initialize their exact axisymmetric metric, not only active leaves.
+    foreach_cell()
+      if (cs[] >= 1.)
+        cm[] = y;
+#endif
+    vof_solid_cleanup (f);
+  }
 }
 
 /**
@@ -365,21 +395,24 @@ event logWriting (i++)
   double yMax = statsf(ypos).max;
   double bFilm = Rtube - yMax;
 
+  int logError = 0;
   if (pid() == 0) {
     static FILE * fp = NULL;
     if (i == 0) {
       fp = fopen (logFile, "w");
-      if (fp == NULL) {
-        fprintf (ferr, "ERROR: cannot open log file %s\n", logFile);
-        exit (1);
+      if (fp != NULL) {
+        fprintf (fp, "# CaseNo %d, MAXlevel %d, Ca %g, La %g, muR %g, "
+                 "rhoR %g, Rtube %g\n",
+                 CaseNo, MAXlevel, Ca, La, muR, rhoR, Rtube);
+        fprintf (fp, "# i dt t ke dVol/Vol0 xTipF xTipR bFilm\n");
       }
-      fprintf (fp, "# CaseNo %d, MAXlevel %d, Ca %g, La %g, muR %g, "
-               "rhoR %g, Rtube %g\n",
-               CaseNo, MAXlevel, Ca, La, muR, rhoR, Rtube);
-      fprintf (fp, "# i dt t ke dVol/Vol0 xTipF xTipR bFilm\n");
     }
     else
       fp = fopen (logFile, "a");
+    if (fp == NULL) {
+      fprintf (ferr, "ERROR: cannot open log file %s\n", logFile);
+      logError = 1;
+    }
     if (fp != NULL) {
       fprintf (fp, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
                i, dt, t, ke, (vol - vol0)/vol0, xTipF, xTipR, bFilm);
@@ -388,6 +421,15 @@ event logWriting (i++)
     }
     fprintf (ferr, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
              i, dt, t, ke, (vol - vol0)/vol0, xTipF, xTipR, bFilm);
+  }
+  if (logError) {
+#if _MPI
+    // A rank-zero I/O failure must end this MPI job, without adding a
+    // collective reduction to every successful diagnostic step.
+    MPI_Abort (MPI_COMM_WORLD, 1);
+#endif
+    runFailed = 1;
+    return 1;
   }
 
   /**
@@ -398,6 +440,7 @@ event logWriting (i++)
   if (ke > 1e3 && i > 10) {
     if (pid() == 0)
       fprintf (ferr, "Kinetic energy blew up. Stopping.\n");
+    runFailed = 1;
     dump (file = dumpFile);
     return 1;
   }
@@ -408,6 +451,7 @@ event logWriting (i++)
     if (pid() == 0)
       fprintf (ferr, "Front tip reached the outlet buffer at t=%g. "
                "Stopping.\n", t);
+    runFailed = 1;
     dump (file = dumpFile);
     return 1;
   }

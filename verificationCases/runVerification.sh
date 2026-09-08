@@ -10,10 +10,10 @@
 # errors the case printed.
 #
 # A case whose source mentions SKIP_EMBED_GUARDS also carries a negative
-# control: the same source built with -DSKIP_EMBED_GUARDS must FAIL. The
-# driver builds that variant too and treats a passing guard-less build as
-# a failure of the suite, because it would mean the guard under test does
-# nothing.
+# control: the same source built with -DSKIP_EMBED_GUARDS must fail its
+# metric (P1) or solid-fraction (P2) probe while the solution is finite.
+# A passing control, a P3-only miss or a non-finite solution does not
+# establish the effect of the embed guards.
 #
 # Usage:
 #   bash verificationCases/runVerification.sh [case.c ...]
@@ -116,7 +116,7 @@ run_case() {
     # Build status, exit status and output are three different things. A
     # qcc failure or a crash is not evidence that the guard assertion
     # fired, so accept the control only when the binary built, exited
-    # non-zero, and said FAIL for itself.
+    # non-zero, and reported a finite P1/P2 assertion failure.
     rm -rf "$nc_dir"
     mkdir -p "$nc_dir"
     cp "$src" "$nc_dir/"
@@ -139,6 +139,11 @@ run_case() {
       echo "${name} negative control: exited ${nc_status} without printing FAIL" >&2
       echo "  it crashed rather than failing its own assertion" >&2
       tail -5 "${nc_dir}/err.log" | sed 's/^/    /' >&2 || true
+      FAILED=1
+    elif grep -q "^divergence:" "${nc_dir}/out.log" || \
+         ! grep -Eq '^P[12] .* -> FAIL$' "${nc_dir}/out.log"; then
+      echo "${name} negative control: no finite P1/P2 failure was demonstrated" >&2
+      sed 's/^/    /' "${nc_dir}/out.log" >&2
       FAILED=1
     else
       echo "  negative control: FAILED as required (exit ${nc_status})"

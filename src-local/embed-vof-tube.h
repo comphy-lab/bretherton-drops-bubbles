@@ -57,15 +57,52 @@ Surface tension itself is safe: `iforce.h` guards its face loop with
 Recomputes the metric fields from the current `cs`/`fs` and restricts
 all four fields on trees. With `EMBED` but no `AXI`, only the
 restriction is needed (the metric is the solid fraction itself, handled
-by `embed.h`).
+by `embed.h`). After `tube_solid()` registers a fixed cylindrical wall,
+the fractions and metrics are reconstructed from that geometry at every
+stored tree level, including MPI neighbour cells. This specialisation
+assumes the wall remains a straight tube of the registered radius.
 */
+#if TREE && AXI && EMBED
+static double tube_metric_radius;
+
+// Integral of the radius over the fluid portion of a radial cell interval,
+// divided by its width. This is both cm and the axial-face metric of a tube.
+static double tube_axial_face_metric (double r, double d)
+{
+  double lo = r - d/2., hi = min(r + d/2., tube_metric_radius);
+  return hi > lo ? (hi*hi - lo*lo)/(2.*d) : 0.;
+}
+#endif
+
 static inline void embed_axi_metric_sync (void)
 {
 #if defined(AXI) && defined(EMBED)
   cm_update (cm, cs, fs);
   fm_update (fm, cs, fs);
+#if TREE
+  // A stationary tube has an exact geometric description at every level.
+  // Populate inactive parents and MPI neighbour storage as well as leaves:
+  // face restriction can read either side of a partition boundary.
+  if (tube_metric_radius > 0.)
+    foreach_cell() {
+      cs[] = clamp((tube_metric_radius - y)/Delta + .5, 0., 1.);
+      fs.x[] = cs[];
+      if (allocated(1)) fs.x[1] = cs[];
+      fs.y[] = y - Delta/2. < tube_metric_radius ? 1. : 0.;
+      if (allocated(0,1)) fs.y[0,1] = y + Delta/2. < tube_metric_radius ? 1. : 0.;
+      cm[] = tube_axial_face_metric(y, Delta);
+      fm.x[] = tube_axial_face_metric(y, Delta);
+      if (allocated(1)) fm.x[1] = tube_axial_face_metric(y, Delta);
+      double r = y - Delta/2.;
+      fm.y[] = r < tube_metric_radius ? max(r,1e-20) : 0.;
+      r = y + Delta/2.;
+      if (allocated(0,1)) fm.y[0,1] = r < tube_metric_radius ? max(r,1e-20) : 0.;
+    }
+#endif
 #endif
 #if defined(EMBED) && TREE
+  // foreach_cell() does not perform automatic boundary-state tracking.
+  for (scalar s in {cs, fs, cm, fm}) set_dirty_stencil(s);
   restriction ({cs, fs, cm, fm});
 #endif
 }
@@ -80,6 +117,9 @@ Embeds the tube wall: solid for $y > R_{tube}$, fluid below.
 */
 static inline void tube_solid (double Rtube)
 {
+#if TREE && AXI && EMBED
+  tube_metric_radius = Rtube;
+#endif
   solid (cs, fs, Rtube - y);
   embed_axi_metric_sync();
 }

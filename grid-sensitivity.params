@@ -1,0 +1,9 @@
+# First grid-sensitivity stage. Ca is the imposed mean inlet value.
+# The four archived MAXlevel=10 cases provide the intermediate grid.
+# Change only MAXlevel; feature-based refinement remains outside this stage.
+BASE_CONFIG=default.params
+CASE_START=1100
+CASE_END=1107
+
+SWEEP_MAXlevel=9,11
+SWEEP_Ca=0.005,0.01,0.02,0.05

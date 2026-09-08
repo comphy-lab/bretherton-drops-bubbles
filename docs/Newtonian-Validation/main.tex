@@ -1,0 +1,286 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[margin=25mm]{geometry}
+\usepackage[authoryear,round]{natbib}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue
+}
+\graphicspath{{figures/}}
+
+\title{Validation of Newtonian long-bubble simulations in circular tubes}
+\author{Vatsal Sanjay}
+\date{September 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+A long gas bubble translating through a wetting liquid leaves an annular film
+between its interface and the tube wall. We assess axisymmetric two-phase
+simulations of this process against the Bretherton asymptote and a
+finite-capillary-number representation of Taylor's measurements. Four
+calculations at one maximum refinement level reproduce the reference flat-film
+thickness within 2\% over $0.0054\lesssim Ca_b\lesssim0.068$. The agreement is
+preliminary because no spatial refinement sequence has yet been completed.
+We distinguish the flat film from the smaller local gap beneath the rear
+meniscus and define a grid-sensitivity study using the four existing physical
+inputs. This study tests whether the measured film thickness and bubble speed
+are independent of spatial resolution before extending the capillary-number
+range.
+\end{abstract}
+
+\section{Physical problem and reference limits}
+
+Viscous stress draws liquid into the film around a translating bubble, while
+surface tension connects the nearly cylindrical film to the curved front and
+rear menisci. Let $R_t$ denote the tube radius, $R_v$ the volume-equivalent
+bubble radius, $U_b$ the bubble speed, and $\overline U$ the imposed mean
+liquid speed. We define
+\begin{equation}
+  H=\frac{b_{\mathrm{flat}}}{R_t}, \qquad
+  Ca_b=\frac{\mu_c U_b}{\sigma}, \qquad
+  Ca_{\mathrm{in}}=\frac{\mu_c\overline U}{\sigma},
+  \label{eq:definitions}
+\end{equation}
+where $\mu_c$ is the continuous-phase viscosity and $\sigma$ is the surface
+tension. The simulations prescribe $Ca_{\mathrm{in}}$, whereas the motion of
+the front tip determines $Ca_b$. The reference laws must therefore be
+evaluated at the measured bubble speed.
+
+For a long inviscid bubble at small capillary and Reynolds numbers,
+\citet{bretherton1961motion} matched the viscous dynamic meniscus to the
+capillary outer shape and obtained
+\begin{equation}
+  H_B\simeq0.643(3Ca_b)^{2/3}\simeq1.337Ca_b^{2/3}.
+  \label{eq:bretherton-film}
+\end{equation}
+The result also assumes negligible gravity, a perfectly wetting liquid, and
+separation between the two dynamic menisci. The rounded coefficient 1.34 is
+conventional, but the unrounded value matters when errors below one per cent
+are discussed. A limiting-case test must show that
+$H/Ca_b^{2/3}\rightarrow1.337$ as $Ca_b\rightarrow0$; a line with slope $2/3$
+over a moderate range does not establish this limit.
+
+Bretherton's second observable is the relative speed excess,
+\begin{equation}
+  W=\frac{U_b-\overline U}{U_b}
+    \simeq1.29(3Ca_b)^{2/3}.
+  \label{eq:speed-excess}
+\end{equation}
+If the uniform film is stationary in the laboratory frame, volume
+conservation gives
+\begin{equation}
+  \frac{\overline U}{U_b}=(1-H)^2,
+  \qquad W=1-(1-H)^2.
+  \label{eq:volume-speed}
+\end{equation}
+The liquid flux in the simulated film must be measured before using
+Eq.~\eqref{eq:volume-speed} as an exact identity. Finite gas viscosity,
+meniscus interaction, and flow within the film can all modify it.
+
+Pressure comparisons require a stated sign convention. Taking the positive
+excess pressure from the liquid behind the bubble to the liquid ahead of it,
+the summed front-and-rear dynamic contribution is
+\begin{equation}
+  \Delta p_{\mathrm{bubble}}
+  \simeq4.52\frac{\sigma}{R_t}(3Ca_b)^{2/3}.
+  \label{eq:pressure-drop}
+\end{equation}
+The coefficient 3.58 quoted in the abstract of
+\citet{bretherton1961motion} is the leading-meniscus dynamic correction. It
+should not replace 4.52 in a comparison across a complete long bubble.
+Numerical pressures must be sampled outside both dynamic menisci using the
+same sign and radius convention.
+
+At finite capillary number, \citet{aussillous2000quick} represented the
+circular-tube measurements of \citet{taylor1961deposition} by
+\begin{equation}
+  H_T=\frac{1.34Ca_b^{2/3}}{1+3.35Ca_b^{2/3}}.
+  \label{eq:aq-correlation}
+\end{equation}
+This rational expression is an empirical fit introduced by Aussillous and
+Qu\'er\'e, rather than an equation proposed by Taylor. It approaches
+Eq.~\eqref{eq:bretherton-film} at small $Ca_b$ and accounts empirically for
+geometrical confinement as the film thickens. Taylor measured the deposited
+liquid fraction $m$ behind an advancing gas finger; for a uniform annular film,
+$m=1-(1-H)^2$. Aussillous and Qu\'er\'e's high-speed experiment instead moved
+a finite liquid column with air. Its inertial thresholds $Ca^*$ and $Ca^{**}$
+are consequently not universal transition values for the finite gas bubbles
+considered here.
+
+\section{Numerical method and provenance}
+
+The calculation solves the axisymmetric, incompressible two-phase
+Navier--Stokes equations. A volume-of-fluid field tracks the gas--liquid
+interface, surface tension supplies the capillary stress, and an embedded
+boundary represents the circular tube wall. The no-slip wall is fully wetted
+by the continuous phase. A Poiseuille profile drives the liquid at the inlet,
+and the bubble translates without touching the wall.
+
+Surface tension, $\mu_c$, and $R_v$ define the repeating scales. The present
+calculations use
+\begin{equation}
+  \frac{R_t}{R_v}=0.7, \qquad
+  \frac{\mu_g}{\mu_c}=0.01, \qquad
+  \frac{\rho_g}{\rho_c}=0.001,
+  \label{eq:properties}
+\end{equation}
+and the volume-radius Laplace number
+\begin{equation}
+  La_v=\frac{\rho_c\sigma R_v}{\mu_c^2}=1.
+\end{equation}
+The tube-based quantities are therefore
+\begin{equation}
+  La_t=0.7La_v, \qquad Re_t=La_tCa_b, \qquad We_t=La_tCa_b^2.
+  \label{eq:dimensionless}
+\end{equation}
+At $Ca_b=1$, both $Re_t$ and $We_t$ are 0.7. Inertia must therefore be
+measured during the extension to order-one capillary number, even though both
+phases remain Newtonian.
+
+The solver and numerical checks use the project-pinned Basilisk release
+\texttt{v2026-08-30}. A reproducible calculation records this version, the
+solver source, dimensionless inputs, compiler options, and analysis
+definitions. The current results use a domain of length $16R_v$ and maximum
+refinement level 10. The smallest available cell is then
+$\Delta_{\min}=16R_v/2^{10}=0.015625R_v$.
+
+\section{Preliminary flat-film comparison}
+
+Figure~\ref{fig:film} compares the four completed calculations with
+Eqs.~\eqref{eq:bretherton-film} and \eqref{eq:aq-correlation}. The plotted
+data are also supplied in \nolinkurl{data/baseline-film.csv}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{film-thickness-vs-ca.pdf}
+  \caption{Flat-film thickness against the measured bubble capillary number.
+  Symbols show the four simulations, the solid curve is the
+  Aussillous--Qu\'er\'e representation of Taylor's data, and the dashed curve
+  is the small-capillary-number Bretherton asymptote. The second panel shows
+  the ratio to the finite-capillary-number correlation. The reference curves
+  extend beyond the range of completed simulations.}
+  \label{fig:film}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Measured flat-film thickness and finite-capillary-number reference
+  values. All four simulations use maximum refinement level 10.}
+  \label{tab:baseline}
+  \begin{tabular}{rrrrr}
+    \toprule
+    $Ca_{\mathrm{in}}$ & $Ca_b$ & $H$ & $H_T$ & $100(H/H_T-1)$ \\
+    \midrule
+    0.005 & 0.00538868 & 0.0366354 & 0.0373420 & $-1.892\%$ \\
+    0.010 & 0.0112414  & 0.0567910 & 0.0575664 & $-1.347\%$ \\
+    0.020 & 0.0239374  & 0.0861486 & 0.0870712 & $-1.060\%$ \\
+    0.050 & 0.0680939  & 0.143663  & 0.143363  & $+0.209\%$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The flat-film estimator removes 30\% of the bubble's axial extent at each end,
+takes the median interface radius within the remaining central region, and
+averages the result over the final quarter of the usable snapshots. A linear
+fit to the front-tip position over the same temporal window gives $U_b$. This
+procedure is designed to exclude both dynamic menisci. The existence of a
+spatial plateau and sensitivity to the trimming and averaging windows have not
+yet been quantified.
+
+The global minimum gap near the rear meniscus is smaller. Its deviations from
+$H_T$ are approximately $-32.3\%$, $-25.9\%$, $-23.7\%$, and $-18.4\%$ for
+the four cases in Table~\ref{tab:baseline}. These values describe a different
+observable: rear capillary waves can produce a local minimum below the
+uniform film, as found in the rear-meniscus calculations of
+\citet{giavedoni1999rear}. A steady minimum gap does not by itself establish a
+steady flat film, pressure drop, bubble length, or complete travelling shape.
+
+At level 10, the measured flat films span at most 1.64, 2.54, 3.86, and 6.44
+smallest cells. These are geometric estimates, rather than verified counts of
+the adaptive leaves within each film. No case presently has a completed
+refinement sequence. The observed agreement within 2\% is therefore a
+single-resolution comparison and cannot yet be interpreted as numerical
+accuracy.
+
+\section{Grid sensitivity and extension in capillary number}
+
+The first grid study holds the four existing input values
+$Ca_{\mathrm{in}}=0.005$, 0.01, 0.02, and 0.05 fixed. Each physical input is
+examined at maximum levels 9, 10, 11, and 12, where level 10 is the existing
+calculation. Selected low-capillary-number cases may require finer stages if
+these four levels do not reach an asymptotic range. Table~\ref{tab:grid}
+records the design; only its level-10 column contains results.
+
+\begin{table}[t]
+  \centering
+  \caption{Grid-sensitivity matrix. ``Pending'' denotes a calculation under
+  investigation and carries no implied result.}
+  \label{tab:grid}
+  \begin{tabular}{rccccc}
+    \toprule
+    $Ca_{\mathrm{in}}$ & Level 9 & Level 10 & Level 11 & Level 12 & Finer \\
+    \midrule
+    0.005 & pending & existing & pending & pending & conditional \\
+    0.010 & pending & existing & pending & pending & conditional \\
+    0.020 & pending & existing & pending & pending & conditional \\
+    0.050 & pending & existing & pending & pending & conditional \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The same inlet capillary number and physical properties are retained across a
+grid sequence. Both $H$ and the resulting $Ca_b$ must converge; retuning the
+inlet speed would hide part of the numerical response. The correlation is
+evaluated at the measured $Ca_b$ on every grid. Bubble volume, length, flat-film
+uniformity, and temporal drift accompany the two primary observables. At
+least three solutions in an asymptotic range are required before assigning a
+convergence order. Time-step and pressure-solver tolerances, domain length,
+boundary clearance, bubble length, and gas viscosity ratio are separate tests
+and should not be folded into the spatial sequence.
+
+Adaptive refinement currently responds to interface, curvature, velocity, and
+strain-rate indicators. A feature-based criterion that guarantees a minimum
+number of cells across the wall--interface gap may reduce the cost of finer
+stages. This remains a proposed numerical method. Its feature definition,
+refinement floor, spatial band, interaction with the embedded boundary, and
+volume-conservation tests must be fixed before it can contribute evidence to
+the grid study.
+
+Once spatial sensitivity is known, the bubble calculations can extend from
+the small-$Ca_b$ limit to $Ca_b=1$. Equation~\eqref{eq:aq-correlation} supplies
+a convenient film-thickness comparison but does not replace independent
+benchmarks. The axisymmetric Stokes solutions of
+\citet{reinelt1985penetration} provide deposited fraction, finger radius, nose
+shape, and front pressure response at finite $Ca_b$.
+\citet{giavedoni1997axisymmetric} and \citet{giavedoni1999rear} give
+complementary front and rear reference problems, including streamline
+topology and rear interfacial undulations. Their plane-channel results must not
+be mixed with the circular-tube geometry.
+
+\section{Present conclusion}
+
+The present calculations support one bounded statement. Four level-10
+simulations of Newtonian gas bubbles reproduce the flat-film value of
+Eq.~\eqref{eq:aq-correlation} within 2\% over
+$0.0054\lesssim Ca_b\lesssim0.068$. The minimum gap beneath the rear meniscus
+does not test the same quantity. Spatial convergence, the limiting Bretherton
+coefficient, speed excess, meniscus profiles, and pressure response remain
+unestablished. The pending refinement matrix is designed to quantify the first
+of these uncertainties before the comparison is extended through $Ca_b=1$.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

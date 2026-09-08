@@ -451,6 +451,7 @@ event logWriting (i++)
     if (pid() == 0)
       fprintf (ferr, "Front tip reached the outlet buffer at t=%g. "
                "Stopping.\n", t);
+    runFailed = 1;
     dump (file = dumpFile);
     return 1;
   }

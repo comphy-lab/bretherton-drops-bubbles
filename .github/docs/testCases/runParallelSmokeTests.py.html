@@ -205,7 +205,7 @@
   <meta name="description" content="Compare short serial and two-rank MPI solver runs and restarts. python import argparse import math import os import select import signal import shutil import...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="assert_metrics_close, copy_build, decode_output, invocation_processes, invoke, last_metrics, main, runparallelsmoketests, signal_verified_group, write_params">
+  <meta name="keywords" content="copy_build, decode_output, invoke, last_metrics, main, open_verified_group, path_is_within, runparallelsmoketests, signal_verified_group, write_params">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
@@ -629,7 +629,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    destination.write_text(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(lines) <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>)</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> invoke(params: Path, output_root: Path, extra: <span class="bu">list</span>[<span class="bu">str</span>], timeout: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span></code></pre></div></div>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> invoke(params: Path, output_root: Path, extra: <span class="bu">list</span>[<span class="bu">str</span>], timeout: <span class="bu">int</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>           <span class="op">*</span>, expected_status: <span class="bu">int</span> <span class="op">=</span> <span class="dv">0</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span></code></pre></div></div>
                 <p>Run the case runner and return its combined
                 diagnostic stream.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
@@ -703,17 +704,18 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        ) <span class="im">from</span> timeout_error</span>
 <span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    receipt.write_text(output, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>)</span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> process.returncode <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> process.returncode <span class="op">!=</span> expected_status:</span>
 <span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(</span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;command failed with status </span><span class="sc">{</span>process<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(command)<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span>output<span class="sc">}</span><span class="ss">&quot;</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;CFL must be &lt;=&quot;</span> <span class="kw">in</span> output:</span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;VOF CFL warning in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;command returned </span><span class="sc">{</span>process<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">, expected </span><span class="sc">{</span>expected_status<span class="sc">}</span><span class="ss">: &quot;</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(command)<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span>output<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;CFL must be &lt;=&quot;</span> <span class="kw">in</span> output:</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;VOF CFL warning in </span><span class="sc">{</span>receipt<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
 <span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> copy_build(source_case: Path, destination_case: Path) <span class="op">-&gt;</span> <span class="va">None</span>:</span></code></pre></div></div>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> copy_build(source_case: Path, destination_case: Path) <span class="op">-&gt;</span> <span class="va">None</span>:</span></code></pre></div></div>
                 <p>Copy a verified case-local build without copying
                 runtime output.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
@@ -781,72 +783,107 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    serial_output <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;serial-cases&quot;</span></span>
 <span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    mpi_output <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-cases&quot;</span></span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    stop_output_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-stop-cases&quot;</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    params_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;params&quot;</span></span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    serial_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    mpi_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>    stop_output_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    params_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    serial_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial.params&quot;</span></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>    mpi_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi.params&quot;</span></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    write_params(serial_params, <span class="dv">9901</span>)</span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_params, <span class="dv">9901</span>)</span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--build-only&quot;</span>], args.timeout)</span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile), <span class="st">&quot;--build-only&quot;</span>],</span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
-<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
-<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
-<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>                         last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>), <span class="st">&quot;fresh run&quot;</span>)</span>
-<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> case_dir <span class="kw">in</span> (serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>):</span>
-<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="kw">not</span> (case_dir <span class="op">/</span> <span class="st">&quot;restart&quot;</span>).is_file() <span class="kw">or</span></span>
-<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>                <span class="kw">not</span> <span class="bu">list</span>((case_dir <span class="op">/</span> <span class="st">&quot;intermediate&quot;</span>).glob(<span class="st">&quot;snapshot-*&quot;</span>))):</span>
-<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;missing restart or snapshot output in </span><span class="sc">{</span>case_dir<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>    serial_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial-restart.params&quot;</span></span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>    mpi_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-restart.params&quot;</span></span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>    write_params(serial_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
-<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>    shutil.copy2(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>,</span>
-<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>                 mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>)</span>
-<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>    invoke(serial_restart_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
-<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_restart_params, mpi_output,</span>
-<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
-<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
-<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
-<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
-<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>                         last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>), <span class="st">&quot;restart&quot;</span>)</span>
-<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>    stop_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-collective-stop.params&quot;</span></span>
-<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>    write_params(stop_params, <span class="dv">9902</span>, Ldomain<span class="op">=</span><span class="st">&quot;7&quot;</span>)</span>
-<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>    copy_build(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
-<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>    stop_output <span class="op">=</span> invoke(</span>
-<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>        stop_params,</span>
-<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>        stop_output_root,</span>
-<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>        [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
-<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
-<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>        args.timeout,</span>
-<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;Front tip reached the outlet buffer&quot;</span> <span class="kw">not</span> <span class="kw">in</span> stop_output:</span>
-<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="st">&quot;MPI early-stop case did not exercise the outlet guard&quot;</span>)</span>
-<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>    last_metrics(stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
-<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;PASS: serial/MPI fresh run, restart, outputs, and collective early stop&quot;</span>)</span>
-<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;work root: </span><span class="sc">{</span>work_root<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> temporary_root <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>        shutil.rmtree(temporary_root)</span>
-<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
-<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
-<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">SystemExit</span>(main())</span></code></pre></div></div>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    mpi_checkpoint_output <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-checkpoint-cases&quot;</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    stop_output_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;mpi-stop-cases&quot;</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    params_root <span class="op">=</span> work_root <span class="op">/</span> <span class="st">&quot;params&quot;</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    serial_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>    mpi_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    mpi_checkpoint_output.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>    stop_output_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    params_root.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    serial_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial.params&quot;</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>    mpi_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi.params&quot;</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>    write_params(serial_params, <span class="dv">9901</span>)</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_params, <span class="dv">9901</span>)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--build-only&quot;</span>], args.timeout)</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>    invoke(serial_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile), <span class="st">&quot;--build-only&quot;</span>],</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_params, mpi_output,</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>    serial_fresh_metrics <span class="op">=</span> last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>)</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>    mpi_fresh_metrics <span class="op">=</span> last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>)</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(serial_fresh_metrics, mpi_fresh_metrics, <span class="st">&quot;fresh run&quot;</span>)</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> case_dir <span class="kw">in</span> (serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>):</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="kw">not</span> (case_dir <span class="op">/</span> <span class="st">&quot;restart&quot;</span>).is_file() <span class="kw">or</span></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>                <span class="kw">not</span> <span class="bu">list</span>((case_dir <span class="op">/</span> <span class="st">&quot;intermediate&quot;</span>).glob(<span class="st">&quot;snapshot-*&quot;</span>))):</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="ss">f&quot;missing restart or snapshot output in </span><span class="sc">{</span>case_dir<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>    mpi_checkpoint_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-checkpoint-restart.params&quot;</span></span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_checkpoint_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>    copy_build(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, mpi_checkpoint_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>    shutil.copy2(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>,</span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>                 mpi_checkpoint_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>)</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>    shutil.copy2(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;c9901-log&quot;</span>,</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>                 mpi_checkpoint_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;c9901-log&quot;</span>)</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>    mpi_checkpoint_restart_output <span class="op">=</span> invoke(</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>        mpi_checkpoint_params,</span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>        mpi_checkpoint_output,</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>        [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>        args.timeout,</span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (</span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Restart file found - simulation will resume from checkpoint.&quot;</span></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>        <span class="kw">not</span> <span class="kw">in</span> mpi_checkpoint_restart_output</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="st">&quot;MPI checkpoint restart was not detected by the runner&quot;</span>)</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>    mpi_checkpoint_restart_metrics <span class="op">=</span> last_metrics(</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>        mpi_checkpoint_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span></span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mpi_checkpoint_restart_metrics[<span class="dv">2</span>] <span class="op">&lt;=</span> mpi_fresh_metrics[<span class="dv">2</span>]:</span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;MPI checkpoint restart did not advance beyond its checkpoint time&quot;</span></span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>    serial_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;serial-restart.params&quot;</span></span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>    mpi_restart_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-restart.params&quot;</span></span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>    write_params(serial_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>    write_params(mpi_restart_params, <span class="dv">9901</span>, tmax<span class="op">=</span><span class="st">&quot;0.06&quot;</span>)</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>    shutil.copy2(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>,</span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a>                 mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span> <span class="op">/</span> <span class="st">&quot;restart&quot;</span>)</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>    invoke(serial_restart_params, serial_output, [<span class="st">&quot;--no-build&quot;</span>], args.timeout)</span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a>    invoke(mpi_restart_params, mpi_output,</span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a>           [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>           args.timeout)</span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(serial_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a>                         last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>), <span class="st">&quot;restart&quot;</span>)</span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>    assert_metrics_close(last_metrics(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>),</span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a>                         mpi_checkpoint_restart_metrics,</span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>                         <span class="st">&quot;serial-owned/MPI-owned checkpoint restart&quot;</span>)</span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a>    stop_params <span class="op">=</span> params_root <span class="op">/</span> <span class="st">&quot;mpi-collective-stop.params&quot;</span></span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a>    write_params(stop_params, <span class="dv">9902</span>, Ldomain<span class="op">=</span><span class="st">&quot;7&quot;</span>)</span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a>    copy_build(mpi_output <span class="op">/</span> <span class="st">&quot;9901&quot;</span>, stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a>    stop_output <span class="op">=</span> invoke(</span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a>        stop_params,</span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a>        stop_output_root,</span>
+<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a>        [<span class="st">&quot;--ranks&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;--rankfile&quot;</span>, <span class="bu">str</span>(rankfile),</span>
+<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;--mpi-timeout&quot;</span>, <span class="bu">str</span>(args.timeout), <span class="st">&quot;--no-build&quot;</span>],</span>
+<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a>        args.timeout,</span>
+<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a>        expected_status<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">&quot;Front tip reached the outlet buffer&quot;</span> <span class="kw">not</span> <span class="kw">in</span> stop_output:</span>
+<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">AssertionError</span>(<span class="st">&quot;MPI early-stop case did not exercise the outlet guard&quot;</span>)</span>
+<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a>    last_metrics(stop_output_root <span class="op">/</span> <span class="st">&quot;9902&quot;</span>)</span>
+<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;PASS: serial/MPI fresh run, cross-mode and MPI checkpoint restarts, &quot;</span></span>
+<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;outputs, and collective early stop&quot;</span>)</span>
+<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;work root: </span><span class="sc">{</span>work_root<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> temporary_root <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb12-135"><a href="#cb12-135" aria-hidden="true" tabindex="-1"></a>        shutil.rmtree(temporary_root)</span>
+<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">SystemExit</span>(main())</span></code></pre></div></div>
             </div>
         </main>
 

@@ -1174,12 +1174,13 @@ def post_process_python_shell_html(html_content: str, source_path: Optional[Path
                 return re.sub(r'href="([^"]+)"',
                               lambda _: f'href="{html.escape(target, quote=True)}"', link_tag)
 
-            if href.endswith('.html'):
+            if parts.path.endswith('.html'):
                 return link_tag
                 
-            if re.search(r'\.(c|h|py|sh|sbatch|md|params)$', href):
+            if re.search(r'\.(c|h|py|sh|sbatch|md|params)$', parts.path):
+                target = urlunsplit(parts._replace(path=parts.path + '.html'))
                 return re.sub(r'href="([^"]+)"',
-                              lambda _: f'href="{html.escape(href + ".html", quote=True)}"', link_tag)
+                              lambda _: f'href="{html.escape(target, quote=True)}"', link_tag)
         
         return link_tag
     
@@ -1732,7 +1733,7 @@ def convert_directory_tree_to_html(readme_content: str) -> str:
             
             if full_dir_path == "docs" or full_dir_path.startswith("docs/"):
                 # Scientific report sources are separate from this code site.
-                report_url = f"https://github.com/{GITHUB_ORG}/{REPO_NAME}/tree/main/{full_dir_path}"
+                report_url = f"https://github.com/{GITHUB_ORG}/{GITHUB_REPO}/tree/main/{full_dir_path}"
                 item_html += f"**[{path}]({report_url})** - {description}"
             elif full_dir_path == "basilisk/src" or full_dir_path.startswith("basilisk/src/"):
                 # For basilisk/src directories, link to basilisk.fr or just show as text

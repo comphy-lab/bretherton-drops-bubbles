@@ -180,7 +180,8 @@ def write_params(destination: Path, case_no: int, **updates: str) -> None:
     destination.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def invoke(params: Path, output_root: Path, extra: list[str], timeout: int) -> str:
+def invoke(params: Path, output_root: Path, extra: list[str], timeout: int,
+           *, expected_status: int = 0) -> str:
     """Run the case runner and return its combined diagnostic stream."""
     command = ["bash", str(RUNNER), str(params), *extra]
     work_root = output_root.parent.resolve(strict=True)
@@ -252,9 +253,10 @@ def invoke(params: Path, output_root: Path, extra: list[str], timeout: int) -> s
         ) from timeout_error
 
     receipt.write_text(output, encoding="utf-8")
-    if process.returncode != 0:
+    if process.returncode != expected_status:
         raise RuntimeError(
-            f"command failed with status {process.returncode}: {' '.join(command)}\n"
+            f"command returned {process.returncode}, expected {expected_status}: "
+            f"{' '.join(command)}\n"
             f"{output}"
         )
     if "CFL must be <=" in output:
@@ -324,10 +326,12 @@ def main() -> int:
 
     serial_output = work_root / "serial-cases"
     mpi_output = work_root / "mpi-cases"
+    mpi_checkpoint_output = work_root / "mpi-checkpoint-cases"
     stop_output_root = work_root / "mpi-stop-cases"
     params_root = work_root / "params"
     serial_output.mkdir(parents=True, exist_ok=True)
     mpi_output.mkdir(parents=True, exist_ok=True)
+    mpi_checkpoint_output.mkdir(parents=True, exist_ok=True)
     stop_output_root.mkdir(parents=True, exist_ok=True)
     params_root.mkdir(parents=True, exist_ok=True)
 
@@ -346,12 +350,40 @@ def main() -> int:
             "--mpi-timeout", str(args.timeout), "--no-build"],
            args.timeout)
 
-    assert_metrics_close(last_metrics(serial_output / "9901"),
-                         last_metrics(mpi_output / "9901"), "fresh run")
+    serial_fresh_metrics = last_metrics(serial_output / "9901")
+    mpi_fresh_metrics = last_metrics(mpi_output / "9901")
+    assert_metrics_close(serial_fresh_metrics, mpi_fresh_metrics, "fresh run")
     for case_dir in (serial_output / "9901", mpi_output / "9901"):
         if (not (case_dir / "restart").is_file() or
                 not list((case_dir / "intermediate").glob("snapshot-*"))):
             raise AssertionError(f"missing restart or snapshot output in {case_dir}")
+
+    mpi_checkpoint_params = params_root / "mpi-checkpoint-restart.params"
+    write_params(mpi_checkpoint_params, 9901, tmax="0.06")
+    copy_build(mpi_output / "9901", mpi_checkpoint_output / "9901")
+    shutil.copy2(mpi_output / "9901" / "restart",
+                 mpi_checkpoint_output / "9901" / "restart")
+    shutil.copy2(mpi_output / "9901" / "c9901-log",
+                 mpi_checkpoint_output / "9901" / "c9901-log")
+    mpi_checkpoint_restart_output = invoke(
+        mpi_checkpoint_params,
+        mpi_checkpoint_output,
+        ["--ranks", "2", "--rankfile", str(rankfile),
+         "--mpi-timeout", str(args.timeout), "--no-build"],
+        args.timeout,
+    )
+    if (
+        "Restart file found - simulation will resume from checkpoint."
+        not in mpi_checkpoint_restart_output
+    ):
+        raise AssertionError("MPI checkpoint restart was not detected by the runner")
+    mpi_checkpoint_restart_metrics = last_metrics(
+        mpi_checkpoint_output / "9901"
+    )
+    if mpi_checkpoint_restart_metrics[2] <= mpi_fresh_metrics[2]:
+        raise AssertionError(
+            "MPI checkpoint restart did not advance beyond its checkpoint time"
+        )
 
     serial_restart_params = params_root / "serial-restart.params"
     mpi_restart_params = params_root / "mpi-restart.params"
@@ -366,6 +398,9 @@ def main() -> int:
            args.timeout)
     assert_metrics_close(last_metrics(serial_output / "9901"),
                          last_metrics(mpi_output / "9901"), "restart")
+    assert_metrics_close(last_metrics(mpi_output / "9901"),
+                         mpi_checkpoint_restart_metrics,
+                         "serial-owned/MPI-owned checkpoint restart")
 
     stop_params = params_root / "mpi-collective-stop.params"
     write_params(stop_params, 9902, Ldomain="7")
@@ -376,12 +411,14 @@ def main() -> int:
         ["--ranks", "2", "--rankfile", str(rankfile),
          "--mpi-timeout", str(args.timeout), "--no-build"],
         args.timeout,
+        expected_status=1,
     )
     if "Front tip reached the outlet buffer" not in stop_output:
         raise AssertionError("MPI early-stop case did not exercise the outlet guard")
     last_metrics(stop_output_root / "9902")
 
-    print("PASS: serial/MPI fresh run, restart, outputs, and collective early stop")
+    print("PASS: serial/MPI fresh run, cross-mode and MPI checkpoint restarts, "
+          "outputs, and collective early stop")
     print(f"work root: {work_root}")
     if temporary_root is not None:
         shutil.rmtree(temporary_root)

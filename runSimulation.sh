@@ -168,6 +168,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --ranks=*)
       MPI_RANKS="${1#*=}"
+      if [[ -z "$MPI_RANKS" ]]; then
+        echo "ERROR: --ranks requires a positive integer value." >&2
+        usage
+        exit 1
+      fi
       shift
       ;;
     --rankfile)
@@ -181,6 +186,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --rankfile=*)
       MPI_RANKFILE="${1#*=}"
+      if [[ -z "$MPI_RANKFILE" ]]; then
+        echo "ERROR: --rankfile requires a file path." >&2
+        usage
+        exit 1
+      fi
       shift
       ;;
     --pe-list)
@@ -194,6 +204,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --pe-list=*)
       MPI_PE_LIST="${1#*=}"
+      if [[ -z "$MPI_PE_LIST" ]]; then
+        echo "ERROR: --pe-list requires explicit comma-separated core indices." >&2
+        usage
+        exit 1
+      fi
       shift
       ;;
     --mpi-timeout)
@@ -207,6 +222,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --mpi-timeout=*)
       MPI_TIMEOUT="${1#*=}"
+      if [[ -z "$MPI_TIMEOUT" ]]; then
+        echo "ERROR: --mpi-timeout requires a positive integer value." >&2
+        usage
+        exit 1
+      fi
       shift
       ;;
     --build-only)

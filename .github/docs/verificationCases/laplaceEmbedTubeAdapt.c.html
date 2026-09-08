@@ -632,13 +632,13 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 physics-level consequence of couplings 1–3 being handled
                 correctly.</p>
                 <h2 id="negative-control">Negative control</h2>
-                <p>Compile with <code>-DSKIP_EMBED_GUARDS</code> to omit
-                the post-adaptation <code>embed_axi_metric_sync()</code>
-                and <code>vof_solid_cleanup()</code> calls — and only
-                those; the <code>init</code> event still synchronises
-                through <code>tube_solid()</code>, so the initial state
-                is identical in both builds and the control isolates the
-                <em>adaptation</em> coupling.</p>
+                <p>Compile with <code>-DSKIP_EMBED_GUARDS</code> to use
+                active-cell metric initialisation without the complete
+                stored-tree tube reconstruction, and to omit the
+                post-adaptation <code>embed_axi_metric_sync()</code> and
+                <code>vof_solid_cleanup()</code> calls. The control
+                tests the complete tube compatibility pathway; it does
+                not isolate the contribution of each call.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I..</span>/src-local <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    laplaceEmbedTubeAdapt.c <span class="at">-o</span> laplaceEmbedTubeAdapt <span class="at">-lm</span></span>
@@ -652,50 +652,12 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 magnitude are recorded and printed. If the guard-less
                 build were to pass, that would be a finding about the
                 header — not a reason to weaken this case.</p>
-                <p>Observed behaviour (this machine, serial, Basilisk as
-                of writing):</p>
-                <ul>
-                <li>the guard-less build <strong>fails, on P1</strong>,
-                at the very first adaptation (<code>i = 0</code>), with
-                <span class="math inline">\(\max|f_m - f_m^{ref}| =
-                6.25\times10^{-4}\)</span> against a local <span
-                class="math inline">\(f_m \approx 0.28\)</span>, i.e. a
-                relative metric error of about <span
-                class="math inline">\(2\times10^{-3}\)</span>. <span
-                class="math inline">\(\max|c_m - c_m^{ref}|\)</span>
-                stays exactly zero: <code>cm</code> has a dedicated
-                axisymmetric prolongation (<code>refine_cm_axi</code>)
-                and its restriction happens to be exact for a planar
-                wall, whereas the <span
-                class="math inline">\(x\)</span>-face metric is not
-                restored;</li>
-                <li>the violation persists, unchanged in magnitude, for
-                all 921 steps;</li>
-                <li><strong>P2 never fires</strong> (see the limits
-                below);</li>
-                <li><strong>P3 is bit-identical between the two
-                builds</strong>: same <span class="math inline">\(\Delta
-                p\)</span>, same <span
-                class="math inline">\(\max|\mathbf{u}|\)</span> to all
-                printed digits, same step count, same leaf count.
-                Instrumenting the offending face shows why: in this
-                geometry the only stale face is the one on the outflow
-                boundary <span class="math inline">\(x = L_0\)</span> in
-                the wall cut-cell row, where the default no-flux
-                condition makes the face flux zero regardless of <span
-                class="math inline">\(f_m\)</span>.</li>
-                </ul>
-                <p>So the negative control does fail for the reason the
-                header claims — the metric is left inconsistent by
-                adaptation — but in <em>this</em> configuration that
-                inconsistency has no measurable dynamical consequence.
-                The case therefore establishes that
-                <code>embed_axi_metric_sync()</code> is doing something
-                real and necessary for metric consistency; it does
-                <strong>not</strong> establish that omitting it would
-                corrupt a production Bretherton run. That would need a
-                configuration in which stale interior faces carry
-                non-zero flux.</p>
+                <p>The control retains valid active-cell geometry at
+                initialisation, so its failure must come from a measured
+                consistency violation rather than an invalid starting
+                PDE state. It does not measure the dynamical error
+                caused by omitting a particular synchronisation
+                call.</p>
                 <h2 id="outputs">Outputs</h2>
                 <ul>
                 <li>the running maxima of P1 and P2 and their
@@ -773,21 +735,21 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/tension.h" title="Link to Basilisk source for tension.h"><span class="im">"tension.h"</span></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="../src-local/embed-vof-tube.h.html" title="Link to local documentation for embed-vof-tube.h"><span class="im">"embed-vof-tube.h"</span></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rtube </span><span class="fl">0.7</span><span class="pp"></span><span class="dv">236</span><span class="pp"></span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rd </span><span class="fl">0.4</span><span class="pp"></span><span class="dv">237</span><span class="pp"></span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Xd </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">238</span><span class="pp"></span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define tend </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">239</span><span class="pp"></span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rtube </span><span class="fl">0.7</span><span class="pp"></span><span class="dv">214</span><span class="pp"></span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Rd </span><span class="fl">0.4</span><span class="pp"></span><span class="dv">215</span><span class="pp"></span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define Xd </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">216</span><span class="pp"></span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define tend </span><span class="fl">1.0</span><span class="pp"></span><span class="dv">217</span><span class="pp"></span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXLEVEL </span><span class="dv">7</span><span class="pp"></span><span class="dv">241</span><span class="pp"></span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MINLEVEL </span><span class="dv">4</span><span class="pp"></span><span class="dv">242</span><span class="pp"></span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAXLEVEL </span><span class="dv">7</span><span class="pp"></span><span class="dv">219</span><span class="pp"></span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MINLEVEL </span><span class="dv">4</span><span class="pp"></span><span class="dv">220</span><span class="pp"></span></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define fErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">244</span><span class="pp"></span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#define csErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">245</span><span class="pp"></span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#define uErr </span><span class="fl">1e-2</span><span class="pp"></span><span class="dv">246</span><span class="pp"></span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define fErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">222</span><span class="pp"></span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#define csErr </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">223</span><span class="pp"></span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#define uErr </span><span class="fl">1e-2</span><span class="pp"></span><span class="dv">224</span><span class="pp"></span></span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_DP </span><span class="fl">2e-2</span><span class="pp"></span><span class="dv">248</span><span class="pp"></span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_U </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">249</span><span class="pp"></span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_METRIC </span><span class="fl">1e-12</span><span class="pp"></span><span class="dv">250</span><span class="pp"></span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_DP </span><span class="fl">2e-2</span><span class="pp"></span><span class="dv">226</span><span class="pp"></span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_U </span><span class="fl">1e-3</span><span class="pp"></span><span class="dv">227</span><span class="pp"></span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TOL_METRIC </span><span class="fl">1e-12</span><span class="pp"></span><span class="dv">228</span><span class="pp"></span></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span></code></pre></div></div>
@@ -818,19 +780,27 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <p>Refine the interface and the wall to
                 <code>MAXLEVEL</code> <em>before</em> embedding the
                 solid and initialising <code>f</code>, so that both are
-                laid down on the mesh they will be carried on.
-                <code>tube_solid()</code> synchronises the metric; this
-                happens in both builds, so the two differ only in what
-                they do after <code>adapt_wavelet()</code>.</p>
+                laid down on the mesh they will be carried on. The
+                guarded build reconstructs geometry throughout the
+                stored tree. The negative control initialises only the
+                active-cell metrics required to start integration and
+                omits the complete tube pathway.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  refine <span class="op">(</span>fabs <span class="op">(</span>sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">))</span> <span class="op">-</span> Rd<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">&amp;&amp;</span> level <span class="op">&lt;</span> MAXLEVEL<span class="op">);</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  refine <span class="op">(</span>fabs <span class="op">(</span>y <span class="op">-</span> Rtube<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">&amp;&amp;</span> level <span class="op">&lt;</span> MAXLEVEL<span class="op">);</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  tube_solid <span class="op">(</span>Rtube<span class="op">);</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  fraction <span class="op">(</span>f<span class="op">,</span> Rd <span class="op">-</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">)));</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(SKIP_EMBED_GUARDS)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  solid <span class="op">(</span>cs<span class="op">,</span> fs<span class="op">,</span> Rtube <span class="op">-</span> y<span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  cm_update <span class="op">(</span>cm<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  fm_update <span class="op">(</span>fm<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  restriction <span class="op">({</span>cs<span class="op">,</span> fs<span class="op">,</span> cm<span class="op">,</span> fm<span class="op">});</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#else</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  tube_solid <span class="op">(</span>Rtube<span class="op">);</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  fraction <span class="op">(</span>f<span class="op">,</span> Rd <span class="op">-</span> sqrt <span class="op">(</span>sq<span class="op">(</span>x <span class="op">-</span> Xd<span class="op">)</span> <span class="op">+</span> sq<span class="op">(</span>y<span class="op">)));</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
                 <h2 id="p1-and-p2-the-coupling-probes">P1 and P2: the
                 coupling probes</h2>
                 <p><code>metric_deviation()</code> recomputes
@@ -990,7 +960,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 and <code>vof_solid_cleanup()</code> repair both,
                 exactly as <code>simulationCases/bretherton.c</code>
                 does. The <code>SKIP_EMBED_GUARDS</code> build omits
-                them and nothing else.</p>
+                these calls and uses the limited initialisation
+                described above.</p>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>event adapt <span class="op">(</span>i<span class="op">++)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -1061,7 +1032,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(SKIP_EMBED_GUARDS)</span></span>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;build: SKIP_EMBED_GUARDS (negative control, &quot;</span></span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;no post-adaptation sync/cleanup)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;active-cell initialisation; no post-adaptation sync/cleanup)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
 <span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="pp">#else</span></span>
 <span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;build: guarded (embed_axi_metric_sync + vof_solid_cleanup &quot;</span></span>
 <span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;after every adapt_wavelet)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>

@@ -1,6 +1,7 @@
 # Execution checks
 
-This directory holds a serial smoke test and a serial/MPI integration check.
+This directory holds observer unit tests, a serial smoke test and a serial/MPI
+integration check.
 
 The serial smoke test checks that `simulationCases/bretherton.c` compiles and
 integrates a few dozen time steps at coarse resolution without producing
@@ -14,6 +15,9 @@ build or the parameter path.
 | `smoke.params` | coarse, short-run parameters (`MAXlevel = 9`, `tmax = 0.05`) |
 | `runSmokeTests.sh` | builds and runs the case, then checks the log |
 | `runParallelSmokeTests.py` | compares serial and two-rank MPI runs and restarts |
+| `centralFilmObserver.c` | tests convergence windows, quality gates and history resets |
+| `runCentralFilmTests.sh` | compiles and runs the observer tests with a C99 compiler |
+| `regridTube.c` | measures transfer and projection changes when refining a saved tube state |
 
 Cases that compare against an exact solution live in
 [`../verificationCases/`](../verificationCases/) and are driven by
@@ -28,7 +32,8 @@ and are deliberately kept apart.
 
 ```bash
 bash testCases/runSmokeTests.sh   # this directory only
-bash runTests.sh                  # verification cases, then this
+bash runTests.sh --unit          # observer tests without Basilisk
+bash runTests.sh                 # observer, verification and smoke tests
 ```
 
 The build goes to `simulationCases/9999/`, which is gitignored.
@@ -37,6 +42,9 @@ The parallel integration check needs Linux with Python pidfd support,
 `qcc`, `mpicc`, and an Open MPI rankfile naming two allocated cores.
 It builds serial and MPI modes once, compares short fresh and restarted runs,
 checks their logs and snapshots, and exercises collective early termination.
+It also compares refined restarts and checks that rejecting a changed domain
+length leaves the seed checkpoint intact. Short runs must report the expected
+incomplete terminal condition; a nonzero exit alone does not pass.
 Run it only inside the corresponding reserved CPU set with a healthy MPI
 toolchain:
 

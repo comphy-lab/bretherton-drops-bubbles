@@ -171,7 +171,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>testCases/README.md | Bretherton drops and bubbles</title>
+  <title>testCases/runCentralFilmTests.sh | Bretherton drops and bubbles</title>
   
   <!-- Critical CSS for fastest paint -->
   <style>
@@ -202,10 +202,10 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="This directory holds observer unit tests, a serial smoke test and a serial/MPI integration check. The serial smoke test checks that simulationCases/bretherto...">
+  <meta name="description" content="set -euo pipefail SCRIPTDIR='\$(cd '\$(dirname '\${BASHSOURCE[0]}')' && pwd)' WORKDIR='\$(mktemp -d '\${TMPDIR:-/tmp}/bretherton-central-film-XXXXXXXX')' tra...">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="readme">
+  <meta name="keywords" content="runcentralfilmtests">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
@@ -424,112 +424,34 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
             
             <div class="page-content">
                 
-                                <h1 class="page-title">testCases/README.md</h1>
+                                <h1 class="page-title">testCases/runCentralFilmTests.sh</h1>
                 
                                 
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/README.md" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/runCentralFilmTests.sh" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
                 
-                <h1 id="execution-checks">Execution checks</h1>
-                <p>This directory holds observer unit tests, a serial
-                smoke test and a serial/MPI integration check.</p>
-                <p>The serial smoke test checks that
-                <code>simulationCases/bretherton.c</code> compiles and
-                integrates a few dozen time steps at coarse resolution
-                without producing a truncated log or blowing up. It
-                compares against <strong>nothing</strong>, so it
-                supports no claim about the discretisation or about the
-                physics. Its value is that it fails loudly and in
-                seconds when a change breaks the build or the parameter
-                path.</p>
-                <table>
-                <colgroup>
-                <col style="width: 50%" />
-                <col style="width: 50%" />
-                </colgroup>
-                <thead>
-                <tr>
-                <th>File</th>
-                <th>Role</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                <td><code>smoke.params</code></td>
-                <td>coarse, short-run parameters
-                (<code>MAXlevel = 9</code>,
-                <code>tmax = 0.05</code>)</td>
-                </tr>
-                <tr>
-                <td><code>runSmokeTests.sh</code></td>
-                <td>builds and runs the case, then checks the log</td>
-                </tr>
-                <tr>
-                <td><code>runParallelSmokeTests.py</code></td>
-                <td>compares serial and two-rank MPI runs and
-                restarts</td>
-                </tr>
-                <tr>
-                <td><code>centralFilmObserver.c</code></td>
-                <td>tests convergence windows, quality gates and history
-                resets</td>
-                </tr>
-                <tr>
-                <td><code>runCentralFilmTests.sh</code></td>
-                <td>compiles and runs the observer tests with a C99
-                compiler</td>
-                </tr>
-                <tr>
-                <td><code>regridTube.c</code></td>
-                <td>measures transfer and projection changes when
-                refining a saved tube state</td>
-                </tr>
-                </tbody>
-                </table>
-                <p>Cases that compare against an exact solution live in
-                <a
-                href="../verificationCases/"><code>../verificationCases/</code></a>
-                and are driven by
-                <code>../verificationCases/runVerification.sh</code>.
-                The campaign that compares against independent
-                experimental data — Taylor (1961) and Aussillous &amp;
-                Quéré (2000) — is configured by
-                <code>sweep.params</code> and
-                <code>sweep-drop.params</code> at the repository root
-                and is meant for production hardware. Those three
-                evidence sources support three different claims and are
-                deliberately kept apart.</p>
-                <h2 id="running">Running</h2>
+                <h1
+                id="runcentralfilmtests.sh">runCentralFilmTests.sh</h1>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> testCases/runSmokeTests.sh   <span class="co"># this directory only</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh <span class="at">--unit</span>          <span class="co"># observer tests without Basilisk</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh                 <span class="co"># observer, verification and smoke tests</span></span></code></pre></div></div>
-                <p>The build goes to <code>simulationCases/9999/</code>,
-                which is gitignored.</p>
-                <p>The parallel integration check needs Linux with
-                Python pidfd support, <code>qcc</code>,
-                <code>mpicc</code>, and an Open MPI rankfile naming two
-                allocated cores. It builds serial and MPI modes once,
-                compares short fresh and restarted runs, checks their
-                logs and snapshots, and exercises collective early
-                termination. It also compares refined restarts and
-                checks that rejecting a changed domain length leaves the
-                seed checkpoint intact. Short runs must report the
-                expected incomplete terminal condition; a nonzero exit
-                alone does not pass. Run it only inside the
-                corresponding reserved CPU set with a healthy MPI
-                toolchain:</p>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> testCases/runParallelSmokeTests.py <span class="at">--rankfile</span> /absolute/path/to/rankfile <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--work-root</span> /absolute/path/to/empty-test-directory</span></code></pre></div></div>
-                <p>The check retains command logs and stops on failed
-                execution, VOF CFL warnings or disagreement beyond its
-                stated tolerances. It checks parallel execution and
-                restart consistency; performance and mesh convergence
-                require separate tests.</p>
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Unit tests for the solver-independent central-film observation contract.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">SCRIPT_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">(cd &quot;</span><span class="dt">\$</span><span class="kw">(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{BASH_SOURCE[0]}&quot;</span><span class="kw">)</span><span class="st">&quot; &amp;&amp; pwd)&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">WORK_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">(mktemp -d &quot;</span><span class="dt">\$</span>{TMPDIR:-/tmp}/bretherton-central-film-XXXXXXXX<span class="st">&quot;)&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">trap</span> <span class="st">&#39;rm -rf -- &quot;\${WORK_DIR}&quot;&#39;</span> EXIT</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="va">CC_BIN</span><span class="op">=</span><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{CC:-cc}&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{CC_BIN}&quot;</span> <span class="dt">\</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">-std</span><span class="op">=</span>c99 <span class="at">-Wall</span> <span class="at">-Wextra</span> <span class="at">-Werror</span> <span class="at">-pedantic</span> <span class="dt">\</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{SCRIPT_DIR}/centralFilmObserver.c&quot;</span> <span class="at">-lm</span> <span class="dt">\</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> <span class="st">&quot;</span><span class="dt">\$</span><span class="st">{WORK_DIR}/centralFilmObserver&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="dt">\$</span><span class="st">{WORK_DIR}/centralFilmObserver&quot;</span></span></code></pre></div></div>
             </div>
         </main>
 
@@ -571,7 +493,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/README.md" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/runCentralFilmTests.sh" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

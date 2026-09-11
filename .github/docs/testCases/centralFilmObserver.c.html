@@ -59,20 +59,20 @@
       --color-primary: #0066cc;
       --color-secondary: #036;
       --color-accent: #0099ff;
-      
+
       /* UI elements */
       --color-header-bg: #f5f5f5;
       --color-footer-bg: #2d2e33;
       --color-border: #e0e0e0;
       --color-input-bg: #f9f9f9;
-      
+
       /* Component colors */
       --color-preloader-bg: #ffffff;
       --color-loader: #0066cc;
       --color-card-bg: #ffffff;
       --color-code-bg: #f5f5f5;
     }
-    
+
     /* Dark theme variables applied via media query when JS is disabled */
     @media (prefers-color-scheme: dark) {
       :root:not(.theme-set) {
@@ -82,13 +82,13 @@
         --color-primary: #4d9fff;
         --color-secondary: #88ccff;
         --color-accent: #00bfff;
-        
+
         /* UI elements - dark mode */
         --color-header-bg: #121212;
         --color-footer-bg: #121212;
         --color-border: #333;
         --color-input-bg: #2d2d2d;
-        
+
         /* Component colors - dark mode */
         --color-preloader-bg: #1a1a1a;
         --color-loader: #4d9fff;
@@ -96,7 +96,7 @@
         --color-code-bg: #2d2d2d;
       }
     }
-    
+
     /* When JS sets the theme explicitly via data attribute */
     [data-theme="dark"] {
       /* Base colors - dark mode */
@@ -105,36 +105,36 @@
       --color-primary: #4d9fff;
       --color-secondary: #88ccff;
       --color-accent: #00bfff;
-      
+
       /* UI elements - dark mode */
       --color-header-bg: #121212;
       --color-footer-bg: #121212;
       --color-border: #333;
       --color-input-bg: #2d2d2d;
-      
+
       /* Component colors - dark mode */
       --color-preloader-bg: #1a1a1a;
       --color-loader: #4d9fff;
       --color-card-bg: #222;
       --color-code-bg: #2d2d2d;
     }
-    
+
     /* Prevent transition flashes during initial load */
     html:not(.transitions-enabled) * {
       transition: none !important;
     }
-    
+
     /* Apply theme to preloader and early elements */
     #preloader {
       background-color: var(--color-preloader-bg);
       color: var(--color-text);
     }
-    
+
     #loader {
       border-color: var(--color-loader);
       border-top-color: transparent;
     }
-    
+
     /* Noscript warning */
     .noscript-warning {
       background-color: var(--color-primary);
@@ -147,7 +147,7 @@
       right: 0;
       z-index: 1000;
     }
-    
+
     /* Theme indicator for no-JS */
     .theme-indicator {
       padding: 5px 10px;
@@ -156,12 +156,12 @@
       color: var(--color-text);
       text-align: center;
     }
-    
+
     /* Hide JS-only elements when no JS */
     .no-js .js-only {
       display: none !important;
     }
-    
+
     /* Show no-JS alternatives */
     .js .no-js-only {
       display: none !important;
@@ -171,8 +171,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="base-url" content="..">
-  <title>testCases/README.md | Bretherton drops and bubbles</title>
-  
+  <title>testCases/centralFilmObserver.c | Bretherton drops and bubbles</title>
+
   <!-- Critical CSS for fastest paint -->
   <style>
       .s-intro__title {
@@ -182,19 +182,19 @@
       .s-header {
           visibility: visible;
       }
-      
+
       /* Ensure theme toggle properly styled immediately */
       .theme-toggle {
           background-color: var(--color-background);
           color: var(--color-text);
       }
-      
+
       /* Control SVG visibility based on theme */
       [data-theme="dark"] .theme-toggle-icon.sun,
       :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
           display: block;
       }
-      
+
       [data-theme="dark"] .theme-toggle-icon.moon,
       :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
           display: none;
@@ -202,10 +202,10 @@
   </style>
 
   <!-- Critical Meta Tags -->
-  <meta name="description" content="This directory holds observer unit tests, a serial smoke test and a serial/MPI integration check. The serial smoke test checks that simulationCases/bretherto...">
+  <meta name="description" content="static int failures;">
   <meta name="author" content="CoMPhy Lab">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="readme">
+  <meta name="keywords" content="../src-local/central-film.h, centralfilmobserver, math.h, stdbool.h, stdio.h, string.h">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
@@ -256,7 +256,7 @@
   <script defer src="../assets/js/main.js"></script>
   <script defer src="../assets/js/theme-toggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
-  
+
   <!-- Optimize page load performance -->
   <script>
     // Preconnect to critical domains
@@ -264,21 +264,21 @@
       'https://cdnjs.cloudflare.com',
       'https://cdn.jsdelivr.net'
     ];
-    
+
     preconnectDomains.forEach(domain => {
       const link = document.createElement('link');
       link.rel = 'preconnect';
       link.href = domain;
       link.crossOrigin = 'anonymous';
       document.head.appendChild(link);
-      
+
       // Also add DNS prefetch as fallback
       const dnsLink = document.createElement('link');
       dnsLink.rel = 'dns-prefetch';
       dnsLink.href = domain;
       document.head.appendChild(dnsLink);
     });
-    
+
     // Detect when document is fully loaded to remove preloader
     window.addEventListener('load', function() {
       const preloader = document.getElementById('preloader');
@@ -305,11 +305,11 @@
         document.head.appendChild(link);
         return link;
       }
-      
+
       // Check if we're on localhost
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Use hardcoded version numbers for reliable loading
-        
+
         // Load Font Awesome using multiple CDNs to maximize reliability for local development
         loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
         // Backup CDN if the first one fails
@@ -330,7 +330,7 @@
       // Mark page as JS-enabled and manage transitions
       document.documentElement.classList.remove('no-js');
       document.documentElement.classList.add('js');
-      
+
       // Allow CSS transitions after initial load to prevent transition flashes
       window.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
@@ -421,115 +421,252 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 
         <!-- Main content -->
         <main class="content">
-            
+
             <div class="page-content">
-                
-                                <h1 class="page-title">testCases/README.md</h1>
-                
-                                
+
+                                <h1 class="page-title">testCases/centralFilmObserver.c</h1>
+
+
                                 <div class="raw-file-button-container">
-                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/README.md" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/centralFilmObserver.c" class="raw-file-button" target="_blank" rel="noopener noreferrer">
                         <i class="fa-brands fa-github"></i> See raw file
                     </a>
                 </div>
-                
-                <h1 id="execution-checks">Execution checks</h1>
-                <p>This directory holds observer unit tests, a serial
-                smoke test and a serial/MPI integration check.</p>
-                <p>The serial smoke test checks that
-                <code>simulationCases/bretherton.c</code> compiles and
-                integrates a few dozen time steps at coarse resolution
-                without producing a truncated log or blowing up. It
-                compares against <strong>nothing</strong>, so it
-                supports no claim about the discretisation or about the
-                physics. Its value is that it fails loudly and in
-                seconds when a change breaks the build or the parameter
-                path.</p>
-                <table>
-                <colgroup>
-                <col style="width: 50%" />
-                <col style="width: 50%" />
-                </colgroup>
-                <thead>
-                <tr>
-                <th>File</th>
-                <th>Role</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                <td><code>smoke.params</code></td>
-                <td>coarse, short-run parameters
-                (<code>MAXlevel = 9</code>,
-                <code>tmax = 0.05</code>)</td>
-                </tr>
-                <tr>
-                <td><code>runSmokeTests.sh</code></td>
-                <td>builds and runs the case, then checks the log</td>
-                </tr>
-                <tr>
-                <td><code>runParallelSmokeTests.py</code></td>
-                <td>compares serial and two-rank MPI runs and
-                restarts</td>
-                </tr>
-                <tr>
-                <td><code>centralFilmObserver.c</code></td>
-                <td>tests convergence windows, quality gates and history
-                resets</td>
-                </tr>
-                <tr>
-                <td><code>runCentralFilmTests.sh</code></td>
-                <td>compiles and runs the observer tests with a C99
-                compiler</td>
-                </tr>
-                <tr>
-                <td><code>regridTube.c</code></td>
-                <td>measures transfer and projection changes when
-                refining a saved tube state</td>
-                </tr>
-                </tbody>
-                </table>
-                <p>Cases that compare against an exact solution live in
-                <a
-                href="../verificationCases/"><code>../verificationCases/</code></a>
-                and are driven by
-                <code>../verificationCases/runVerification.sh</code>.
-                The campaign that compares against independent
-                experimental data — Taylor (1961) and Aussillous &amp;
-                Quéré (2000) — is configured by
-                <code>sweep.params</code> and
-                <code>sweep-drop.params</code> at the repository root
-                and is meant for production hardware. Those three
-                evidence sources support three different claims and are
-                deliberately kept apart.</p>
-                <h2 id="running">Running</h2>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> testCases/runSmokeTests.sh   <span class="co"># this directory only</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh <span class="at">--unit</span>          <span class="co"># observer tests without Basilisk</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> runTests.sh                 <span class="co"># observer, verification and smoke tests</span></span></code></pre></div></div>
-                <p>The build goes to <code>simulationCases/9999/</code>,
-                which is gitignored.</p>
-                <p>The parallel integration check needs Linux with
-                Python pidfd support, <code>qcc</code>,
-                <code>mpicc</code>, and an Open MPI rankfile naming two
-                allocated cores. It builds serial and MPI modes once,
-                compares short fresh and restarted runs, checks their
-                logs and snapshots, and exercises collective early
-                termination. It also compares refined restarts and
-                checks that rejecting a changed domain length leaves the
-                seed checkpoint intact. Short runs must report the
-                expected incomplete terminal condition; a nonzero exit
-                alone does not pass. Run it only inside the
-                corresponding reserved CPU set with a healthy MPI
-                toolchain:</p>
-                <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> testCases/runParallelSmokeTests.py <span class="at">--rankfile</span> /absolute/path/to/rankfile <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--work-root</span> /absolute/path/to/empty-test-directory</span></code></pre></div></div>
-                <p>The check retains command logs and stops on failed
-                execution, VOF CFL warnings or disagreement beyond its
-                stated tolerances. It checks parallel execution and
-                restart consistency; performance and mesh convergence
-                require separate tests.</p>
+
+                <p>#include &lt;math.h&gt; #include &lt;stdbool.h&gt;
+                #include &lt;stdio.h&gt; #include &lt;string.h&gt;</p>
+                <p>#include “../src-local/central-film.h”</p>
+                <p>static int failures;</p>
+                <p>#define CHECK(condition) do {<br />
+                if (!(condition)) {<br />
+                fprintf (stderr, “FAIL %s:%d: %s”,
+                <strong>func</strong>, <strong>LINE</strong>,
+                #condition);<br />
+                failures++;<br />
+                }<br />
+                } while (0)</p>
+                <p>static CentralFilmConfig standard_config (void) {
+                return (CentralFilmConfig) { .advance_window = 1.,
+                .minimum_observed_advance = 3., .film_relative_tolerance
+                = 0.02, .front_speed_relative_tolerance = 0.02,
+                .minimum_coverage = 0.8, .maximum_spatial_spread = 0.1,
+                .minimum_fresh_fraction = 0.75, .minimum_cells = 4.,
+                .shape_relative_tolerance = 0.02, .hold_windows = 2 };
+                }</p>
+                <p>static CentralFilmMeasurement measurement (double
+                time, double front, double film) { return
+                (CentralFilmMeasurement) { .time = time, .front = front,
+                .rear = front - 2., .centroid = front - 1., .film =
+                film, .spatial_spread = 0.01, .coverage = 0.95,
+                .fresh_fraction = 0.9, .minimum_cells = 6. }; }</p>
+                <p>static bool push (CentralFilmObserver * observer,
+                CentralFilmWindow * window, double time, double front,
+                double film) { CentralFilmMeasurement sample =
+                measurement (time, front, film); return
+                central_film_observer_push (observer, sample, window);
+                }</p>
+                <p>static void test_quantiles (void) { double odd[] =
+                {9., 1., 5.}; double even[] = {4., 1., 3., 2.}; double
+                quartiles[] = {0., 10., 20., 30., 40.}; CHECK
+                (central_film_median (odd, 3) == 5.); CHECK
+                (central_film_median (even, 4) == 2.5); CHECK
+                (central_film_quantile (quartiles, 5, 0.25) == 10.);
+                CHECK (isnan (central_film_quantile (NULL, 3, 0.5)));
+                CHECK (isnan (central_film_quantile (quartiles, 0,
+                0.5))); CHECK (isnan (central_film_quantile (quartiles,
+                5, -0.01))); CHECK (isnan (central_film_quantile
+                (quartiles, 5, 1.01))); CHECK (isnan
+                (central_film_quantile (quartiles, 5, NAN))); CHECK
+                (isnan (central_film_quantile (quartiles, 5,
+                INFINITY))); }</p>
+                <p>static void test_stable_translating_film_converges
+                (void) { CentralFilmObserver observer; CentralFilmWindow
+                window = {0}; central_film_observer_init (&amp;observer,
+                standard_config());</p>
+                <p>CHECK (!push (&amp;observer, &amp;window, 0., 0.,
+                0.1)); CHECK (push (&amp;observer, &amp;window, 1., 1.,
+                0.1)); CHECK (window.quality_ok); CHECK
+                (!window.stable); CHECK (!window.film_converged); CHECK
+                (push (&amp;observer, &amp;window, 2., 2., 0.1)); CHECK
+                (!window.stable); CHECK (window.hold_count == 0); CHECK
+                (!window.film_converged); CHECK (push (&amp;observer,
+                &amp;window, 3., 3., 0.1)); CHECK (window.stable); CHECK
+                (window.hold_count == 1); CHECK
+                (!window.film_converged); CHECK (push (&amp;observer,
+                &amp;window, 4., 4., 0.1)); CHECK (window.stable); CHECK
+                (window.hold_count == 2); CHECK (window.film_converged);
+                CHECK (window.shape_steady); }</p>
+                <p>static void
+                test_reinitialisation_uses_relative_advance (void) {
+                CentralFilmObserver observer; CentralFilmWindow window =
+                {0}; central_film_observer_init (&amp;observer,
+                standard_config());</p>
+                <p>CHECK (!push (&amp;observer, &amp;window, 1000.,
+                10000., 0.1)); CHECK (!window.film_converged); CHECK
+                (push (&amp;observer, &amp;window, 1001., 10001., 0.1));
+                CHECK (!window.stable); CHECK (!window.film_converged);
+                CHECK (push (&amp;observer, &amp;window, 1002., 10002.,
+                0.1)); CHECK (!window.film_converged); CHECK (push
+                (&amp;observer, &amp;window, 1003., 10003., 0.1)); CHECK
+                (!window.film_converged); CHECK (push (&amp;observer,
+                &amp;window, 1004., 10004., 0.1)); CHECK
+                (window.film_converged); }</p>
+                <p>static void check_bad_quality_sample
+                (CentralFilmMeasurement bad) { CentralFilmObserver
+                observer; CentralFilmWindow window = {0};
+                central_film_observer_init (&amp;observer,
+                standard_config()); CHECK (!central_film_observer_push
+                (&amp;observer, bad, &amp;window)); CHECK
+                (!observer.initialized); CHECK
+                (!observer.have_previous_window); CHECK
+                (observer.hold_count == 0); }</p>
+                <p>static void test_quality_screens (void) {
+                CentralFilmMeasurement bad = measurement (0., 0., 0.1);
+                bad.fresh_fraction = 0.2; check_bad_quality_sample
+                (bad);</p>
+                <p>bad = measurement (0., 0., 0.1); bad.coverage = 0.5;
+                check_bad_quality_sample (bad);</p>
+                <p>bad = measurement (0., 0., 0.1); bad.minimum_cells =
+                2.; check_bad_quality_sample (bad);</p>
+                <p>bad = measurement (0., 0., 0.1); bad.spatial_spread =
+                0.2; check_bad_quality_sample (bad);</p>
+                <p>bad = measurement (0., 0., 0.);
+                check_bad_quality_sample (bad); }</p>
+                <p>static void test_bad_quality_breaks_a_hold (void) {
+                CentralFilmObserver observer; CentralFilmWindow window =
+                {0}; CentralFilmConfig config = standard_config();
+                CentralFilmMeasurement sample;
+                central_film_observer_init (&amp;observer, config);</p>
+                <p>CHECK (!push (&amp;observer, &amp;window, 0., 0.,
+                0.1)); CHECK (push (&amp;observer, &amp;window, 1., 1.,
+                0.1)); CHECK (push (&amp;observer, &amp;window, 2., 2.,
+                0.1)); CHECK (window.hold_count == 0); CHECK (push
+                (&amp;observer, &amp;window, 3., 3., 0.1)); CHECK
+                (window.hold_count == 1);</p>
+                <p>sample = measurement (4., 4., 0.1); sample.coverage =
+                0.5; CHECK (!central_film_observer_push (&amp;observer,
+                sample, &amp;window)); CHECK (!observer.initialized);
+                CHECK (!observer.have_previous_window); CHECK
+                (observer.hold_count == 0); CHECK (!push (&amp;observer,
+                &amp;window, 5., 5., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 6., 6., 0.1)); CHECK (!window.stable);
+                CHECK (!window.film_converged); }</p>
+                <p>static void test_drifting_film_is_not_stable (void) {
+                CentralFilmObserver observer; CentralFilmWindow window =
+                {0}; central_film_observer_init (&amp;observer,
+                standard_config()); CHECK (!push (&amp;observer,
+                &amp;window, 0., 0., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 1., 1., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 2., 2., 0.2)); CHECK (window.film_drift
+                &gt; observer.config.film_relative_tolerance); CHECK
+                (!window.stable); CHECK (!window.film_converged); }</p>
+                <p>static void test_changing_front_speed_is_not_stable
+                (void) { CentralFilmObserver observer; CentralFilmWindow
+                window = {0}; central_film_observer_init (&amp;observer,
+                standard_config()); CHECK (!push (&amp;observer,
+                &amp;window, 0., 0., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 1., 1., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 3., 2., 0.1)); CHECK
+                (window.front_speed_drift &gt;
+                observer.config.front_speed_relative_tolerance); CHECK
+                (!window.stable); CHECK (!window.film_converged); }</p>
+                <p>static void
+                test_film_and_shape_milestones_are_distinct (void) {
+                CentralFilmObserver observer; CentralFilmWindow window =
+                {0}; central_film_observer_init (&amp;observer,
+                standard_config());</p>
+                <p>for (int i = 0; i &lt;= 4; i++) {
+                CentralFilmMeasurement sample = measurement ((double) i,
+                (double) i, 0.1); sample.rear = -2. + 0.5<em>i;
+                sample.centroid = -1. + 0.8</em>i; bool completed =
+                central_film_observer_push (&amp;observer, sample,
+                &amp;window); CHECK (completed == (i &gt; 0)); } CHECK
+                (window.film_converged); CHECK (!window.shape_steady);
+                CHECK (!window.shape_converged); }</p>
+                <p>static void
+                test_shape_convergence_needs_consecutive_windows (void)
+                { CentralFilmObserver observer; CentralFilmWindow window
+                = {0}; central_film_observer_init (&amp;observer,
+                standard_config());</p>
+                <p>for (int i = 0; i &lt;= 4; i++) {
+                CentralFilmMeasurement sample = measurement ((double) i,
+                (double) i, 0.1); sample.rear = -2. + 0.5<em>i;
+                sample.centroid = -1. + 0.8</em>i; (void)
+                central_film_observer_push (&amp;observer, sample,
+                &amp;window); } CHECK (window.film_converged); CHECK
+                (!window.shape_steady);</p>
+                <p>CentralFilmMeasurement steady = measurement (5., 5.,
+                0.1); steady.rear = 1.; steady.centroid = 3.2; CHECK
+                (central_film_observer_push (&amp;observer, steady,
+                &amp;window)); CHECK (window.film_converged); CHECK
+                (window.shape_steady); CHECK (window.shape_hold_count ==
+                1); CHECK (!window.shape_converged);</p>
+                <p>steady = measurement (6., 6., 0.1); steady.rear = 2.;
+                steady.centroid = 4.2; CHECK (central_film_observer_push
+                (&amp;observer, steady, &amp;window)); CHECK
+                (window.shape_steady); CHECK (window.shape_hold_count ==
+                2); CHECK (window.shape_converged); }</p>
+                <p>static void assert_discontinuity_restarts_observation
+                (CentralFilmMeasurement discontinuity, bool
+                discontinuity_is_new_anchor) { CentralFilmObserver
+                observer; CentralFilmWindow window = {0};
+                central_film_observer_init (&amp;observer,
+                standard_config()); CHECK (!push (&amp;observer,
+                &amp;window, 0., 0., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 1., 1., 0.1)); CHECK (push (&amp;observer,
+                &amp;window, 2., 2., 0.1)); CHECK (window.hold_count ==
+                0); CHECK (push (&amp;observer, &amp;window, 3., 3.,
+                0.1)); CHECK (window.hold_count == 1);</p>
+                <p>CHECK (!central_film_observer_push (&amp;observer,
+                discontinuity, &amp;window));</p>
+                <p>/* A bad observation breaks continuity. The next
+                valid sample is a new anchor and cannot close a window
+                using history from before the gap.</p>
+                <p>CHECK (push (&amp;observer, &amp;window, 20., 20.,
+                0.1) == discontinuity_is_new_anchor); if
+                (!discontinuity_is_new_anchor) CHECK (push
+                (&amp;observer, &amp;window, 21., 21., 0.1)); CHECK
+                (!window.stable); CHECK (window.hold_count == 0); CHECK
+                (!window.film_converged); } static void
+                test_nonfinite_sample_breaks_history (void) {
+                CentralFilmMeasurement bad = measurement (3., 3., 0.1);
+                bad.film = NAN;
+                assert_discontinuity_restarts_observation (bad, false);
+                bad = measurement (3., 3., 0.1); bad.front = INFINITY;
+                assert_discontinuity_restarts_observation (bad, false);
+                } static void test_nonmonotonic_time_breaks_history
+                (void) { CentralFilmMeasurement bad = measurement (1.5,
+                3., 0.1); assert_discontinuity_restarts_observation
+                (bad, true); bad = measurement (3., 4., 0.1);
+                assert_discontinuity_restarts_observation (bad, true); }
+                static void test_nonmonotonic_front_breaks_history
+                (void) { CentralFilmMeasurement bad = measurement (3.,
+                1.5, 0.1); assert_discontinuity_restarts_observation
+                (bad, true); bad = measurement (4., 3., 0.1);
+                assert_discontinuity_restarts_observation (bad, true); }
+                static void test_null_arguments_are_rejected (void) {
+                CentralFilmObserver observer; CentralFilmWindow window =
+                {0}; CentralFilmMeasurement sample = measurement (0.,
+                0., 0.1); central_film_observer_init (&amp;observer,
+                standard_config()); CHECK (!central_film_observer_push
+                (NULL, sample, &amp;window)); CHECK
+                (!central_film_observer_push (&amp;observer, sample,
+                NULL)); } int main (void) { test_quantiles();
+                test_stable_translating_film_converges();
+                test_reinitialisation_uses_relative_advance();
+                test_quality_screens();
+                test_bad_quality_breaks_a_hold();
+                test_drifting_film_is_not_stable();
+                test_changing_front_speed_is_not_stable();
+                test_film_and_shape_milestones_are_distinct();
+                test_shape_convergence_needs_consecutive_windows();
+                test_nonfinite_sample_breaks_history();
+                test_nonmonotonic_time_breaks_history();
+                test_nonmonotonic_front_breaks_history();
+                test_null_arguments_are_rejected(); if (failures) {
+                fprintf (stderr, “central-film observer: %d assertion(s)
+                failed”, failures); return 1; } puts (“central-film
+                observer: PASS”); return 0; }</p>
             </div>
         </main>
 
@@ -571,7 +708,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
               <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
                 <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
               </a>
-              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/README.md" class="edit-link" aria-label="Edit this page on GitHub">
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/centralFilmObserver.c" class="edit-link" aria-label="Edit this page on GitHub">
                 <i class="fa-brands fa-github"></i> Edit this page
               </a>
             </div>

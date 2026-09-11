@@ -489,7 +489,17 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 parameters, source, executable, diagnostic log,
                 <code>restart</code> dump and
                 <code>intermediate/snapshot-*</code> files. An existing
-                restart resumes that case.</p>
+                restart resumes that case. Success requires stable
+                deposited central-film measurements and, by default,
+                agreement of the front, rear and centroid speeds.
+                Reaching <code>tmax</code> or the outlet buffer returns
+                an explicit incomplete status with a nonzero exit code.
+                For a refined restart, use a separate case directory
+                containing a copy of the seed dump, set
+                <code>freshFront</code> to its front position, and
+                specify <code>regridBurnR</code>. Changing
+                <code>Ldomain</code> while restoring a dump is rejected;
+                start a fresh case to change the domain length.</p>
                 <p>For a single-node MPI allocation,
                 <code>--pe-list 0,1,2,3</code> can replace the rankfile
                 when those are the allocated Open MPI core indices. Set

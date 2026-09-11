@@ -2,6 +2,7 @@
 """Compare short serial and two-rank MPI solver runs and restarts."""
 
 import argparse
+import hashlib
 import math
 import os
 import select
@@ -20,6 +21,10 @@ RUNNER = REPO_ROOT / "runSimulation.sh"
 SMOKE_PARAMS = REPO_ROOT / "testCases" / "smoke.params"
 BUILD_FILES = ("bretherton", "bretherton.c", "build.meta")
 INVOCATION_TAG = "BRETHERTON_PARALLEL_SMOKE_INVOCATION"
+TERMINAL_PREFIXES = (
+    "SUCCESS:", "INCOMPLETE_TMAX:", "INCOMPLETE_OUTLET:", "HARDFAIL_",
+    "ERROR: Runtime parameters must be finite."
+)
 
 
 def decode_output(output: str | bytes | None) -> str:
@@ -180,8 +185,30 @@ def write_params(destination: Path, case_no: int, **updates: str) -> None:
     destination.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def read_params(source: Path) -> dict[str, str]:
+    """Read the flat key/value subset used by the smoke parameter files."""
+    values = {}
+    for line in source.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#") and "=" in stripped:
+            key, value = stripped.split("=", 1)
+            values[key.strip()] = value.strip()
+    return values
+
+
+def incomplete_message(params: Path) -> str:
+    """Return the solver's exact expected tmax terminal diagnostic."""
+    values = read_params(params)
+    return (
+        f"INCOMPLETE_TMAX: case {int(values['CaseNo'])} reached tmax without "
+        "the requested stationarity milestone: "
+        f"Ca {float(values['Ca']):.6g}, La {float(values['La']):.6g}, "
+        f"muR {float(values['muR']):.6g}, rhoR {float(values['rhoR']):.6g}."
+    )
+
+
 def invoke(params: Path, output_root: Path, extra: list[str], timeout: int,
-           *, expected_status: int = 0) -> str:
+           *, expected_outcome: str | None = None) -> str:
     """Run the case runner and return its combined diagnostic stream."""
     command = ["bash", str(RUNNER), str(params), *extra]
     work_root = output_root.parent.resolve(strict=True)
@@ -190,6 +217,8 @@ def invoke(params: Path, output_root: Path, extra: list[str], timeout: int,
     environment["OUTPUT_ROOT"] = str(output_root)
     environment[INVOCATION_TAG] = invocation_tag
     stage = "build" if "--build-only" in extra else "run"
+    outcome = expected_outcome or ("build" if stage == "build" else "incomplete")
+    expected_status = 0 if outcome == "build" else 1
     receipt = output_root.parent / f"{output_root.name}-{params.stem}-{stage}.log"
     process = subprocess.Popen(
         command,
@@ -259,6 +288,57 @@ def invoke(params: Path, output_root: Path, extra: list[str], timeout: int,
             f"{' '.join(command)}\n"
             f"{output}"
         )
+    terminal_lines = [
+        line for line in output.splitlines()
+        if line.startswith(TERMINAL_PREFIXES)
+    ]
+    if outcome == "build":
+        if terminal_lines:
+            raise AssertionError(f"build emitted a terminal solver status: {terminal_lines}")
+    elif outcome == "incomplete":
+        expected = incomplete_message(params)
+        if terminal_lines != [expected]:
+            raise AssertionError(
+                f"expected exact tmax incomplete diagnostic {expected!r}, "
+                f"found {terminal_lines!r}"
+            )
+    elif outcome == "outlet":
+        prefix = "INCOMPLETE_OUTLET: front tip reached the outlet buffer at t="
+        if (len(terminal_lines) != 1 or
+                not terminal_lines[0].startswith(prefix) or
+                not terminal_lines[0].endswith(".")):
+            raise AssertionError(
+                f"expected one outlet incomplete diagnostic, found {terminal_lines!r}"
+            )
+        try:
+            outlet_time = float(terminal_lines[0][len(prefix):-1])
+        except ValueError as error:
+            raise AssertionError(
+                f"outlet diagnostic has invalid time: {terminal_lines[0]!r}"
+            ) from error
+        if not math.isfinite(outlet_time):
+            raise AssertionError(
+                f"outlet diagnostic has nonfinite time: {terminal_lines[0]!r}"
+            )
+    elif outcome == "domain-mismatch":
+        expected = (
+            "HARDFAIL_DOMAIN_MISMATCH: restart L0=16 differs from requested "
+            "Ldomain=15; a dump cannot be extended or shrunk in place."
+        )
+        if terminal_lines != [expected]:
+            raise AssertionError(
+                f"expected exact domain-mismatch diagnostic {expected!r}, "
+                f"found {terminal_lines!r}"
+            )
+    elif outcome == "invalid-parameters":
+        expected = "ERROR: Runtime parameters must be finite."
+        if terminal_lines != [expected]:
+            raise AssertionError(
+                f"expected exact finite-parameter diagnostic {expected!r}, "
+                f"found {terminal_lines!r}"
+            )
+    else:
+        raise ValueError(f"unknown expected outcome: {outcome}")
     if "CFL must be <=" in output:
         raise AssertionError(f"VOF CFL warning in {receipt}")
     return output
@@ -269,6 +349,15 @@ def copy_build(source_case: Path, destination_case: Path) -> None:
     destination_case.mkdir(parents=True, exist_ok=True)
     for name in BUILD_FILES:
         shutil.copy2(source_case / name, destination_case / name)
+
+
+def sha256_file(path: Path) -> str:
+    """Hash a potentially large dump without retaining it in memory."""
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def last_metrics(case_dir: Path) -> list[float]:
@@ -327,11 +416,19 @@ def main() -> int:
     serial_output = work_root / "serial-cases"
     mpi_output = work_root / "mpi-cases"
     mpi_checkpoint_output = work_root / "mpi-checkpoint-cases"
+    serial_regrid_output = work_root / "serial-regrid-cases"
+    mpi_regrid_output = work_root / "mpi-regrid-cases"
+    domain_mismatch_output = work_root / "domain-mismatch-cases"
+    invalid_parameters_output = work_root / "invalid-parameter-cases"
     stop_output_root = work_root / "mpi-stop-cases"
     params_root = work_root / "params"
     serial_output.mkdir(parents=True, exist_ok=True)
     mpi_output.mkdir(parents=True, exist_ok=True)
     mpi_checkpoint_output.mkdir(parents=True, exist_ok=True)
+    serial_regrid_output.mkdir(parents=True, exist_ok=True)
+    mpi_regrid_output.mkdir(parents=True, exist_ok=True)
+    domain_mismatch_output.mkdir(parents=True, exist_ok=True)
+    invalid_parameters_output.mkdir(parents=True, exist_ok=True)
     stop_output_root.mkdir(parents=True, exist_ok=True)
     params_root.mkdir(parents=True, exist_ok=True)
 
@@ -341,6 +438,23 @@ def main() -> int:
     write_params(mpi_params, 9901)
 
     invoke(serial_params, serial_output, ["--build-only"], args.timeout)
+
+    invalid_parameter_cases = (
+        (9905, {"tmax": "nan"}),
+        (9906, {"Ca": "inf"}),
+    )
+    for case_no, updates in invalid_parameter_cases:
+        params = params_root / f"invalid-{case_no}.params"
+        write_params(params, case_no, **updates)
+        copy_build(serial_output / "9901",
+                   invalid_parameters_output / str(case_no))
+        invoke(params, invalid_parameters_output, ["--no-build"], args.timeout,
+               expected_outcome="invalid-parameters")
+        if (invalid_parameters_output / str(case_no) / "restart").exists():
+            raise AssertionError(
+                f"invalid-parameter case {case_no} created a restart"
+            )
+
     invoke(serial_params, serial_output, ["--no-build"], args.timeout)
     invoke(mpi_params, mpi_output,
            ["--ranks", "2", "--rankfile", str(rankfile), "--build-only"],
@@ -357,6 +471,18 @@ def main() -> int:
         if (not (case_dir / "restart").is_file() or
                 not list((case_dir / "intermediate").glob("snapshot-*"))):
             raise AssertionError(f"missing restart or snapshot output in {case_dir}")
+
+    # Preserve one identical t=0.05 seed before the restart checks advance and
+    # overwrite their case-local dumps.
+    seed_front = serial_fresh_metrics[5]
+    copy_build(serial_output / "9901", serial_regrid_output / "9903")
+    copy_build(mpi_output / "9901", mpi_regrid_output / "9903")
+    for destination in (serial_regrid_output, mpi_regrid_output):
+        shutil.copy2(serial_output / "9901" / "restart",
+                     destination / "9903" / "restart")
+    copy_build(serial_output / "9901", domain_mismatch_output / "9904")
+    shutil.copy2(serial_output / "9901" / "restart",
+                 domain_mismatch_output / "9904" / "restart")
 
     mpi_checkpoint_params = params_root / "mpi-checkpoint-restart.params"
     write_params(mpi_checkpoint_params, 9901, tmax="0.06")
@@ -402,6 +528,42 @@ def main() -> int:
                          mpi_checkpoint_restart_metrics,
                          "serial-owned/MPI-owned checkpoint restart")
 
+    serial_regrid_params = params_root / "serial-regrid.params"
+    mpi_regrid_params = params_root / "mpi-regrid.params"
+    regrid_updates = {
+        "MAXlevel": "10", "filmMinLevel": "10", "regridBurnR": "0.01",
+        "freshFront": f"{seed_front:.17g}", "tmax": "0.06"
+    }
+    write_params(serial_regrid_params, 9903, **regrid_updates)
+    write_params(mpi_regrid_params, 9903, **regrid_updates)
+    serial_regrid_text = invoke(serial_regrid_params, serial_regrid_output,
+                                ["--no-build"], args.timeout)
+    mpi_regrid_text = invoke(
+        mpi_regrid_params, mpi_regrid_output,
+        ["--ranks", "2", "--rankfile", str(rankfile),
+         "--mpi-timeout", str(args.timeout), "--no-build"], args.timeout
+    )
+    for output in (serial_regrid_text, mpi_regrid_text):
+        if ("Restart file found - simulation will resume from checkpoint."
+                not in output or
+                "# restart observation burn:" not in output or
+                "distance=0.01" not in output or "MAXlevel=10" not in output):
+            raise AssertionError(
+                "regrid case did not report restart, level, and burn provenance"
+            )
+    assert_metrics_close(last_metrics(serial_regrid_output / "9903"),
+                         last_metrics(mpi_regrid_output / "9903"),
+                         "regridded restart")
+
+    domain_mismatch_params = params_root / "domain-mismatch.params"
+    write_params(domain_mismatch_params, 9904, Ldomain="15", tmax="0.06")
+    mismatch_restart = domain_mismatch_output / "9904" / "restart"
+    restart_hash = sha256_file(mismatch_restart)
+    invoke(domain_mismatch_params, domain_mismatch_output,
+           ["--no-build"], args.timeout, expected_outcome="domain-mismatch")
+    if sha256_file(mismatch_restart) != restart_hash:
+        raise AssertionError("domain-mismatch rejection modified its restart dump")
+
     stop_params = params_root / "mpi-collective-stop.params"
     write_params(stop_params, 9902, Ldomain="7")
     copy_build(mpi_output / "9901", stop_output_root / "9902")
@@ -411,14 +573,15 @@ def main() -> int:
         ["--ranks", "2", "--rankfile", str(rankfile),
          "--mpi-timeout", str(args.timeout), "--no-build"],
         args.timeout,
-        expected_status=1,
+        expected_outcome="outlet",
     )
-    if "Front tip reached the outlet buffer" not in stop_output:
+    if "INCOMPLETE_OUTLET: front tip reached the outlet buffer" not in stop_output:
         raise AssertionError("MPI early-stop case did not exercise the outlet guard")
     last_metrics(stop_output_root / "9902")
 
-    print("PASS: serial/MPI fresh run, cross-mode and MPI checkpoint restarts, "
-          "outputs, and collective early stop")
+    print("PASS: finite-parameter rejection, serial/MPI fresh run, cross-mode, "
+          "checkpoint and regridded restarts, domain rejection, outputs, and "
+          "collective early stop")
     print(f"work root: {work_root}")
     if temporary_root is not None:
         shutil.rmtree(temporary_root)

@@ -452,7 +452,26 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># capped below the ~9.0 R available before the outlet buffer</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dt">                </span><span class="co"># tmax and tsnap derive from travelR and Ca unless set here</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">tRamp</span><span class="ot">=</span><span class="st">1        # inlet ramp time</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">dtmax</span><span class="ot">=</span><span class="fl">0.01</span></span></code></pre></div></div>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">dtmax</span><span class="ot">=</span><span class="fl">0.01</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Deposited central-film convergence; distances use the radius R above.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="dt">advWin</span><span class="ot">=</span><span class="fl">0.25</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dt">advMin</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dt">convHold</span><span class="ot">=</span><span class="dv">3</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="dt">bTol</span><span class="ot">=</span><span class="st">0.002      # relative change between successive window-averaged films</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="dt">speedTol</span><span class="ot">=</span><span class="st">0.02   # relative change of front speed between windows</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="dt">shapeTol</span><span class="ot">=</span><span class="st">0.02   # front/rear/centroid speed agreement and relative length drift</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="dt">requireShapeSteady</span><span class="ot">=</span><span class="kw">true</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="dt">filmBins</span><span class="ot">=</span><span class="dv">128</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="dt">filmCoverage</span><span class="ot">=</span><span class="fl">0.95</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="dt">filmFlatTol</span><span class="ot">=</span><span class="fl">0.05</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="dt">freshFracMin</span><span class="ot">=</span><span class="fl">0.98</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="dt">filmCells</span><span class="ot">=</span><span class="st">4     # measured minimum cells across the film; 0 disables this gate</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="dt">filmMinLevel</span><span class="ot">=</span><span class="st">0 # optional mesh floor over the interface and wall-facing film</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="dt">solverTol</span><span class="ot">=</span><span class="fl">0.0001</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># filmSampleDt derives from tsnap and advWin unless explicitly set.</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># For a refined restart, set freshFront to the seed front position and</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># regridBurnR to the required settling distance. Restart windows start empty.</span></span></code></pre></div></div>
             </div>
         </main>
 

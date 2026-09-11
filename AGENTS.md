@@ -11,9 +11,9 @@ bretherton-drops-bubbles/
 ├── src-local/         # project headers: parameter accessors + embed/VOF compatibility
 ├── simulationCases/   # Basilisk entry points; numbered case output directories (gitignored)
 ├── verificationCases/ # exact-solution cases and their driver
-├── testCases/         # smoke test only
+├── testCases/         # observer unit tests and execution/restart checks
 ├── postProcess/       # snapshot and log analysis
-├── runTests.sh        # entry point: verification cases, then smoke test
+├── runTests.sh        # entry point: unit tests, verification cases, then smoke test
 ├── default.params     # runtime defaults (bubble)
 ├── sweep.params       # bubble validation sweep contract
 └── sweep-drop.params  # drop counterpart sweep contract
@@ -44,8 +44,8 @@ bretherton-drops-bubbles/
   for the smoke test).
 - Run the evidence suite before committing solver changes:
   `bash runTests.sh`. Cases are separated by evidence source, and the
-  separation is deliberate: `testCases/` = smoke, compiles and runs a few
-  steps against no comparator; `verificationCases/` = exact solutions of
+  separation is deliberate: `testCases/` = software unit, execution and
+  transfer checks; `verificationCases/` = exact solutions of
   the implemented equations (see `verificationCases/README.md`);
   validation = independent experimental data (Taylor 1961, Aussillous &
   Quéré 2000) via the root sweep files on production hardware. Bretherton
@@ -56,7 +56,9 @@ bretherton-drops-bubbles/
   `embed.h` sets `cs.prolongation = fraction_refine`, which is exact for
   any planar interface, so the tube wall carries identically zero wavelet
   error at any `csErr`. Wall and film refinement come from the `f` and
-  `KAPPA` criteria plus the explicit `refine()` in the init event. Do not
+  `KAPPA` criteria plus explicit initialization and measured-film refinement.
+  `filmMinLevel` floors the interface and wall-facing liquid band;
+  `filmCells` uses a measured thickness and is capped by `MAXlevel`. Do not
   add a `csErr` and assume the wall is resolved; check the cut-cell level
   range instead.
 - A reported velocity is meaningless without the `TOLERANCE` it was

@@ -12,7 +12,7 @@ bretherton-drops-bubbles/
 ├── simulationCases/   # Basilisk entry points; numbered case output directories (gitignored)
 ├── verificationCases/ # exact-solution cases and their driver
 ├── testCases/         # observer unit tests and execution/restart checks
-├── postProcess/       # snapshot and log analysis
+├── postProcess/       # snapshot and log analysis (`central_film.py` replays observation windows from logs)
 ├── runTests.sh        # entry point: unit tests, verification cases, then smoke test
 ├── default.params     # runtime defaults (bubble)
 ├── sweep.params       # bubble validation sweep contract

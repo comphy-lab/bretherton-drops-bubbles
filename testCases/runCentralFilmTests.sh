@@ -14,3 +14,4 @@ CC_BIN="${CC:-cc}"
   -o "${WORK_DIR}/centralFilmObserver"
 
 "${WORK_DIR}/centralFilmObserver"
+python3 "${SCRIPT_DIR}/test_central_film_observer.py"

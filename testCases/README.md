@@ -16,7 +16,8 @@ build or the parameter path.
 | `runSmokeTests.sh` | builds and runs the case, then checks the log |
 | `runParallelSmokeTests.py` | compares serial and two-rank MPI runs and restarts |
 | `centralFilmObserver.c` | tests convergence windows, quality gates and history resets |
-| `runCentralFilmTests.sh` | compiles and runs the observer tests with a C99 compiler |
+| `test_central_film_observer.py` | same observer contract in Python, plus log stitching across a restart |
+| `runCentralFilmTests.sh` | compiles the C tests and runs the Python log-acceptance tests |
 | `regridTube.c` | measures transfer and projection changes when refining a saved tube state |
 
 Cases that compare against an exact solution live in
@@ -32,7 +33,7 @@ and are deliberately kept apart.
 
 ```bash
 bash testCases/runSmokeTests.sh   # this directory only
-bash runTests.sh --unit          # observer tests without Basilisk
+bash runTests.sh --unit          # C observer tests and Python log stitching, without Basilisk
 bash runTests.sh                 # observer, verification and smoke tests
 ```
 

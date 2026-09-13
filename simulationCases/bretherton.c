@@ -83,6 +83,7 @@ expected duration.
 #include "params.h"
 #include "embed-vof-tube.h"
 #include "central-film.h"
+#include "tag.h"
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -275,26 +276,65 @@ static void refine_measured_film (void)
   tube_refinement_geometry_end();
 }
 
-/** Returns interface tips, global minimum gap and dispersed-phase centroid. */
+/**
+Tips and the global minimum gap are taken on the largest connected VOF
+component. A global `statsf(xpos).min` otherwise locks onto a leftover
+fragment while the main rear keeps moving.
+*/
 static bool current_drop_geometry (double * xFrontNow, double * xRearNow,
                                    double * minimumFilm,
                                    double * centroidNow)
 {
+  scalar cc[];
+  foreach()
+    cc[] = f[] > 1e-4;
+  int n = tag (cc);
+  if (n < 1)
+    return false;
+
+  double volComp[n];
+  for (int j = 0; j < n; j++)
+    volComp[j] = 0.;
+  foreach (serial)
+    if (cc[] > 0.)
+      volComp[((int) cc[]) - 1] += f[]*dv();
+#if _MPI
+  MPI_Allreduce (MPI_IN_PLACE, volComp, n, MPI_DOUBLE, MPI_SUM,
+                 MPI_COMM_WORLD);
+#endif
+  int mainTag = 1;
+  double vMain = volComp[0];
+  for (int j = 1; j < n; j++)
+    if (volComp[j] > vMain) {
+      vMain = volComp[j];
+      mainTag = j + 1;
+    }
+
   scalar xpos[], ypos[];
   position (f, xpos, {1, 0});
   position (f, ypos, {0, 1});
-  *xFrontNow = statsf(xpos).max;
-  *xRearNow = statsf(xpos).min;
-  *minimumFilm = Rtube - statsf(ypos).max;
-
-  double volume = 0., moment = 0.;
-  foreach (reduction(+:volume) reduction(+:moment)) {
+  double xFront = -HUGE, xRear = HUGE, yMax = -HUGE, volume = 0., moment = 0.;
+  foreach (reduction(max:xFront) reduction(min:xRear) reduction(max:yMax)
+           reduction(+:volume) reduction(+:moment)) {
+    if ((int) cc[] != mainTag)
+      continue;
     double element = f[]*dv();
     volume += element;
     moment += x*element;
+    if (cs[] > 0. && f[] > 1e-6 && f[] < 1. - 1e-6) {
+      if (finite (xpos[]) && xpos[] > xFront)
+        xFront = xpos[];
+      if (finite (xpos[]) && xpos[] < xRear)
+        xRear = xpos[];
+      if (finite (ypos[]) && ypos[] > yMax)
+        yMax = ypos[];
+    }
   }
+  *xFrontNow = xFront;
+  *xRearNow = xRear;
+  *minimumFilm = Rtube - yMax;
   *centroidNow = volume > 0. ? moment/volume : 0.;
-  return *xFrontNow > *xRearNow && volume > 0.;
+  return finite (xFront) && finite (xRear) && xFront > xRear && volume > 0.;
 }
 
 static bool close_parameter (double a, double b)

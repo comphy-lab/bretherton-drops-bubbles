@@ -663,8 +663,11 @@ event init (t = 0)
     vof_solid_cleanup (f);
     tStart = t;
     double tt, U, dUdt, target, disp, fresh;
+    // A frame-state file belongs to this case directory (continuation
+    // stations never copy it); its clock must sit within one snapshot of the
+    // restored dump, not match it to the last bit.
     if (read_frame_state (&tt, &U, &dUdt, &target, &disp, &fresh) &&
-        close_parameter (tt, t)) {
+        fabs (tt - t) <= tsnap) {
       // same-case resume: keep the frame exactly where the dump left it
       comoving_frame_init (&frame, U, target, tau, prescribedU);
       frame.dUdt = dUdt;
@@ -783,6 +786,16 @@ event writingFiles (t = 0; t += tsnap; t <= tmax)
   dump (file = nameOut);
 }
 
+/** JSON has no NaN: non-finite values are written as null. */
+static void json_number (FILE * fp, const char * key, double value,
+                         const char * tail)
+{
+  if (isfinite (value))
+    fprintf (fp, "  \"%s\": %.17g%s\n", key, value, tail);
+  else
+    fprintf (fp, "  \"%s\": null%s\n", key, tail);
+}
+
 /** Writes the station receipt and the interface polyline. */
 static void write_station (const char * status, RenewalWindow * w)
 {
@@ -800,22 +813,31 @@ static void write_station (const char * status, RenewalWindow * w)
     speedRatio/stagnant - 1. : NAN;
   double mobility = U > 0. ? 1. - Ca/U : NAN;
   fprintf (fp, "{\n  \"status\": \"%s\",\n  \"CaseNo\": %d,\n"
-           "  \"Ca_in\": %.17g,\n  \"La\": %.17g,\n  \"muR\": %.17g,\n"
-           "  \"rhoR\": %.17g,\n  \"Rtube\": %.17g,\n  \"MAXlevel\": %d,\n"
-           "  \"padLevel\": %d,\n  \"Ldomain\": %.17g,\n  \"outlet\": %d,\n"
-           "  \"tau\": %.17g,\n  \"t\": %.17g,\n  \"i\": %d,\n"
-           "  \"U\": %.17g,\n  \"Ca_b\": %.17g,\n  \"v_rel\": %.17g,\n"
-           "  \"dUdt\": %.17g,\n  \"xTarget\": %.17g,\n"
-           "  \"displacement\": %.17g,\n  \"freshFront\": %.17g,\n"
-           "  \"h\": %.17g,\n  \"h_over_Rtube\": %.17g,\n"
-           "  \"h_over_R0\": %.17g,\n  \"speed_ratio\": %.17g,\n"
-           "  \"stagnant_film_residual\": %.17g,\n  \"m\": %.17g,\n"
-           "  \"hold_count\": %d\n}\n",
-           status, CaseNo, Ca, La, muR, rhoR, Rtube, MAXlevel, padLevel,
-           Ldomain, outletMode, tau, t, iter, frame.U, U, frame.v_rel,
-           frame.dUdt, frame.target, frame.displacement, freshFront,
-           h, h/Rtube, h, speedRatio, stagnantResidual, mobility,
-           w ? w->hold_count : 0);
+           "  \"MAXlevel\": %d,\n  \"padLevel\": %d,\n  \"outlet\": %d,\n"
+           "  \"i\": %d,\n  \"hold_count\": %d,\n", status, CaseNo, MAXlevel,
+           padLevel, outletMode, iter, w ? w->hold_count : 0);
+  json_number (fp, "Ca_in", Ca, ",");
+  json_number (fp, "La", La, ",");
+  json_number (fp, "muR", muR, ",");
+  json_number (fp, "rhoR", rhoR, ",");
+  json_number (fp, "Rtube", Rtube, ",");
+  json_number (fp, "Ldomain", Ldomain, ",");
+  json_number (fp, "tau", tau, ",");
+  json_number (fp, "t", t, ",");
+  json_number (fp, "U", frame.U, ",");
+  json_number (fp, "Ca_b", U, ",");
+  json_number (fp, "v_rel", frame.v_rel, ",");
+  json_number (fp, "dUdt", frame.dUdt, ",");
+  json_number (fp, "xTarget", frame.target, ",");
+  json_number (fp, "displacement", frame.displacement, ",");
+  json_number (fp, "freshFront", freshFront, ",");
+  json_number (fp, "h", h, ",");
+  json_number (fp, "h_over_Rtube", h/Rtube, ",");
+  json_number (fp, "h_over_R0", h, ",");
+  json_number (fp, "speed_ratio", speedRatio, ",");
+  json_number (fp, "stagnant_film_residual", stagnantResidual, ",");
+  json_number (fp, "m", mobility, "");
+  fprintf (fp, "}\n");
   fclose (fp);
   FILE * fi = fopen ("interface.dat", "w");
   if (fi) {

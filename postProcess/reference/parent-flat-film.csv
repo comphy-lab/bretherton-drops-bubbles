@@ -1,0 +1,12 @@
+# Parent lab-frame results for the Newtonian bubble at Ca_in = 0.05, muR = 0.01,
+# rhoR = 0.001, La = 1, Rtube/R0 = 0.7. H = h/Rtube is the deposited central
+# film (median over the central 30-70 % of the bubble). delta_over_R0 is the
+# finest cell size. Sources: docs/Newtonian-Validation/main.tex Table 1 (L10)
+# and the companion table vendored by bretherton-drops-bubbles-fem PR 1
+# (docs/validation/data/companion-basilisk.csv), itself extracted from the
+# parent campaign logs.
+label,level,L0,delta_over_R0,Ca_in,Ca_b,H,source
+L9-1103,9,16,0.03125,0.05,0.06808654688994892,0.14403006495322737,fem-pr1-companion-basilisk.csv
+L10-1004,10,16,0.015625,0.05,0.0680939,0.143663,docs/Newtonian-Validation/main.tex
+L11-case-11006,11,16,0.0078125,0.04328761281083057,0.057547367773978494,0.1333418199728804,fem-pr1-companion-basilisk.csv
+L12-case-12003,12,16,0.00390625,0.05623413251903491,0.07840495895850441,0.1539084743391724,fem-pr1-companion-basilisk.csv

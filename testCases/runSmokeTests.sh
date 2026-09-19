@@ -1,7 +1,7 @@
 #!/bin/bash
 # runSmokeTests.sh
 #
-# Smoke test for the production solver.
+# Smoke tests for the production solver and its co-moving window variant.
 #
 # A smoke test proves only that simulationCases/bretherton.c compiles and
 # integrates a few dozen time steps at coarse resolution without blowing
@@ -77,6 +77,35 @@ if [[ ${RUN_STATUS} -eq 1 ]] && \
   fi
 else
   echo "bretherton.c smoke test: FAIL (status ${RUN_STATUS}; expected exact INCOMPLETE_TMAX status 1)" >&2
+  FAILED=1
+fi
+
+echo "-----------------------------------------"
+echo "Smoke test: simulationCases/bretherton-comoving.c"
+echo "-----------------------------------------"
+
+COMOVING_CASE_DIR="${REPO_ROOT}/simulationCases/9998"
+COMOVING_RECEIPT="$(mktemp "${TMPDIR:-/tmp}/bretherton-comoving-smoke-XXXXXXXX.log")"
+trap 'rm -f -- "${SMOKE_RECEIPT}" "${COMOVING_RECEIPT}"' EXIT
+EXPECTED_COMOVING="INCOMPLETE_TMAX: case 9998 reached tmax without stationarity: Ca 0.05."
+rm -rf "$COMOVING_CASE_DIR"
+
+set +e
+bash "${REPO_ROOT}/runSimulation.sh" "testCases/smoke-comoving.params" \
+  --exec bretherton-comoving.c 2>&1 | tee "${COMOVING_RECEIPT}"
+COMOVING_STATUS=${PIPESTATUS[0]}
+set -e
+
+COMOVING_TERMINAL="$(
+  grep -E '^(SUCCESS:|INCOMPLETE_|HARDFAIL_)' "${COMOVING_RECEIPT}" || true
+)"
+if [[ ${COMOVING_STATUS} -eq 1 ]] && \
+   [[ "${COMOVING_TERMINAL}" == "${EXPECTED_COMOVING}" ]] && \
+   [[ -f "${COMOVING_CASE_DIR}/station.json" ]] && \
+   [[ "$(grep -cv '^#' "${COMOVING_CASE_DIR}/c9998-log")" -ge 4 ]]; then
+  echo "bretherton-comoving.c smoke test: PASS (station receipt written; expected tmax incomplete)"
+else
+  echo "bretherton-comoving.c smoke test: FAIL (status ${COMOVING_STATUS})" >&2
   FAILED=1
 fi
 

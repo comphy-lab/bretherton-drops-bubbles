@@ -854,7 +854,14 @@ event logWriting (i++)
   double xTipF, xTipR, bFilm, centroid;
   bool geometryOK = current_drop_geometry
     (&xTipF, &xTipR, &bFilm, &centroid);
-  bool centralOK = geometryOK && measure_central_film
+  if (!geometryOK) {
+    if (pid() == 0)
+      fprintf (ferr, "HARDFAIL_GEOMETRY: no dispersed-phase component at t=%g.\n",
+               t);
+    runFailed = 1;
+    return 1;
+  }
+  bool centralOK = measure_central_film
     (xTipR, xTipF, centroid, &latestFilmMeasurement);
   if (centralOK)
     latestFilmValid = true;

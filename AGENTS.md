@@ -8,7 +8,8 @@ surface tension, Bretherton validation.
 
 ```
 bretherton-drops-bubbles/
-├── src-local/         # project headers: parameter accessors + embed/VOF compatibility
+├── src-local/         # project headers: parameter accessors, embed/VOF compatibility,
+│                      # central-film observation contract
 ├── simulationCases/   # Basilisk entry points; numbered case output directories (gitignored)
 ├── verificationCases/ # exact-solution cases and their driver
 ├── testCases/         # observer unit tests and execution/restart checks

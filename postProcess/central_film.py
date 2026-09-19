@@ -336,7 +336,7 @@ def config_from_params(params: Mapping[str, float | str]) -> CentralFilmConfig:
 
 def _truthy(value: float | str, default: bool = True) -> bool:
     if isinstance(value, str):
-        return value.strip().lower() not in {"0", "false", "no"}
+        return value.strip().lower() not in {"0", "false", "no", "off"}
     return bool(value) if value is not None else default
 
 
@@ -458,7 +458,10 @@ def accept_samples(
     observer = central_film_observer_init(config)
     window = CentralFilmWindow()
     t_ramp = float(params.get("tRamp", 1.0))
-    burn = float(params.get("restartBurnR", 0.0))
+    burn = max(
+        float(params.get("restartBurnR", 0.0)),
+        float(params.get("regridBurnR", 0.0)),
+    )
     require = (
         _truthy(params.get("requireShapeSteady", 1.0))
         if require_shape is None

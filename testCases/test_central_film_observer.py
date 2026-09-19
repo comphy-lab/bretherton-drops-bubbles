@@ -17,6 +17,7 @@ from central_film import (  # noqa: E402
     CentralFilmConfig,
     CentralFilmMeasurement,
     CentralFilmWindow,
+    _truthy,
     accept_samples,
     central_film_median,
     central_film_observer_init,
@@ -277,6 +278,35 @@ class LogStitchTests(unittest.TestCase):
             second.write_text(_log_text([2.0, 3.0, 4.0, 3.5]))
             times = [sample.time for sample in stitch_logs([first, second])]
             self.assertEqual(times, [0.0, 1.0, 2.0, 3.0, 4.0, 3.5])
+
+    def test_off_token_matches_solver_bool(self) -> None:
+        self.assertFalse(_truthy("off"))
+        self.assertFalse(_truthy("OFF"))
+        self.assertTrue(_truthy("true"))
+
+    def test_regrid_burn_is_applied_with_restart_burn(self) -> None:
+        params = {
+            "advWin": 1.0,
+            "advMin": 3.0,
+            "bTol": 0.02,
+            "speedTol": 0.02,
+            "filmCoverage": 0.8,
+            "filmFlatTol": 0.1,
+            "freshFracMin": 0.75,
+            "filmCells": 4.0,
+            "shapeTol": 0.02,
+            "convHold": 2,
+            "tRamp": 0.0,
+            "restartBurnR": 0.0,
+            "regridBurnR": 10.0,
+            "requireShapeSteady": 1,
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "c-log"
+            path.write_text(_log_text([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+            result = accept_samples(parse_log(path), params)
+            self.assertEqual(result.eligible_samples, 0)
+            self.assertFalse(result.success)
 
     def test_old_eight_column_log_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

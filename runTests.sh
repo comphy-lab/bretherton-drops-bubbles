@@ -41,7 +41,7 @@ for arg in "$@"; do
       SELECTED_MODE="${arg}"
       ;;
     -h|--help)
-      sed -n '2,12p' "${BASH_SOURCE[0]}"
+      sed -n '2,13p' "${BASH_SOURCE[0]}"
       exit 0
       ;;
     *)

@@ -44,6 +44,9 @@ Surface tension itself is safe: `iforce.h` guards its face loop with
   `{cs, fs, cm, fm}`; call after `solid()` and after `adapt_wavelet()`.
 - `tube_solid(Rtube)`: embed a cylindrical tube wall of radius `Rtube`
   (fluid at `y < Rtube`) and synchronise the metric.
+- `tube_refinement_geometry_begin()` / `tube_refinement_geometry_end()`:
+  bracket an explicit `refine()` of a fixed tube, repairing MPI coarse/ghost
+  geometry while leaving solution-field transfer operators unchanged.
 - `vof_solid_cleanup(f)`: clamp `f` and reset it to the continuous phase
   in full-solid cells; call after `adapt_wavelet()`.
 */
@@ -122,6 +125,53 @@ static inline void tube_solid (double Rtube)
 #endif
   solid (cs, fs, Rtube - y);
   embed_axi_metric_sync();
+}
+
+/**
+### Exact tube geometry during explicit tree refinement
+
+When a dump is restored with a different MPI decomposition, coarse/ghost
+`cs` and `fs` storage can be stale even when every active leaf has the correct
+straight-wall geometry. `refine_embed_linear()` legitimately requires those
+coarse neighbours while prolongating pressure and velocity. The callback
+below repairs the complete 3-by-3 coarse stencil of each parent before its
+children are created, then gives the children their exact tube fraction.
+
+Bracket only explicit fixed-tube `refine()` calls with the begin/end pair.
+The standard embedded fraction operator is restored immediately afterwards;
+solution-field and momentum operators are never replaced. Follow the end call
+with `embed_axi_metric_sync()` and the usual VOF solid cleanup.
+*/
+#if TREE && AXI && EMBED
+static void tube_fraction_refine_exact (Point point, scalar field)
+{
+  for (int i = -1; i <= 1; i++)
+    for (int j = -1; j <= 1; j++)
+      if (allocated(i,j)) {
+        double radius = y + j*Delta;
+        cs[i,j] = clamp((tube_metric_radius - radius)/Delta + .5, 0., 1.);
+        fs.x[i,j] = cs[i,j];
+        fs.y[i,j] = radius - Delta/2. < tube_metric_radius ? 1. : 0.;
+      }
+  foreach_child()
+    field[] = clamp((tube_metric_radius - y)/Delta + .5, 0., 1.);
+}
+#endif
+
+static inline void tube_refinement_geometry_begin (void)
+{
+#if TREE && AXI && EMBED
+  assert (tube_metric_radius > 0.);
+  cs.refine = cs.prolongation = tube_fraction_refine_exact;
+#endif
+}
+
+static inline void tube_refinement_geometry_end (void)
+{
+#if TREE && AXI && EMBED
+  cs.refine = embed_fraction_refine;
+  cs.prolongation = fraction_refine;
+#endif
 }
 
 /**

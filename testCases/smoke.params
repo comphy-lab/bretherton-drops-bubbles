@@ -15,3 +15,4 @@ tmax=0.05
 tsnap=0.025
 tRamp=1
 dtmax=0.001
+filmSampleDt=0.002

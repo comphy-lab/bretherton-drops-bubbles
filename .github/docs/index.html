@@ -483,7 +483,17 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 parameters, source, executable, diagnostic log,
                 <code>restart</code> dump and
                 <code>intermediate/snapshot-*</code> files. An existing
-                restart resumes that case.</p>
+                restart resumes that case. Success requires stable
+                deposited central-film measurements and, by default,
+                agreement of the front, rear and centroid speeds.
+                Reaching <code>tmax</code> or the outlet buffer returns
+                an explicit incomplete status with a nonzero exit code.
+                For a refined restart, use a separate case directory
+                containing a copy of the seed dump, set
+                <code>freshFront</code> to its front position, and
+                specify <code>regridBurnR</code>. Changing
+                <code>Ldomain</code> while restoring a dump is rejected;
+                start a fresh case to change the domain length.</p>
                 <p>For a single-node MPI allocation,
                 <code>--pe-list 0,1,2,3</code> can replace the rankfile
                 when those are the allocated Open MPI core indices. Set
@@ -600,6 +610,8 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <h3 id="src-local">src-local</h3>
                 <ul>
                 <li><a
+                href="src-local/central-film.h.html">src-local/central-film.h</a></li>
+                <li><a
                 href="src-local/embed-vof-tube.h.html">src-local/embed-vof-tube.h</a></li>
                 <li><a
                 href="src-local/params.h.html">src-local/params.h</a></li>
@@ -610,6 +622,12 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 <ul>
                 <li><a
                 href="testCases/README.md.html">testCases/README.md</a></li>
+                <li><a
+                href="testCases/centralFilmObserver.c.html">testCases/centralFilmObserver.c</a></li>
+                <li><a
+                href="testCases/regridTube.c.html">testCases/regridTube.c</a></li>
+                <li><a
+                href="testCases/runCentralFilmTests.sh.html">testCases/runCentralFilmTests.sh</a></li>
                 <li><a
                 href="testCases/runParallelSmokeTests.py.html">testCases/runParallelSmokeTests.py</a></li>
                 <li><a

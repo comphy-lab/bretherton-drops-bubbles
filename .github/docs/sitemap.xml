@@ -71,6 +71,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/src-local/central-film.h.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/src-local/embed-vof-tube.h.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -97,6 +102,21 @@
   </url>
   <url>
     <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/README.md.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/centralFilmObserver.c.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/regridTube.c.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://comphy-lab.org/bretherton-drops-bubbles/testCases/runCentralFilmTests.sh.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

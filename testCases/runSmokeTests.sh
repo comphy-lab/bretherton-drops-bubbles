@@ -49,21 +49,34 @@ echo "Smoke test: simulationCases/bretherton.c"
 echo "-----------------------------------------"
 
 SMOKE_CASE_DIR="${REPO_ROOT}/simulationCases/9999"
+SMOKE_RECEIPT="$(mktemp "${TMPDIR:-/tmp}/bretherton-smoke-XXXXXXXX.log")"
+trap 'rm -f -- "${SMOKE_RECEIPT}"' EXIT
+EXPECTED_INCOMPLETE="INCOMPLETE_TMAX: case 9999 reached tmax without the requested stationarity milestone: Ca 0.05, La 1, muR 0.01, rhoR 0.001."
 rm -rf "$SMOKE_CASE_DIR"
 
 FAILED=0
-if bash "${REPO_ROOT}/runSimulation.sh" "testCases/smoke.params"; then
+set +e
+bash "${REPO_ROOT}/runSimulation.sh" "testCases/smoke.params" \
+  2>&1 | tee "${SMOKE_RECEIPT}"
+RUN_STATUS=${PIPESTATUS[0]}
+set -e
+
+TERMINAL_OUTPUT="$(
+  grep -E '^(SUCCESS:|INCOMPLETE_|HARDFAIL_)' "${SMOKE_RECEIPT}" || true
+)"
+if [[ ${RUN_STATUS} -eq 1 ]] && \
+   [[ "${TERMINAL_OUTPUT}" == "${EXPECTED_INCOMPLETE}" ]]; then
   SMOKE_LOG="${SMOKE_CASE_DIR}/c9999-log"
   if [[ -f "$SMOKE_LOG" ]] && \
      [[ "$(grep -cv '^#' "$SMOKE_LOG")" -ge 10 ]] && \
      ! grep -qi "blew up" "$SMOKE_LOG"; then
-    echo "bretherton.c smoke test: PASS ($(grep -cv '^#' "$SMOKE_LOG") logged steps)"
+    echo "bretherton.c smoke test: PASS ($(grep -cv '^#' "$SMOKE_LOG") logged steps; expected tmax incomplete)"
   else
     echo "bretherton.c smoke test: FAIL (missing or truncated log)" >&2
     FAILED=1
   fi
 else
-  echo "bretherton.c smoke test: FAIL (runner exited non-zero)" >&2
+  echo "bretherton.c smoke test: FAIL (status ${RUN_STATUS}; expected exact INCOMPLETE_TMAX status 1)" >&2
   FAILED=1
 fi
 

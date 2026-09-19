@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>testCases/regridTube.c | Bretherton drops and bubbles</title>
+
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="This is a bounded software test of the transfer operators used when a saved production state is refined by one or two levels. It restores an actual Basilisk ...">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="embed-vof-tube.h, embed.h, errno.h, float.h, navier-stokes/centered.h, navier-stokes/conserving.h, regridtube, struct, tension.h, two-phase.h">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="../assets/js/main.js" as="script">
+  <link rel="preload" href="../assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="../assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/custom_styles.css">
+  <link rel="stylesheet" href="../assets/css/command-palette.css">
+  <link rel="stylesheet" href="../assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="../assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+  <link rel="manifest" href="../assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script>
+    window.ASSET_PATH_PREFIX = "..";
+  </script>
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery-ui.packed.js"></script>
+  <script src="../assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script defer src="../assets/js/html-sanitizer.js"></script>
+  <script defer src="../assets/js/search-helper.js"></script>
+  <script defer src="../assets/js/command-palette.js"></script>
+  <script defer src="../assets/js/command-data.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "bretherton-drops-bubbles";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="../assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/bretherton-drops-bubbles">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>bretherton-drops-bubbles</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+
+            <div class="page-content">
+
+                                <h1 class="page-title">testCases/regridTube.c</h1>
+
+
+                                <div class="raw-file-button-container">
+                    <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/raw/main/testCases/regridTube.c" class="raw-file-button" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i> See raw file
+                    </a>
+                </div>
+
+                <h1
+                id="restart-regridding-contract-for-the-bretherton-tube-solver">Restart
+                regridding contract for the Bretherton tube solver</h1>
+                <p>This is a bounded software test of the transfer
+                operators used when a saved production state is refined
+                by one or two levels. It restores an actual Basilisk
+                dump, rebuilds the same embedded axisymmetric tube,
+                applies the same film-floor geometry as
+                <code>bretherton.c</code>, and stops before time
+                integration.</p>
+                <p>The test reports axisymmetric dispersed volume and
+                centroid, mixture momentum, kinetic energy, exact
+                straight-tube geometry errors, solid contamination and
+                the discrete leaf face-flux divergence before and after
+                one projection. On an adaptive embedded tree this direct
+                leaf readback is a diagnostic, not the multilevel norm
+                controlled by the Poisson solver. The projection uses
+                the operator-normalised value <code>dt = 1</code>; it is
+                not a substitute for a normal production timestep with
+                the complete solver event sequence and does not by
+                itself establish pointwise incompressibility. Running
+                the same command with serial and MPI builds supplies the
+                parallel agreement check. These measurements establish
+                only the restart/regrid implementation contract; they do
+                not establish grid convergence or physical
+                stationarity.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-I..</span>/src-local <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> regridTube.c <span class="at">-o</span> regridTube <span class="at">-lm</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./regridTube</span> SNAPSHOT LEVELS RTUBE FILM CA RHO1 RHO2 <span class="pp">[</span><span class="ss">TOLERANCE</span><span class="pp">]</span></span></code></pre></div></div>
+                <p><code>LEVELS</code> must be one or two.
+                <code>FILM</code> is the dimensional central-film
+                thickness used by the source checkpoint (for example
+                <code>Rtube*(b/Rtube)</code>). The remaining arguments
+                reproduce the production boundary conditions and density
+                law.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/embed.h" title="Link to Basilisk source for embed.h"><span class="im">"embed.h"</span></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/axi.h" title="Link to Basilisk source for axi.h"><span class="im">"axi.h"</span></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/navier-stokes/centered.h" title="Link to Basilisk source for navier-stokes/centered.h"><span class="im">"navier-stokes/centered.h"</span></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/two-phase.h" title="Link to Basilisk source for two-phase.h"><span class="im">"two-phase.h"</span></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/navier-stokes/conserving.h" title="Link to Basilisk source for navier-stokes/conserving.h"><span class="im">"navier-stokes/conserving.h"</span></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="https://basilisk.fr/src/tension.h" title="Link to Basilisk source for tension.h"><span class="im">"tension.h"</span></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><a href="../src-local/embed-vof-tube.h.html" title="Link to local documentation for embed-vof-tube.h"><span class="im">"embed-vof-tube.h"</span></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;float.h&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> snapshotFile<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> levelIncrement<span class="op">,</span> sourceLevel<span class="op">,</span> targetLevel<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">double</span> Rtube<span class="op">,</span> filmThickness<span class="op">,</span> Ca<span class="op">,</span> tRamp <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> failed <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define INLET_RAMP </span><span class="op">(</span><span class="pp">tRamp </span><span class="op">&gt;</span><span class="pp"> </span><span class="fl">0.</span><span class="pp"> </span><span class="op">?</span><span class="pp"> min </span><span class="op">(</span><span class="pp">t</span><span class="op">/</span><span class="pp">tRamp</span><span class="op">,</span><span class="pp"> </span><span class="fl">1.</span><span class="op">)</span><span class="pp"> </span><span class="op">:</span><span class="pp"> </span><span class="fl">1.</span><span class="op">)</span><span class="pp"></span><span class="dv">47</span><span class="pp"></span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>left<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span>y <span class="op">&lt;</span> Rtube <span class="op">?</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                       <span class="fl">2.</span><span class="op">*</span>Ca<span class="op">*</span>INLET_RAMP<span class="op">*(</span><span class="fl">1.</span> <span class="op">-</span> sq<span class="op">(</span>y<span class="op">/</span>Rtube<span class="op">))</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>left<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>p<span class="op">[</span>left<span class="op">]</span>   <span class="op">=</span> neumann <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>pf<span class="op">[</span>left<span class="op">]</span>  <span class="op">=</span> neumann <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>f<span class="op">[</span>left<span class="op">]</span>   <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>right<span class="op">]</span> <span class="op">=</span> neumann <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>right<span class="op">]</span> <span class="op">=</span> neumann <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>p<span class="op">[</span>right<span class="op">]</span>   <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>pf<span class="op">[</span>right<span class="op">]</span>  <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>n<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>u<span class="op">.</span>t<span class="op">[</span>embed<span class="op">]</span> <span class="op">=</span> dirichlet <span class="op">(</span><span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> leaves<span class="op">,</span> mixed<span class="op">,</span> cut<span class="op">;</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> level_min<span class="op">,</span> level_max<span class="op">,</span> mixed_level_min<span class="op">,</span> mixed_level_max<span class="op">;</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> volume<span class="op">,</span> centroid_x<span class="op">,</span> centroid_y<span class="op">;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> momentum_x<span class="op">,</span> momentum_y<span class="op">,</span> kinetic_energy<span class="op">;</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> tube_volume_error<span class="op">,</span> inlet_area_error<span class="op">,</span> outlet_area_error<span class="op">;</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> cs_error<span class="op">,</span> fs_error<span class="op">,</span> cm_error<span class="op">,</span> fm_error<span class="op">,</span> solid_fraction_max<span class="op">;</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> leaf_flux_divergence_diagnostic<span class="op">;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> physical_divergence_full_max<span class="op">,</span> physical_divergence_cut_max<span class="op">;</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> minimum_positive_cm<span class="op">;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> RegridMetrics<span class="op">;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">bool</span> parse_double <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> text<span class="op">,</span> <span class="dt">double</span> <span class="op">*</span> value<span class="op">)</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  errno <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> <span class="op">*</span> end <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>value <span class="op">=</span> strtod <span class="op">(</span>text<span class="op">,</span> <span class="op">&amp;</span>end<span class="op">);</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> errno <span class="op">==</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> end <span class="op">!=</span> text <span class="op">&amp;&amp;</span> <span class="op">*</span>end <span class="op">==</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span> <span class="op">&amp;&amp;</span> isfinite <span class="op">(*</span>value<span class="op">);</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">bool</span> parse_increment <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> text<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span> value<span class="op">)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  errno <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> <span class="op">*</span> end <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> parsed <span class="op">=</span> strtol <span class="op">(</span>text<span class="op">,</span> <span class="op">&amp;</span>end<span class="op">,</span> <span class="dv">10</span><span class="op">);</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>errno <span class="op">||</span> end <span class="op">==</span> text <span class="op">||</span> <span class="op">*</span>end <span class="op">!=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span> <span class="op">||</span> <span class="op">(</span>parsed <span class="op">!=</span> <span class="dv">1</span> <span class="op">&amp;&amp;</span> parsed <span class="op">!=</span> <span class="dv">2</span><span class="op">))</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>value <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">)</span> parsed<span class="op">;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>Reconstruct the face flux exactly as
+                <code>centered.h</code> does after user init.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> rebuild_face_flux <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  event <span class="op">(</span><span class="st">&quot;properties&quot;</span><span class="op">);</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  trash <span class="op">({</span>uf<span class="op">});</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  foreach_face<span class="op">()</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    uf<span class="op">.</span>x<span class="op">[]</span> <span class="op">=</span> fm<span class="op">.</span>x<span class="op">[]*</span>face_value <span class="op">(</span>u<span class="op">.</span>x<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  boundary <span class="op">((</span>scalar <span class="op">*){</span>uf<span class="op">});</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> divergence_metrics <span class="op">(</span>RegridMetrics <span class="op">*</span> metrics<span class="op">)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> rawMaximum <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> fullMaximum <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> cutMaximum <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> minimumCm <span class="op">=</span> HUGE<span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>serial<span class="op">,</span> noauto<span class="op">)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cm<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">double</span> divergence <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      foreach_dimension<span class="op">()</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        divergence <span class="op">+=</span> uf<span class="op">.</span>x<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">-</span> uf<span class="op">.</span>x<span class="op">[];</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      <span class="dt">const</span> <span class="dt">double</span> raw <span class="op">=</span> fabs <span class="op">(</span>divergence<span class="op">/</span>Delta<span class="op">);</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">const</span> <span class="dt">double</span> physical <span class="op">=</span> raw<span class="op">/</span>cm<span class="op">[];</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      rawMaximum <span class="op">=</span> max <span class="op">(</span>rawMaximum<span class="op">,</span> raw<span class="op">);</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      minimumCm <span class="op">=</span> min <span class="op">(</span>minimumCm<span class="op">,</span> cm<span class="op">[]);</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;=</span> <span class="fl">1.</span><span class="op">)</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        fullMaximum <span class="op">=</span> max <span class="op">(</span>fullMaximum<span class="op">,</span> physical<span class="op">);</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">)</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        cutMaximum <span class="op">=</span> max <span class="op">(</span>cutMaximum<span class="op">,</span> physical<span class="op">);</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="pp">#if _MPI</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  mpi_all_reduce <span class="op">(</span>rawMaximum<span class="op">,</span> MPI_DOUBLE<span class="op">,</span> MPI_MAX<span class="op">);</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  mpi_all_reduce <span class="op">(</span>fullMaximum<span class="op">,</span> MPI_DOUBLE<span class="op">,</span> MPI_MAX<span class="op">);</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  mpi_all_reduce <span class="op">(</span>cutMaximum<span class="op">,</span> MPI_DOUBLE<span class="op">,</span> MPI_MAX<span class="op">);</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  mpi_all_reduce <span class="op">(</span>minimumCm<span class="op">,</span> MPI_DOUBLE<span class="op">,</span> MPI_MIN<span class="op">);</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>leaf_flux_divergence_diagnostic <span class="op">=</span> rawMaximum<span class="op">;</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>physical_divergence_full_max <span class="op">=</span> fullMaximum<span class="op">;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>physical_divergence_cut_max <span class="op">=</span> cutMaximum<span class="op">;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>minimum_positive_cm <span class="op">=</span> minimumCm <span class="op">&lt;</span> HUGE <span class="op">?</span> minimumCm <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <p>Compare the live tube fractions and metrics with the
+                exact straight tube.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> geometry_errors <span class="op">(</span>RegridMetrics <span class="op">*</span> metrics<span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> tubeVolume <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> inlet <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> outlet <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> ecs <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> efs <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> ecm <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> efm <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> fsolid <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  scalar cmv <span class="op">=</span> cm<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  face vector fmv <span class="op">=</span> fm<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>tubeVolume<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>ecs<span class="op">)</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(</span>max<span class="op">:</span>ecm<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>fsolid<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    tubeVolume <span class="op">+=</span> dv<span class="op">();</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> csExact <span class="op">=</span> clamp <span class="op">((</span>Rtube <span class="op">-</span> y<span class="op">)/</span>Delta <span class="op">+</span> <span class="fl">.5</span><span class="op">,</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> cmExact <span class="op">=</span> tube_axial_face_metric <span class="op">(</span>y<span class="op">,</span> Delta<span class="op">);</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    ecs <span class="op">=</span> max <span class="op">(</span>ecs<span class="op">,</span> fabs <span class="op">(</span>cs<span class="op">[]</span> <span class="op">-</span> csExact<span class="op">));</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    ecm <span class="op">=</span> max <span class="op">(</span>ecm<span class="op">,</span> fabs <span class="op">(</span>cmv<span class="op">[]</span> <span class="op">-</span> cmExact<span class="op">));</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&lt;=</span> <span class="fl">0.</span><span class="op">)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      fsolid <span class="op">=</span> max <span class="op">(</span>fsolid<span class="op">,</span> fabs <span class="op">(</span>f<span class="op">[]));</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  foreach_face <span class="op">(</span>x<span class="op">,</span> reduction<span class="op">(</span>max<span class="op">:</span>efs<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>efm<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> exact <span class="op">=</span> clamp <span class="op">((</span>Rtube <span class="op">-</span> y<span class="op">)/</span>Delta <span class="op">+</span> <span class="fl">.5</span><span class="op">,</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    efs <span class="op">=</span> max <span class="op">(</span>efs<span class="op">,</span> fabs <span class="op">(</span>fs<span class="op">.</span>x<span class="op">[]</span> <span class="op">-</span> exact<span class="op">));</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    efm <span class="op">=</span> max <span class="op">(</span>efm<span class="op">,</span> fabs <span class="op">(</span>fmv<span class="op">.</span>x<span class="op">[]</span> <span class="op">-</span> tube_axial_face_metric<span class="op">(</span>y<span class="op">,</span> Delta<span class="op">)));</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  foreach_face <span class="op">(</span>y<span class="op">,</span> reduction<span class="op">(</span>max<span class="op">:</span>efs<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>efm<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> fsExact <span class="op">=</span> y <span class="op">&lt;</span> Rtube <span class="op">?</span> <span class="fl">1.</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> fmExact <span class="op">=</span> fsExact <span class="op">?</span> max<span class="op">(</span>y<span class="op">,</span> <span class="fl">1e-20</span><span class="op">)</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    efs <span class="op">=</span> max <span class="op">(</span>efs<span class="op">,</span> fabs <span class="op">(</span>fs<span class="op">.</span>y<span class="op">[]</span> <span class="op">-</span> fsExact<span class="op">));</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    efm <span class="op">=</span> max <span class="op">(</span>efm<span class="op">,</span> fabs <span class="op">(</span>fmv<span class="op">.</span>y<span class="op">[]</span> <span class="op">-</span> fmExact<span class="op">));</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  foreach_boundary <span class="op">(</span>left<span class="op">,</span> reduction<span class="op">(+:</span>inlet<span class="op">))</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    inlet <span class="op">+=</span> fm<span class="op">.</span>x<span class="op">[]*</span>Delta<span class="op">;</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  foreach_boundary <span class="op">(</span>right<span class="op">,</span> reduction<span class="op">(+:</span>outlet<span class="op">))</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    outlet <span class="op">+=</span> fm<span class="op">.</span>x<span class="op">[</span><span class="dv">1</span><span class="op">]*</span>Delta<span class="op">;</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> exactVolume <span class="op">=</span> L0<span class="op">*</span>sq<span class="op">(</span>Rtube<span class="op">)/</span><span class="fl">2.</span><span class="op">;</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> exactArea <span class="op">=</span> sq<span class="op">(</span>Rtube<span class="op">)/</span><span class="fl">2.</span><span class="op">;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>tube_volume_error <span class="op">=</span> fabs <span class="op">(</span>tubeVolume <span class="op">-</span> exactVolume<span class="op">);</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>inlet_area_error <span class="op">=</span> fabs <span class="op">(</span>inlet <span class="op">-</span> exactArea<span class="op">);</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>outlet_area_error <span class="op">=</span> fabs <span class="op">(</span>outlet <span class="op">-</span> exactArea<span class="op">);</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>cs_error <span class="op">=</span> ecs<span class="op">;</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>fs_error <span class="op">=</span> efs<span class="op">;</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>cm_error <span class="op">=</span> ecm<span class="op">;</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>fm_error <span class="op">=</span> efm<span class="op">;</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">-&gt;</span>solid_fraction_max <span class="op">=</span> fsolid<span class="op">;</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> RegridMetrics measure_state <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  RegridMetrics metrics <span class="op">=</span> <span class="op">{.</span>level_min <span class="op">=</span> <span class="dv">30</span><span class="op">,</span> <span class="op">.</span>mixed_level_min <span class="op">=</span> <span class="dv">30</span><span class="op">};</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> volume <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> mx <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> my <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> px <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> py <span class="op">=</span> <span class="fl">0.</span><span class="op">,</span> ke <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> leaves <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> mixed <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> cut <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> levelMin <span class="op">=</span> <span class="dv">30</span><span class="op">,</span> levelMax <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> mixedMin <span class="op">=</span> <span class="dv">30</span><span class="op">,</span> mixedMax <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(+:</span>volume<span class="op">)</span> reduction<span class="op">(+:</span>mx<span class="op">)</span> reduction<span class="op">(+:</span>my<span class="op">)</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(+:</span>px<span class="op">)</span> reduction<span class="op">(+:</span>py<span class="op">)</span> reduction<span class="op">(+:</span>ke<span class="op">)</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(+:</span>leaves<span class="op">)</span> reduction<span class="op">(+:</span>mixed<span class="op">)</span> reduction<span class="op">(+:</span>cut<span class="op">)</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(</span>min<span class="op">:</span>levelMin<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>levelMax<span class="op">)</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>           reduction<span class="op">(</span>min<span class="op">:</span>mixedMin<span class="op">)</span> reduction<span class="op">(</span>max<span class="op">:</span>mixedMax<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">double</span> element <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>pi<span class="op">*</span>dv<span class="op">();</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">double</span> dispersed <span class="op">=</span> f<span class="op">[]*</span>element<span class="op">;</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">double</span> density <span class="op">=</span> rho<span class="op">(</span>f<span class="op">[]);</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    leaves<span class="op">++;</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    levelMin <span class="op">=</span> min <span class="op">(</span>levelMin<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    levelMax <span class="op">=</span> max <span class="op">(</span>levelMax<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>f<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">1e-6</span> <span class="op">&amp;&amp;</span> f<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span> <span class="op">-</span> <span class="fl">1e-6</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>      mixed<span class="op">++;</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>      mixedMin <span class="op">=</span> min <span class="op">(</span>mixedMin<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>      mixedMax <span class="op">=</span> max <span class="op">(</span>mixedMax<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span><span class="op">)</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>      cut<span class="op">++;</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>    volume <span class="op">+=</span> dispersed<span class="op">;</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>    mx <span class="op">+=</span> x<span class="op">*</span>dispersed<span class="op">;</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>    my <span class="op">+=</span> y<span class="op">*</span>dispersed<span class="op">;</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    px <span class="op">+=</span> density<span class="op">*</span>u<span class="op">.</span>x<span class="op">[]*</span>element<span class="op">;</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>    py <span class="op">+=</span> density<span class="op">*</span>u<span class="op">.</span>y<span class="op">[]*</span>element<span class="op">;</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    ke <span class="op">+=</span> <span class="fl">0.5</span><span class="op">*</span>density<span class="op">*(</span>sq<span class="op">(</span>u<span class="op">.</span>x<span class="op">[])</span> <span class="op">+</span> sq<span class="op">(</span>u<span class="op">.</span>y<span class="op">[]))*</span>element<span class="op">;</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>leaves <span class="op">=</span> leaves<span class="op">;</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>mixed <span class="op">=</span> mixed<span class="op">;</span></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>cut <span class="op">=</span> cut<span class="op">;</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>level_min <span class="op">=</span> levelMin<span class="op">;</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>level_max <span class="op">=</span> levelMax<span class="op">;</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>mixed_level_min <span class="op">=</span> mixed <span class="op">?</span> mixedMin <span class="op">:</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>mixed_level_max <span class="op">=</span> mixed <span class="op">?</span> mixedMax <span class="op">:</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>volume <span class="op">=</span> volume<span class="op">;</span></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>centroid_x <span class="op">=</span> volume <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">?</span> mx<span class="op">/</span>volume <span class="op">:</span> nodata<span class="op">;</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>centroid_y <span class="op">=</span> volume <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">?</span> my<span class="op">/</span>volume <span class="op">:</span> nodata<span class="op">;</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>momentum_x <span class="op">=</span> px<span class="op">;</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>momentum_y <span class="op">=</span> py<span class="op">;</span></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>  metrics<span class="op">.</span>kinetic_energy <span class="op">=</span> ke<span class="op">;</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>  divergence_metrics <span class="op">(&amp;</span>metrics<span class="op">);</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>  geometry_errors <span class="op">(&amp;</span>metrics<span class="op">);</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> metrics<span class="op">;</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> print_metrics <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> stage<span class="op">,</span> RegridMetrics m<span class="op">)</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>  <span class="co">// iter is the global event counter declared by Basilisk&#39;s grid/events.h.</span></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>  printf <span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%ld</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%ld</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%d</span><span class="st">,</span><span class="sc">%ld</span><span class="st">,&quot;</span></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,&quot;</span></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,&quot;</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g</span><span class="st">,</span><span class="sc">%.17g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>          stage<span class="op">,</span> npe<span class="op">(),</span> t<span class="op">,</span> iter<span class="op">,</span> m<span class="op">.</span>leaves<span class="op">,</span> m<span class="op">.</span>level_min<span class="op">,</span> m<span class="op">.</span>level_max<span class="op">,</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>mixed<span class="op">,</span> m<span class="op">.</span>mixed_level_min<span class="op">,</span> m<span class="op">.</span>mixed_level_max<span class="op">,</span> m<span class="op">.</span>cut<span class="op">,</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>volume<span class="op">,</span> m<span class="op">.</span>centroid_x<span class="op">,</span> m<span class="op">.</span>centroid_y<span class="op">,</span></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>momentum_x<span class="op">,</span> m<span class="op">.</span>momentum_y<span class="op">,</span> m<span class="op">.</span>kinetic_energy<span class="op">,</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>tube_volume_error<span class="op">,</span> m<span class="op">.</span>inlet_area_error<span class="op">,</span> m<span class="op">.</span>outlet_area_error<span class="op">,</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>cs_error<span class="op">,</span> m<span class="op">.</span>fs_error<span class="op">,</span> m<span class="op">.</span>cm_error<span class="op">,</span> m<span class="op">.</span>fm_error<span class="op">,</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>solid_fraction_max<span class="op">,</span> m<span class="op">.</span>leaf_flux_divergence_diagnostic<span class="op">,</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>physical_divergence_full_max<span class="op">,</span> m<span class="op">.</span>physical_divergence_cut_max<span class="op">,</span></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>          m<span class="op">.</span>minimum_positive_cm<span class="op">);</span></span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>  fflush <span class="op">(</span>stdout<span class="op">);</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main <span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span> <span class="op">**</span> argv<span class="op">)</span></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>argc <span class="op">!=</span> <span class="dv">8</span> <span class="op">&amp;&amp;</span> argc <span class="op">!=</span> <span class="dv">9</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;usage: </span><span class="sc">%s</span><span class="st"> SNAPSHOT LEVELS RTUBE FILM CA RHO1 RHO2 &quot;</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;[TOLERANCE]</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> argv<span class="op">[</span><span class="dv">0</span><span class="op">]);</span></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>  snapshotFile <span class="op">=</span> argv<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>  TOLERANCE <span class="op">=</span> <span class="fl">1e-4</span><span class="op">;</span></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>parse_increment<span class="op">(</span>argv<span class="op">[</span><span class="dv">2</span><span class="op">],</span> <span class="op">&amp;</span>levelIncrement<span class="op">)</span> <span class="op">||</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">3</span><span class="op">],</span> <span class="op">&amp;</span>Rtube<span class="op">)</span> <span class="op">||</span> <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">4</span><span class="op">],</span> <span class="op">&amp;</span>filmThickness<span class="op">)</span> <span class="op">||</span></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">5</span><span class="op">],</span> <span class="op">&amp;</span>Ca<span class="op">)</span> <span class="op">||</span> <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">6</span><span class="op">],</span> <span class="op">&amp;</span>rho1<span class="op">)</span> <span class="op">||</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>      <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">7</span><span class="op">],</span> <span class="op">&amp;</span>rho2<span class="op">)</span> <span class="op">||</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span>argc <span class="op">==</span> <span class="dv">9</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>parse_double<span class="op">(</span>argv<span class="op">[</span><span class="dv">8</span><span class="op">],</span> <span class="op">&amp;</span>TOLERANCE<span class="op">))</span> <span class="op">||</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>      Rtube <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">||</span> filmThickness <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">||</span> Ca <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">||</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>      rho1 <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">||</span> rho2 <span class="op">&lt;=</span> <span class="fl">0.</span> <span class="op">||</span> TOLERANCE <span class="op">&lt;=</span> <span class="fl">0.</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;FAIL invalid argument</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>  mu1 <span class="op">=</span> mu2 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>  f<span class="op">.</span>sigma <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>  DT <span class="op">=</span> <span class="fl">1e-2</span><span class="op">;</span></span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>  init_grid <span class="op">(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">4</span><span class="op">);</span></span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a>  run<span class="op">();</span></span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> failed<span class="op">;</span></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>event init <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>restore <span class="op">(</span>file <span class="op">=</span> snapshotFile<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>      fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;FAIL cannot restore </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> snapshotFile<span class="op">);</span></span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>    failed <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> restoredMaximumLevel <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>restoredMaximumLevel<span class="op">))</span></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a>    restoredMaximumLevel <span class="op">=</span> max <span class="op">(</span>restoredMaximumLevel<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a>  sourceLevel <span class="op">=</span> restoredMaximumLevel<span class="op">;</span></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a>  targetLevel <span class="op">=</span> sourceLevel <span class="op">+</span> levelIncrement<span class="op">;</span></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>targetLevel <span class="op">&gt;</span> <span class="dv">30</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>      fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;FAIL target level </span><span class="sc">%d</span><span class="st"> is unsupported</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> targetLevel<span class="op">);</span></span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a>    failed <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a>  tube_solid <span class="op">(</span>Rtube<span class="op">);</span></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>  boundary <span class="op">({</span>f<span class="op">,</span> u<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">,</span> cm<span class="op">,</span> fm<span class="op">});</span></span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>  rebuild_face_flux<span class="op">();</span></span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;stage,ranks,t,iter,leaves,level_min,level_max,mixed,&quot;</span></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;mixed_level_min,mixed_level_max,cut,volume,centroid_x,centroid_y,&quot;</span></span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;momentum_x,momentum_y,kinetic_energy,tube_volume_error,&quot;</span></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;inlet_area_error,outlet_area_error,cs_error,fs_error,cm_error,&quot;</span></span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;fm_error,solid_fraction_max,leaf_flux_divergence_diagnostic,&quot;</span></span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;physical_divergence_full_max,physical_divergence_cut_max,&quot;</span></span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;minimum_positive_cm</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;# source_level=</span><span class="sc">%d</span><span class="st"> target_level=</span><span class="sc">%d</span><span class="st"> L0=</span><span class="sc">%.17g</span><span class="st"> &quot;</span></span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Rtube=</span><span class="sc">%.17g</span><span class="st"> film=</span><span class="sc">%.17g</span><span class="st"> Ca=</span><span class="sc">%.17g</span><span class="st"> rho1=</span><span class="sc">%.17g</span><span class="st"> rho2=</span><span class="sc">%.17g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>             sourceLevel<span class="op">,</span> targetLevel<span class="op">,</span> L0<span class="op">,</span> Rtube<span class="op">,</span> filmThickness<span class="op">,</span> Ca<span class="op">,</span></span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a>             rho1<span class="op">,</span> rho2<span class="op">);</span></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a>  print_metrics <span class="op">(</span><span class="st">&quot;restored&quot;</span><span class="op">,</span> measure_state<span class="op">());</span></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> front <span class="op">=</span> <span class="op">-</span>HUGE<span class="op">,</span> rear <span class="op">=</span> HUGE<span class="op">;</span></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>  scalar xpos<span class="op">[];</span></span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a>  position <span class="op">(</span>f<span class="op">,</span> xpos<span class="op">,</span> <span class="op">{</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">});</span></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a>  front <span class="op">=</span> statsf<span class="op">(</span>xpos<span class="op">).</span>max<span class="op">;</span></span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a>  rear <span class="op">=</span> statsf<span class="op">(</span>xpos<span class="op">).</span>min<span class="op">;</span></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!(</span>front <span class="op">&gt;</span> rear<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a>      fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;FAIL cannot reconstruct interface tips</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a>    failed <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> wall0 <span class="op">=</span> rear <span class="op">-</span> Rtube<span class="op">,</span> wall1 <span class="op">=</span> front <span class="op">+</span> Rtube<span class="op">;</span></span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> band <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>filmThickness<span class="op">;</span></span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a>  tube_refinement_geometry_begin<span class="op">();</span></span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a>  refine <span class="op">((</span>level <span class="op">&lt;</span> targetLevel <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>           f<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">1e-6</span> <span class="op">&amp;&amp;</span> f<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span> <span class="op">-</span> <span class="fl">1e-6</span><span class="op">)</span> <span class="op">||</span></span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span>level <span class="op">&lt;</span> targetLevel <span class="op">&amp;&amp;</span> cs<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">0.</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a>           x <span class="op">&gt;</span> wall0 <span class="op">&amp;&amp;</span> x <span class="op">&lt;</span> wall1 <span class="op">&amp;&amp;</span> y <span class="op">+</span> Delta<span class="op">/</span><span class="fl">2.</span> <span class="op">&gt;</span> Rtube <span class="op">-</span> band<span class="op">));</span></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>  tube_refinement_geometry_end<span class="op">();</span></span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a>  embed_axi_metric_sync<span class="op">();</span></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>  vof_solid_cleanup <span class="op">(</span>f<span class="op">);</span></span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>  boundary <span class="op">({</span>f<span class="op">,</span> u<span class="op">,</span> cs<span class="op">,</span> fs<span class="op">,</span> cm<span class="op">,</span> fm<span class="op">});</span></span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>  rebuild_face_flux<span class="op">();</span></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>  print_metrics <span class="op">(</span><span class="st">&quot;regridded_pre_projection&quot;</span><span class="op">,</span> measure_state<span class="op">());</span></span></code></pre></div></div>
+                <p><code>dt = 1</code> makes the multilevel projection
+                residual directly comparable with
+                <code>TOLERANCE</code>. The direct leaf divergence and
+                its physical value divided by <code>cm</code> remain
+                useful AMR diagnostics, but are not the convergence norm
+                used by Basilisk’s tree Poisson operator.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> projectionDt <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  mgstats projection <span class="op">=</span> project <span class="op">(</span>uf<span class="op">,</span> p<span class="op">,</span> alpha<span class="op">,</span> projectionDt<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  RegridMetrics projected <span class="op">=</span> measure_state<span class="op">();</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  print_metrics <span class="op">(</span><span class="st">&quot;regridded_post_projection&quot;</span><span class="op">,</span> projected<span class="op">);</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> achieved <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  foreach <span class="op">(</span>reduction<span class="op">(</span>max<span class="op">:</span>achieved<span class="op">))</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>f<span class="op">[]</span> <span class="op">&gt;</span> <span class="fl">1e-6</span> <span class="op">&amp;&amp;</span> f<span class="op">[]</span> <span class="op">&lt;</span> <span class="fl">1.</span> <span class="op">-</span> <span class="fl">1e-6</span><span class="op">)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      achieved <span class="op">=</span> max <span class="op">(</span>achieved<span class="op">,</span> level<span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;# standalone_projection dt=</span><span class="sc">%g</span><span class="st"> resb=</span><span class="sc">%.17g</span><span class="st"> resa=</span><span class="sc">%.17g</span><span class="st"> &quot;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;iterations=</span><span class="sc">%d</span><span class="st"> nrelax=</span><span class="sc">%d</span><span class="st"> target=</span><span class="sc">%d</span><span class="st"> mixed_max=</span><span class="sc">%d</span><span class="st"> &quot;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;post_leaf_flux_divergence=</span><span class="sc">%.17g\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>             projectionDt<span class="op">,</span> projection<span class="op">.</span>resb<span class="op">,</span> projection<span class="op">.</span>resa<span class="op">,</span> projection<span class="op">.</span>i<span class="op">,</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>             projection<span class="op">.</span>nrelax<span class="op">,</span> targetLevel<span class="op">,</span> achieved<span class="op">,</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>             projected<span class="op">.</span>leaf_flux_divergence_diagnostic<span class="op">);</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">double</span> roundoffAllowance <span class="op">=</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="fl">64.</span><span class="op">*</span>DBL_EPSILON<span class="op">*</span>max <span class="op">(</span><span class="fl">1.</span><span class="op">,</span> projection<span class="op">.</span>resa<span class="op">);</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">bool</span> fieldsFinite <span class="op">=</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    isfinite <span class="op">(</span>projected<span class="op">.</span>volume<span class="op">)</span> <span class="op">&amp;&amp;</span> isfinite <span class="op">(</span>projected<span class="op">.</span>centroid_x<span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    isfinite <span class="op">(</span>projected<span class="op">.</span>centroid_y<span class="op">)</span> <span class="op">&amp;&amp;</span> isfinite <span class="op">(</span>projected<span class="op">.</span>momentum_x<span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    isfinite <span class="op">(</span>projected<span class="op">.</span>momentum_y<span class="op">)</span> <span class="op">&amp;&amp;</span> isfinite <span class="op">(</span>projected<span class="op">.</span>kinetic_energy<span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    isfinite <span class="op">(</span>projected<span class="op">.</span>leaf_flux_divergence_diagnostic<span class="op">);</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">bool</span> geometryOK <span class="op">=</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>tube_volume_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>inlet_area_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>outlet_area_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>cs_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span> projected<span class="op">.</span>fs_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>cm_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span> projected<span class="op">.</span>fm_error <span class="op">&lt;=</span> <span class="fl">5e-12</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    projected<span class="op">.</span>solid_fraction_max <span class="op">==</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="dt">const</span> <span class="dt">bool</span> projectionOK <span class="op">=</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    isfinite <span class="op">(</span>projection<span class="op">.</span>resb<span class="op">)</span> <span class="op">&amp;&amp;</span> isfinite <span class="op">(</span>projection<span class="op">.</span>resa<span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    projection<span class="op">.</span>resa <span class="op">&lt;=</span> TOLERANCE <span class="op">+</span> roundoffAllowance<span class="op">;</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>achieved <span class="op">!=</span> targetLevel <span class="op">||</span> <span class="op">!</span>fieldsFinite <span class="op">||</span> <span class="op">!</span>geometryOK <span class="op">||</span> <span class="op">!</span>projectionOK<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>      fprintf <span class="op">(</span>stderr<span class="op">,</span> <span class="st">&quot;FAIL regrid/projection predicate: tolerance=</span><span class="sc">%.17g</span><span class="st"> &quot;</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;roundoff_allowance=</span><span class="sc">%.17g\n</span><span class="st">&quot;</span><span class="op">,</span> TOLERANCE<span class="op">,</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>               roundoffAllowance<span class="op">);</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    failed <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="../assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/bretherton-drops-bubbles/edit/main/testCases/regridTube.c" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> Edit this page
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>

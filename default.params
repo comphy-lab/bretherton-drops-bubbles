@@ -16,3 +16,22 @@ travelR=8       # bubble advance in units of R; sets tmax = travelR/Ca
                 # tmax and tsnap derive from travelR and Ca unless set here
 tRamp=1        # inlet ramp time
 dtmax=0.01
+
+# Deposited central-film convergence; distances use the radius R above.
+advWin=0.25
+advMin=1
+convHold=3
+bTol=0.002      # relative change between successive window-averaged films
+speedTol=0.02   # relative change of front speed between windows
+shapeTol=0.02   # front/rear/centroid speed agreement and relative length drift
+requireShapeSteady=true
+filmBins=128
+filmCoverage=0.95
+filmFlatTol=0.05
+freshFracMin=0.98
+filmCells=4     # measured minimum cells across the film; 0 disables this gate
+filmMinLevel=0 # optional mesh floor over the interface and wall-facing film
+solverTol=0.0001
+# filmSampleDt derives from tsnap and advWin unless explicitly set.
+# For a refined restart, set freshFront to the seed front position and
+# regridBurnR to the required settling distance. Restart windows start empty.

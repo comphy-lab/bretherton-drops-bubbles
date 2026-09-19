@@ -499,6 +499,11 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 tube wall of radius <code>Rtube</code> (fluid at
                 <code>y &lt; Rtube</code>) and synchronise the
                 metric.</li>
+                <li><code>tube_refinement_geometry_begin()</code> /
+                <code>tube_refinement_geometry_end()</code>: bracket an
+                explicit <code>refine()</code> of a fixed tube,
+                repairing MPI coarse/ghost geometry while leaving
+                solution-field transfer operators unchanged.</li>
                 <li><code>vof_solid_cleanup(f)</code>: clamp
                 <code>f</code> and reset it to the continuous phase in
                 full-solid cells; call after
@@ -506,7 +511,7 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 </ul>
                 <div class="code-block-container"><div class="code-block-container"><pre
                 class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifndef EMBED_VOF_TUBE_H</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define EMBED_VOF_TUBE_H</span><span class="dv">52</span><span class="pp"></span><span class="dv">53</span><span class="pp"></span></span></code></pre></div></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define EMBED_VOF_TUBE_H</span><span class="dv">55</span><span class="pp"></span><span class="dv">56</span><span class="pp"></span></span></code></pre></div></div>
                 <h3
                 id="embed_axi_metric_sync">embed_axi_metric_sync()</h3>
                 <p>Recomputes the metric fields from the current
@@ -582,6 +587,58 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  solid <span class="op">(</span>cs<span class="op">,</span> fs<span class="op">,</span> Rtube <span class="op">-</span> y<span class="op">);</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  embed_axi_metric_sync<span class="op">();</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
+                <h3
+                id="exact-tube-geometry-during-explicit-tree-refinement">Exact
+                tube geometry during explicit tree refinement</h3>
+                <p>When a dump is restored with a different MPI
+                decomposition, coarse/ghost <code>cs</code> and
+                <code>fs</code> storage can be stale even when every
+                active leaf has the correct straight-wall geometry.
+                <code>refine_embed_linear()</code> legitimately requires
+                those coarse neighbours while prolongating pressure and
+                velocity. The callback below repairs the complete 3-by-3
+                coarse stencil of each parent before its children are
+                created, then gives the children their exact tube
+                fraction.</p>
+                <p>Bracket only explicit fixed-tube
+                <code>refine()</code> calls with the begin/end pair. The
+                standard embedded fraction operator is restored
+                immediately afterwards; solution-field and momentum
+                operators are never replaced. Follow the end call with
+                <code>embed_axi_metric_sync()</code> and the usual VOF
+                solid cleanup.</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE &amp;&amp; AXI &amp;&amp; EMBED</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> tube_fraction_refine_exact <span class="op">(</span>Point point<span class="op">,</span> scalar field<span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">1</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;=</span> <span class="dv">1</span><span class="op">;</span> j<span class="op">++)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>allocated<span class="op">(</span>i<span class="op">,</span>j<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">double</span> radius <span class="op">=</span> y <span class="op">+</span> j<span class="op">*</span>Delta<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        cs<span class="op">[</span>i<span class="op">,</span>j<span class="op">]</span> <span class="op">=</span> clamp<span class="op">((</span>tube_metric_radius <span class="op">-</span> radius<span class="op">)/</span>Delta <span class="op">+</span> <span class="fl">.5</span><span class="op">,</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        fs<span class="op">.</span>x<span class="op">[</span>i<span class="op">,</span>j<span class="op">]</span> <span class="op">=</span> cs<span class="op">[</span>i<span class="op">,</span>j<span class="op">];</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        fs<span class="op">.</span>y<span class="op">[</span>i<span class="op">,</span>j<span class="op">]</span> <span class="op">=</span> radius <span class="op">-</span> Delta<span class="op">/</span><span class="fl">2.</span> <span class="op">&lt;</span> tube_metric_radius <span class="op">?</span> <span class="fl">1.</span> <span class="op">:</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  foreach_child<span class="op">()</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    field<span class="op">[]</span> <span class="op">=</span> clamp<span class="op">((</span>tube_metric_radius <span class="op">-</span> y<span class="op">)/</span>Delta <span class="op">+</span> <span class="fl">.5</span><span class="op">,</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> tube_refinement_geometry_begin <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE &amp;&amp; AXI &amp;&amp; EMBED</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  assert <span class="op">(</span>tube_metric_radius <span class="op">&gt;</span> <span class="fl">0.</span><span class="op">);</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  cs<span class="op">.</span>refine <span class="op">=</span> cs<span class="op">.</span>prolongation <span class="op">=</span> tube_fraction_refine_exact<span class="op">;</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> tube_refinement_geometry_end <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="pp">#if TREE &amp;&amp; AXI &amp;&amp; EMBED</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  cs<span class="op">.</span>refine <span class="op">=</span> embed_fraction_refine<span class="op">;</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  cs<span class="op">.</span>prolongation <span class="op">=</span> fraction_refine<span class="op">;</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></div>
                 <h3 id="vof_solid_cleanup">vof_solid_cleanup()</h3>
                 <p>Enforces the continuous-phase value
                 <code>f = 0</code> in full-solid cells and clamps
@@ -594,19 +651,19 @@ window.baseDomain = "https://comphy-lab.org/bretherton-drops-bubbles";
                 phase at <code>c = 1</code>).</li>
                 </ul>
                 <div class="code-block-container"><div class="code-block-container"><pre
-                class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> vof_solid_cleanup <span class="op">(</span>scalar c<span class="op">)</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(EMBED)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&lt;=</span> <span class="fl">0.</span><span class="op">)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    else</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> clamp <span class="op">(</span>c<span class="op">[],</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div></div>
+                class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> vof_solid_cleanup <span class="op">(</span>scalar c<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#if defined(EMBED)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  foreach<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>cs<span class="op">[]</span> <span class="op">&lt;=</span> <span class="fl">0.</span><span class="op">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    else</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      c<span class="op">[]</span> <span class="op">=</span> clamp <span class="op">(</span>c<span class="op">[],</span> <span class="fl">0.</span><span class="op">,</span> <span class="fl">1.</span><span class="op">);</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div></div>
             </div>
         </main>
 

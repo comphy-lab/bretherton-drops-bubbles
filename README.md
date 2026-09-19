@@ -43,6 +43,13 @@ Case output defaults to `simulationCases/<CaseNo>/`. Set `OUTPUT_ROOT` to a
 separate run directory for production calculations. Each case contains its
 parameters, source, executable, diagnostic log, `restart` dump and
 `intermediate/snapshot-*` files. An existing restart resumes that case.
+Success requires stable deposited central-film measurements and, by default,
+agreement of the front, rear and centroid speeds. Reaching `tmax` or the
+outlet buffer returns an explicit incomplete status with a nonzero exit code.
+For a refined restart, use a separate case directory containing a copy of the
+seed dump, set `freshFront` to its front position, and specify `regridBurnR`.
+Changing `Ldomain` while restoring a dump is rejected; start a fresh case to
+change the domain length.
 
 For a single-node MPI allocation, `--pe-list 0,1,2,3` can replace the rankfile
 when those are the allocated Open MPI core indices. Set `MPIEXEC` to select

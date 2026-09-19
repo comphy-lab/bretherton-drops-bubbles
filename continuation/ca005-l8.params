@@ -1,0 +1,26 @@
+# Co-moving prototype station: Ca_in=0.05, MAXlevel 8 on L0=8 (Delta = 8/2^8).
+# Parent comparison: L0=16 level 9 has the same Delta.
+CaseNo=1000
+MAXlevel=8
+MINlevel=4
+Ca=0.05
+La=1
+muR=0.01
+rhoR=0.001
+Rtube=0.7
+Rb0frac=0.8
+xRear=1.05
+Ldomain=8
+tmax=600
+tsnap=2
+tRamp=1
+dtmax=0.01
+outlet=poiseuille
+tau=1
+wRenew=0.5
+burnRenew=1.0
+convHold=3
+bTol=0.002
+speedTol=0.02
+posTol=0.02
+filmCells=4

@@ -661,20 +661,23 @@ event init (t = 0)
         cm[] = y;
 #endif
     vof_solid_cleanup (f);
-    tStart = t;
+    // The global clock is not yet the restored time inside this event, so the
+    // ramp origin is taken from the first time step (see frameControl).
+    tStart = -1.;
     double tt, U, dUdt, target, disp, fresh;
-    // A frame-state file belongs to this case directory (continuation
-    // stations never copy it); its clock must sit within one snapshot of the
-    // restored dump, not match it to the last bit.
-    if (read_frame_state (&tt, &U, &dUdt, &target, &disp, &fresh) &&
-        fabs (tt - t) <= tsnap) {
+    // A frame-state file belongs to this case directory: continuation
+    // stations never copy it, so its presence identifies a same-case resume.
+    if (read_frame_state (&tt, &U, &dUdt, &target, &disp, &fresh)) {
       // same-case resume: keep the frame exactly where the dump left it
       comoving_frame_init (&frame, U, target, tau, prescribedU);
       frame.dUdt = dUdt;
       frame.displacement = disp;
       freshFront = fresh;
-      tStart = t - tRamp;   // no new ramp on a same-case resume
-      CaPrev = Ca;
+      CaPrev = Ca;          // no new ramp on a same-case resume
+      if (pid() == 0)
+        fprintf (ferr, "# same-case resume: t=%g U=%g dUdt=%g target=%g "
+                 "displacement=%g freshFront=%g\n", tt, U, dUdt, target, disp,
+                 fresh);
     }
     else if (pid() == 0)
       fprintf (ferr, "# continuation seed: Uframe0=%g xTarget=%g CaPrev=%g "
@@ -716,6 +719,8 @@ event init (t = 0)
 /** Frame controller: runs before the solver's `last` events each step. */
 event frameControl (i++)
 {
+  if (tStart < 0.)
+    tStart = t;   // first step after a restore: the clock is now restored
   double xc = bubble_centroid();
   comoving_frame_update (&frame, xc, t);
 }
@@ -939,7 +944,7 @@ event logWriting (i++)
     return 1;
   }
 
-  if (centralOK && t - tStart >= tRamp && frame.U > 0.) {
+  if (centralOK && tStart >= 0. && t - tStart >= tRamp && frame.U > 0.) {
     RenewalSample s = {
       .time = t, .film = latestFilmMeasurement.film, .U = frame.U,
       .xc = centroid, .length = xTipF - xTipR, .error = frame.error,

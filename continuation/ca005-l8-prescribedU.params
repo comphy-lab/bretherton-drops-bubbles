@@ -1,6 +1,9 @@
+# V2 Galilean-invariance check: same as ca005-l8 but the frame speed is prescribed at
+# half the expected bubble speed, so the bubble drifts through the window. The steady
+# film and Ca_b must agree with the controlled station; the observer stops on drift.
 # Co-moving prototype station: Ca_in=0.05, MAXlevel 8 on L0=8 (Delta = 8/2^8).
 # Parent comparison: L0=16 level 9 has the same Delta.
-CaseNo=1000
+CaseNo=1010
 MAXlevel=8
 MINlevel=4
 Ca=0.05
@@ -17,10 +20,12 @@ tRamp=1
 dtmax=0.01
 outlet=poiseuille
 tau=1
+prescribedU=true
+Uframe0=0.034
 wRenew=0.5
 burnRenew=1.0
 convHold=3
 bTol=0.002
 speedTol=0.02
 posTol=0.02
-filmCells=3
+filmCells=4

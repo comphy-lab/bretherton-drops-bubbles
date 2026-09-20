@@ -20,4 +20,4 @@ convHold=3
 bTol=0.002
 speedTol=0.02
 posTol=0.02
-filmCells=2
+filmCells=1.5

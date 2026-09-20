@@ -818,9 +818,31 @@ static void json_number (FILE * fp, const char * key, double value,
     fprintf (fp, "  \"%s\": null%s\n", key, tail);
 }
 
-/** Writes the station receipt and the interface polyline. */
+/**
+Writes the interface facets. `output_facets()` reconstructs normals through
+the height functions, whose boundary exchange is an MPI collective, so every
+rank must call it. Each rank writes its own file (`interface.dat` for a serial
+or OpenMP run, `interface-<rank>.dat` under MPI); the post-processor
+concatenates them. Calling it on rank 0 alone left the other ranks in
+finalisation and all of them busy-polling forever. */
+static void write_interface (void)
+{
+  char name[64];
+  if (npe() > 1)
+    sprintf (name, "interface-%d.dat", pid());
+  else
+    sprintf (name, "interface.dat");
+  FILE * fi = fopen (name, "w");
+  if (fi) {
+    output_facets (f, fi);
+    fclose (fi);
+  }
+}
+
+/** Writes the station receipt (rank 0) after the collective facet output. */
 static void write_station (const char * status, RenewalWindow * w)
 {
+  write_interface();
   if (pid() != 0)
     return;
   FILE * fp = fopen ("station.json", "w");
@@ -861,11 +883,6 @@ static void write_station (const char * status, RenewalWindow * w)
   json_number (fp, "m", mobility, "");
   fprintf (fp, "}\n");
   fclose (fp);
-  FILE * fi = fopen ("interface.dat", "w");
-  if (fi) {
-    output_facets (f, fi);
-    fclose (fi);
-  }
 }
 
 event logWriting (i++)

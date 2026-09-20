@@ -44,6 +44,25 @@ class LadderTests(unittest.TestCase):
         self.assertEqual(p["MAXlevel"], "9")
         self.assertGreater(float(p["tmax"]), 250.0)
 
+    def test_ca_in_from_bubble_speed_matches_identity(self):
+        cab = 0.068
+        ca = rc.ca_in_for_bubble_speed(cab)
+        h = rc.aussillous_quere(cab)
+        self.assertAlmostEqual(cab / ca, 1.0 / (1.0 - h) ** 2, places=12)
+        self.assertLess(ca, cab)
+
+    def test_predicted_film_cells_scales_with_level(self):
+        c8 = rc.predicted_film_cells(0.068, 0.7, 8.0, 8)
+        c9 = rc.predicted_film_cells(0.068, 0.7, 8.0, 9)
+        self.assertAlmostEqual(c9, 2 * c8)
+        self.assertGreater(c8, 3.0)
+
+    def test_fresh_station_seeds_capsule_from_aq(self):
+        p = rc.plan_station({"Rtube": "0.7", "Ldomain": "16"}, case_no=1, ca=0.05,
+                            seed=None, maxlevel=9, renewals=6, ca_b_target=0.068)
+        self.assertAlmostEqual(float(p["Rb0frac"]), 1 - rc.aussillous_quere(0.068), places=5)
+        self.assertGreater(float(p["tmax"]), 100)
+
     def test_receipt_and_log_parsing(self):
         tmp = Path(self._testMethodName)
         tmp.mkdir(exist_ok=True)

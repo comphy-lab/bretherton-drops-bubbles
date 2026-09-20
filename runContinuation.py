@@ -92,6 +92,33 @@ def last_log_row(case_dir: Path, case_no: int) -> dict | None:
     return dict(zip(header, last))
 
 
+def aussillous_quere(ca_b: float) -> float:
+    """h/Rtube = 1.34 Ca_b^(2/3) / (1 + 2.5 * 1.34 Ca_b^(2/3))."""
+    x = 1.34 * ca_b ** (2.0 / 3.0)
+    return x / (1.0 + 2.5 * x)
+
+
+def ca_in_for_bubble_speed(ca_b: float) -> float:
+    """Inlet Ca that gives bubble speed ``ca_b`` under the stagnant-film identity.
+
+    ``Ca_b / Ca_in = (Rt/(Rt - h))^2`` with ``h/Rt`` from Aussillous-Quere, so
+    ``Ca_in = Ca_b (1 - h/Rt)^2``. The measured ``Ca_b`` is an output; this only
+    places the stations.
+    """
+    return ca_b * (1.0 - aussillous_quere(ca_b)) ** 2
+
+
+def predicted_film_cells(ca_b: float, rtube: float, ldomain: float, maxlevel: int) -> float:
+    """Aussillous-Quere film thickness in cells of the finest level."""
+    return aussillous_quere(ca_b) * rtube / (ldomain / 2 ** maxlevel)
+
+
+def bubble_length(ca_b: float, rtube: float) -> float:
+    """Axial length of the volume-matched capsule seeded at the AQ film."""
+    rb = rtube * (1.0 - aussillous_quere(ca_b))
+    return 2.0 * rb + (4.0 / 3.0) * (1.0 / rb ** 2 - rb)
+
+
 def geometric_ladder(start: float, stop: float, factor: float) -> list[float]:
     if start <= 0 or stop <= 0 or factor <= 1:
         raise ValueError("start, stop must be positive and factor > 1")
@@ -109,17 +136,22 @@ def geometric_ladder(start: float, stop: float, factor: float) -> list[float]:
 
 def plan_station(base: dict[str, str], *, case_no: int, ca: float,
                  seed: dict | None, maxlevel: int | None,
-                 renewals: float) -> dict[str, str]:
+                 renewals: float, ca_b_target: float | None = None) -> dict[str, str]:
     """Parameters for one station given the seed receipt (or None)."""
     values = dict(base)
     values["CaseNo"] = str(case_no)
     values["Ca"] = f"{ca:.12g}"
     if maxlevel is not None:
         values["MAXlevel"] = str(maxlevel)
+    rtube = float(values.get("Rtube", 0.7))
+    ca_b_guess = ca_b_target if ca_b_target else ca
     if seed is None:
         values["CaPrev"] = "0"
         values.pop("Uframe0", None)
         values.pop("xTarget", None)
+        # seed the capsule at the Aussillous-Quere film so the transient is short
+        values["Rb0frac"] = f"{1.0 - aussillous_quere(ca_b_guess):.6f}"
+        values["tmax"] = f"{renewals * bubble_length(ca_b_guess, rtube) / ca_b_guess:.6g}"
         return values
     # The dumped velocity field lives in the seed's frame, so the new station
     # must start with exactly the seed frame speed; the controller does the rest.
@@ -135,9 +167,17 @@ def plan_station(base: dict[str, str], *, case_no: int, ca: float,
 
 
 def run_station(case_dir: Path, params: Path, *, exec_name: str, threads: int,
-                output_root: Path, dry_run: bool) -> int:
-    cmd = ["bash", str(RUNNER), str(params), "--exec", exec_name,
-           "--threads", str(threads)]
+                output_root: Path, dry_run: bool, ranks: int = 0,
+                pe_list: str | None = None, rankfile: str | None = None) -> int:
+    cmd = ["bash", str(RUNNER), str(params), "--exec", exec_name]
+    if ranks:
+        cmd += ["--ranks", str(ranks)]
+        if rankfile:
+            cmd += ["--rankfile", rankfile]
+        elif pe_list:
+            cmd += ["--pe-list", pe_list]
+    else:
+        cmd += ["--threads", str(threads)]
     env = dict(os.environ, OUTPUT_ROOT=str(output_root))
     print("RUN", " ".join(cmd), flush=True)
     if dry_run:
@@ -154,6 +194,15 @@ def main(argv: list[str] | None = None) -> int:
                         help="base parameter file for every station")
     parser.add_argument("--ca", type=float, nargs="*", default=None,
                         help="explicit Ca_in stations in ladder order")
+    parser.add_argument("--ca-b", type=float, nargs="*", default=None,
+                        help="target bubble speeds in ladder order; converted to Ca_in "
+                             "through the stagnant-film identity with the AQ film")
+    parser.add_argument("--min-film-cells", type=float, default=0.0,
+                        help="skip (and record) stations whose AQ film spans fewer cells "
+                             "than this at the station's MAXlevel")
+    parser.add_argument("--ranks", type=int, default=0, help="MPI ranks (0 = OpenMP)")
+    parser.add_argument("--pe-list", default=None)
+    parser.add_argument("--rankfile", default=None)
     parser.add_argument("--ca-start", type=float)
     parser.add_argument("--ca-stop", type=float)
     parser.add_argument("--factor", type=float, default=1.5)
@@ -172,7 +221,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
-    if args.ca:
+    targets: dict[float, float] = {}
+    if args.ca_b:
+        stations = []
+        for cab in args.ca_b:
+            ca = ca_in_for_bubble_speed(cab)
+            stations.append(ca)
+            targets[ca] = cab
+    elif args.ca:
         stations = list(args.ca)
     elif args.ca_start and args.ca_stop:
         stations = geometric_ladder(args.ca_start, args.ca_stop, args.factor)
@@ -205,6 +261,23 @@ def main(argv: list[str] | None = None) -> int:
     exit_code = 0
     while pending:
         ca = pending[0]
+        cab_target = targets.get(ca)
+        level = args.maxlevel or int(base.get("MAXlevel", 10))
+        ldom = float(base.get("Ldomain", 8.0)); rt = float(base.get("Rtube", 0.7))
+        cells = predicted_film_cells(cab_target or ca, rt, ldom, level)
+        if args.min_film_cells > 0 and cells < args.min_film_cells:
+            row = {"status": "SKIPPED_UNRESOLVED", "Ca_in": ca, "Ca_b_target": cab_target,
+                   "MAXlevel": level, "Ldomain": ldom, "predicted_film_cells": cells,
+                   "route": "skipped", "seed_case": None, "case_dir": None}
+            ledger["results"] = [r for r in ledger["results"]
+                                 if not (math.isclose(float(r["Ca_in"]), ca, rel_tol=1e-9)
+                                         and r.get("MAXlevel") == level)]
+            ledger["results"].append(row)
+            save_ledger(ledger_path, ledger)
+            print(f"SKIP Ca_in={ca:g} (Ca_b~{cab_target}): AQ film spans {cells:.2f} cells "
+                  f"< {args.min_film_cells} at level {level}", flush=True)
+            pending.pop(0)
+            continue
         case_dir = output_root / str(case_no)
         receipt = read_receipt(case_dir)
         route = "fresh" if seed is None else "continuation"
@@ -220,7 +293,8 @@ def main(argv: list[str] | None = None) -> int:
             if seed_dir is not None:
                 shutil.copy2(seed_dir / "restart", case_dir / "restart")
             params = plan_station(base, case_no=case_no, ca=ca, seed=seed,
-                                  maxlevel=args.maxlevel, renewals=args.renewals)
+                                  maxlevel=args.maxlevel, renewals=args.renewals,
+                                  ca_b_target=cab_target)
             params_path = output_root / f"station-{case_no}.params"
             write_params(params_path, params,
                          f"station CaseNo {case_no}: Ca_in={ca:g} route={route} "
@@ -228,7 +302,8 @@ def main(argv: list[str] | None = None) -> int:
             started = time.time()
             code = run_station(case_dir, params_path, exec_name=args.exec_name,
                                threads=args.threads, output_root=output_root,
-                               dry_run=args.dry_run)
+                               dry_run=args.dry_run, ranks=args.ranks,
+                               pe_list=args.pe_list, rankfile=args.rankfile)
             wall = time.time() - started
             if args.dry_run:
                 receipt = {"status": "DRY_RUN", "Ca_in": ca, "U": seed["U"] if seed else 0.0,
@@ -246,6 +321,8 @@ def main(argv: list[str] | None = None) -> int:
             receipt["deltaTail"] = float(row["deltaTail"])
             receipt["minCells"] = float(row["minCells"])
         receipt["route"] = route
+        receipt["Ca_b_target"] = cab_target
+        receipt["predicted_film_cells"] = cells
         receipt["seed_case"] = seed_dir.name if seed_dir else None
         receipt["case_dir"] = str(case_dir)
         ledger["results"] = [r for r in ledger["results"]
@@ -272,6 +349,8 @@ def main(argv: list[str] | None = None) -> int:
             mid = math.sqrt(float(seed["Ca_in"]) * ca)
             print(f"HALVING step: inserting Ca_in={mid:g} before {ca:g}", flush=True)
             pending.insert(0, mid)
+            if cab_target:
+                targets[mid] = math.sqrt(float(seed.get("Ca_b_target") or seed["Ca_b"]) * cab_target)
         case_no += 1
     return exit_code
 

@@ -1,0 +1,23 @@
+# Ca ladder base for the co-moving window at MAXlevel 10 on L0=16 (Delta = 1/64).
+# Per-station CaseNo, Ca, CaPrev, Uframe0, xTarget, Rb0frac and tmax are written
+# by runContinuation.py. Physical parameters follow the parent bubble defaults.
+MAXlevel=10
+MINlevel=4
+La=1
+muR=0.01
+rhoR=0.001
+Rtube=0.7
+xRear=1.05
+Ldomain=16
+tsnap=2
+tRamp=1
+dtmax=0.01
+outlet=poiseuille
+tau=1
+wRenew=0.5
+burnRenew=1.0
+convHold=3
+bTol=0.002
+speedTol=0.02
+posTol=0.02
+filmCells=2

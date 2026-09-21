@@ -180,6 +180,47 @@ def draw_panel(ax, d, seg, case, limits, xlo, xhi, equal):
         sp.set_visible(False)
 
 
+def render_single(item, case, limits, outdir):
+    """One panel: the whole window at true aspect.
+
+    For a co-moving case the domain *is* the travelling window, so the
+    two-row layout of the lab-frame video (whole domain above, moving
+    window below) collapses to a single panel. The wall is rigid and the
+    limits are fixed, so its pixels never move between frames.
+    """
+    idx, snapshot, tval = item
+    dest = os.path.join(outdir, f"frame-{idx:05d}.png")
+    seg = facets(snapshot)
+    if len(seg) == 0:
+        return None
+    Rt, Ld = case["Rtube"], case["Ldomain"]
+    d = fields(snapshot, 0.0, Ld, Rt, case["ny"], case["muR"])
+    if d is None:
+        return None
+    panel_w = 17.0 * (0.88 - 0.03)
+    panel_h = panel_w * (2.0 * Rt * 1.06) / Ld
+    fig_h = panel_h + 1.35
+    fig = plt.figure(figsize=(17, fig_h))
+    ax = fig.add_axes([0.03, 0.30 / fig_h, 0.85, panel_h / fig_h])
+    draw_panel(ax, d, seg, case, limits, 0.0, Ld, equal=True)
+    fig.suptitle(rf"$Ca_{{in}} = {case['Ca']}$,  MAXlevel {case['MAXlevel']},  "
+                 rf"$t = {tval:.2f}$", fontsize=21, y=1.0 - 0.22 / fig_h)
+    imv = plt.cm.ScalarMappable(cmap="Blues",
+                                norm=plt.Normalize(limits["vmin"], limits["vmax"]))
+    imd = plt.cm.ScalarMappable(cmap="hot_r",
+                                norm=plt.Normalize(limits["dmin"], limits["dmax"]))
+    lo, hgt = 0.30 / fig_h, panel_h / fig_h
+    cbv = fig.colorbar(imv, cax=fig.add_axes([0.905, lo + 0.52 * hgt, 0.012, 0.46 * hgt]))
+    cbd = fig.colorbar(imd, cax=fig.add_axes([0.905, lo + 0.02 * hgt, 0.012, 0.46 * hgt]))
+    cbv.set_label(r"$|u|$", fontsize=17, labelpad=9)
+    cbd.set_label(r"$\log_{10}(\mu\,D\!:\!D)$", fontsize=17, labelpad=9)
+    for cb in (cbv, cbd):
+        cb.ax.tick_params(labelsize=12)
+    fig.savefig(dest, dpi=105)
+    plt.close(fig)
+    return dest
+
+
 def render(item, case, limits, outdir):
     idx, snapshot, tval = item
     dest = os.path.join(outdir, f"frame-{idx:05d}.png")
@@ -257,6 +298,9 @@ def main():
                     help="radial samples across the full domain")
     ap.add_argument("--window", type=float, default=8.0,
                     help="travelling window width in units of R (fixed)")
+    ap.add_argument("--single", action="store_true",
+                    help="one panel of the whole domain; for co-moving cases, "
+                         "where the domain is the window")
     args = ap.parse_args()
     if args.window <= 0:
         ap.error("--window must be positive")
@@ -330,7 +374,7 @@ def main():
             os.remove(old_frame)
     os.makedirs(outdir, exist_ok=True)
     with Pool(args.cpus) as pool:
-        made = pool.map(partial(render, case=case, limits=limits,
+        made = pool.map(partial(render_single if args.single else render, case=case, limits=limits,
                                 outdir=outdir), items)
     made = [m for m in made if m]
     print(f"rendered {len(made)} of {len(items)} frames", flush=True)

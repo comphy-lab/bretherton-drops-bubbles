@@ -197,23 +197,26 @@ def render_single(item, case, limits, outdir):
     d = fields(snapshot, 0.0, Ld, Rt, case["ny"], case["muR"])
     if d is None:
         return None
-    panel_w = 17.0 * (0.88 - 0.03)
+    # Horizontal colourbars under the panel: a 16 R window is too short for
+    # two stacked vertical bars to carry readable labels.
+    panel_w = 17.0 * 0.94
     panel_h = panel_w * (2.0 * Rt * 1.06) / Ld
-    fig_h = panel_h + 1.35
+    fig_h = panel_h + 2.3
     fig = plt.figure(figsize=(17, fig_h))
-    ax = fig.add_axes([0.03, 0.30 / fig_h, 0.85, panel_h / fig_h])
+    ax = fig.add_axes([0.03, 1.35 / fig_h, 0.94, panel_h / fig_h])
     draw_panel(ax, d, seg, case, limits, 0.0, Ld, equal=True)
-    fig.suptitle(rf"$Ca_{{in}} = {case['Ca']}$,  MAXlevel {case['MAXlevel']},  "
-                 rf"$t = {tval:.2f}$", fontsize=21, y=1.0 - 0.22 / fig_h)
+    fig.suptitle(rf"$Ca_{{in}} = {case['Ca']:.4g}$,  MAXlevel {case['MAXlevel']},  "
+                 rf"$t = {tval:.1f}$", fontsize=21, y=1.0 - 0.25 / fig_h)
     imv = plt.cm.ScalarMappable(cmap="Blues",
                                 norm=plt.Normalize(limits["vmin"], limits["vmax"]))
     imd = plt.cm.ScalarMappable(cmap="hot_r",
                                 norm=plt.Normalize(limits["dmin"], limits["dmax"]))
-    lo, hgt = 0.30 / fig_h, panel_h / fig_h
-    cbv = fig.colorbar(imv, cax=fig.add_axes([0.905, lo + 0.52 * hgt, 0.012, 0.46 * hgt]))
-    cbd = fig.colorbar(imd, cax=fig.add_axes([0.905, lo + 0.02 * hgt, 0.012, 0.46 * hgt]))
-    cbv.set_label(r"$|u|$", fontsize=17, labelpad=9)
-    cbd.set_label(r"$\log_{10}(\mu\,D\!:\!D)$", fontsize=17, labelpad=9)
+    cbv = fig.colorbar(imv, cax=fig.add_axes([0.08, 0.62 / fig_h, 0.36, 0.16 / fig_h]),
+                       orientation="horizontal")
+    cbd = fig.colorbar(imd, cax=fig.add_axes([0.56, 0.62 / fig_h, 0.36, 0.16 / fig_h]),
+                       orientation="horizontal")
+    cbv.set_label(r"$|u|$ (frame)", fontsize=17, labelpad=6)
+    cbd.set_label(r"$\log_{10}(\mu\,D\!:\!D)$", fontsize=17, labelpad=6)
     for cb in (cbv, cbd):
         cb.ax.tick_params(labelsize=12)
     fig.savefig(dest, dpi=105)

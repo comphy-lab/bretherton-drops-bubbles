@@ -63,6 +63,20 @@ class LadderTests(unittest.TestCase):
         self.assertAlmostEqual(float(p["Rb0frac"]), 1 - rc.aussillous_quere(0.068), places=5)
         self.assertGreater(float(p["tmax"]), 100)
 
+    def test_continued_station_recentres_a_lengthening_bubble(self):
+        seed = {"Ca_in": 0.19, "U": 0.34, "xTarget": 2.91, "t": 1500.0, "length": 5.3}
+        p = rc.plan_station({"Rtube": "0.7", "xRear": "1.05"}, case_no=2020, ca=0.27,
+                            seed=seed, maxlevel=9, renewals=6, ca_b_target=0.51)
+        self.assertGreater(float(p["xTarget"]), 2.91)
+        self.assertEqual(float(p["xTargetPrev"]), 2.91)
+        self.assertGreater(float(p["targetRampTime"]), 1.0)
+        # a short bubble keeps its inherited target and needs no ramp
+        q = rc.plan_station({"Rtube": "0.7", "xRear": "1.05"}, case_no=1, ca=0.03,
+                            seed={"Ca_in": 0.022, "U": 0.026, "xTarget": 3.5, "t": 400.0},
+                            maxlevel=9, renewals=6, ca_b_target=0.038)
+        self.assertEqual(float(q["xTarget"]), 3.5)
+        self.assertNotIn("targetRampTime", q)
+
     def test_receipt_and_log_parsing(self):
         tmp = Path(self._testMethodName)
         tmp.mkdir(exist_ok=True)

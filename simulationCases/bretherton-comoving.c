@@ -66,6 +66,7 @@ double bTol, uRel, dRel, VelErr, DErr, csErr;
 double filmCoverage, filmFlatTol, freshFracMin, speedTol, shapeTol, posTol;
 double filmCells, filmSampleDt, solverTol;
 double freshFront, tau, Uframe0, xTarget, wRenew, burnRenew;
+double xTargetPrev, targetRampTime;
 int convHold, filmBins, filmMinLevel;
 bool prescribedU;
 bool restoredRun = false, logNeedsHeader = false, logHasContent = false;
@@ -503,12 +504,20 @@ int main (int argc, char const *argv[])
   vol0 = 4.*pi/3.;
   freshFront = param_double ("freshFront", Xb0 + Lcyl/2. + Rb0);
   xTarget = param_double ("xTarget", Xb0);
+  /**
+  A continuation station may re-centre the bubble in the window (the bubble
+  lengthens along a Ca ladder). The target then moves linearly from
+  `xTargetPrev` to `xTarget` over `targetRampTime`, so the frame speed
+  changes by a small fraction of the bubble speed rather than impulsively. */
+  xTargetPrev = param_double ("xTargetPrev", xTarget);
+  targetRampTime = param_double ("targetRampTime", 0.);
 
   const double finiteParameters[] = {
     Ca, CaPrev, La, muR, rhoR, Rtube, Rb0frac, xRear, Ldomain, travelR,
     tmax, tsnap, DT, tRamp, bTol, uRel, dRel, csErr, filmCoverage,
     filmFlatTol, freshFracMin, speedTol, shapeTol, filmCells, filmSampleDt,
-    solverTol, freshFront, tau, Uframe0, xTarget, wRenew, burnRenew, posTol
+    solverTol, freshFront, tau, Uframe0, xTarget, wRenew, burnRenew, posTol,
+    xTargetPrev, targetRampTime
   };
   for (unsigned int j = 0; j < sizeof(finiteParameters)/sizeof(double); j++)
     if (!isfinite(finiteParameters[j])) {
@@ -528,7 +537,7 @@ int main (int argc, char const *argv[])
       freshFracMin > 1. || speedTol <= 0. || shapeTol <= 0. ||
       filmCells < 0. || filmMinLevel < 0 || filmMinLevel > MAXlevel ||
       filmSampleDt <= 0. || solverTol <= 0. || tau <= 0. || wRenew <= 0. ||
-      burnRenew < 0. || posTol <= 0.) {
+      burnRenew < 0. || posTol <= 0. || targetRampTime < 0.) {
     fprintf (ferr, "ERROR: Invalid runtime parameters.\n");
     return 1;
   }
@@ -687,6 +696,8 @@ event init (t = 0)
     if (read_frame_state (&tt, &U, &dUdt, &target, &disp, &fresh)) {
       // same-case resume: keep the frame exactly where the dump left it
       comoving_frame_init (&frame, U, target, tau, prescribedU);
+      xTargetPrev = xTarget = target;   // same case: no re-centring
+      targetRampTime = 0.;
       frame.dUdt = dUdt;
       frame.displacement = disp;
       freshFront = fresh;
@@ -696,9 +707,14 @@ event init (t = 0)
                  "displacement=%g freshFront=%g\n", tt, U, dUdt, target, disp,
                  fresh);
     }
-    else if (pid() == 0)
-      fprintf (ferr, "# continuation seed: Uframe0=%g xTarget=%g CaPrev=%g "
-               "freshFront=%g\n", Uframe0, xTarget, CaPrev, freshFront);
+    else {
+      if (targetRampTime > 0.)
+        frame.target = xTargetPrev;
+      if (pid() == 0)
+        fprintf (ferr, "# continuation seed: Uframe0=%g xTarget=%g (from %g "
+                 "over %g) CaPrev=%g freshFront=%g\n", Uframe0, xTarget,
+                 xTargetPrev, targetRampTime, CaPrev, freshFront);
+    }
   }
 
   double front, rear, minimumFilm, centroid, axisTip;
@@ -738,6 +754,10 @@ event frameControl (i++)
 {
   if (tStart < 0.)
     tStart = t;   // first step after a restore: the clock is now restored
+  if (targetRampTime > 0.) {
+    double r = clamp ((t - tStart)/targetRampTime, 0., 1.);
+    frame.target = xTargetPrev + (xTarget - xTargetPrev)*r;
+  }
   double xc = bubble_centroid();
   comoving_frame_update (&frame, xc, t);
 }

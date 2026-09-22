@@ -157,7 +157,19 @@ def plan_station(base: dict[str, str], *, case_no: int, ca: float,
     # must start with exactly the seed frame speed; the controller does the rest.
     values["CaPrev"] = f"{float(seed['Ca_in']):.12g}"
     values["Uframe0"] = f"{float(seed['U']):.17g}"
-    values["xTarget"] = f"{float(seed['xTarget']):.17g}"
+    # Re-centre when the predicted bubble would reach the rear guard. The
+    # bubble lengthens along the ladder, so a target inherited from a short
+    # seed eventually puts the rear tip inside 0.5 Rtube of the inlet and the
+    # station ends INCOMPLETE_DRIFT. The target moves at half the seed frame
+    # speed so the re-centring is a gentle frame-speed change.
+    x_rear = float(values.get("xRear", 1.05))
+    seed_target = float(seed["xTarget"])
+    required = x_rear + 0.5 * bubble_length(ca_b_guess, rtube) + 0.5 * rtube
+    target = max(seed_target, required)
+    values["xTarget"] = f"{target:.17g}"
+    values["xTargetPrev"] = f"{seed_target:.17g}"
+    if target > seed_target:
+        values["targetRampTime"] = f"{max(1.0, (target - seed_target) / (0.5 * float(seed['U']))):.6g}"
     # tmax is absolute on a restored clock: allow `renewals` film renewals of
     # the seed bubble at the predicted speed.
     length = float(seed.get("length", 0.0)) or 4.0
@@ -241,7 +253,8 @@ def main(argv: list[str] | None = None) -> int:
     ledger_path = args.ledger or output_root / "continuation.json"
     ledger = load_ledger(ledger_path)
     base = read_params(args.base)
-    for key in ("CaseNo", "Ca", "CaPrev", "Uframe0", "xTarget"):
+    for key in ("CaseNo", "Ca", "CaPrev", "Uframe0", "xTarget", "xTargetPrev",
+                "targetRampTime"):
         base.pop(key, None)
 
     seed: dict | None = None

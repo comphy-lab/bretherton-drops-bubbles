@@ -200,7 +200,7 @@ class ObserverContractTests(unittest.TestCase):
         self.assertFalse(central_film_observer_push(observer, sample, None))
 
 
-def _log_text(times: Sequence[float]) -> str:
+def _log_text(times: Sequence[float], iterations: Sequence[int] | None = None) -> str:
     header = (
         "# CaseNo 1, MAXlevel 9, MINlevel 4, Ca 0.1, La 1, muR 0.01, "
         "rhoR 0.001, Rtube 0.7, Ldomain 16, solverTol 1e-6\n"
@@ -209,6 +209,8 @@ def _log_text(times: Sequence[float]) -> str:
     )
     rows = []
     for index, time in enumerate(times):
+        if iterations is not None:
+            index = iterations[index]
         front = time
         rear = time - 2.0
         centroid = time - 1.0
@@ -278,6 +280,63 @@ class LogStitchTests(unittest.TestCase):
             second.write_text(_log_text([2.0, 3.0, 4.0, 3.5]))
             times = [sample.time for sample in stitch_logs([first, second])]
             self.assertEqual(times, [0.0, 1.0, 2.0, 3.0, 4.0, 3.5])
+
+    def test_restore_in_carried_log_supersedes_later_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            log = Path(raw) / "c1-log"
+            log.write_text(
+                _log_text([0.0, 1.0, 2.0, 3.0, 2.5, 3.5, 4.5], [0, 10, 20, 30, 25, 35, 45])
+            )
+            times = [sample.time for sample in stitch_logs([log])]
+            self.assertEqual(times, [0.0, 1.0, 2.0, 2.5, 3.5, 4.5])
+
+    def test_restore_to_the_first_row_replaces_all_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            log = Path(raw) / "c1-log"
+            log.write_text(_log_text([1.0, 2.0, 3.0, 1.0, 2.5], [10, 20, 30, 10, 25]))
+            times = [sample.time for sample in stitch_logs([log])]
+            self.assertEqual(times, [1.0, 2.5])
+
+    def test_reversal_before_the_first_iteration_is_kept(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            log = Path(raw) / "c1-log"
+            log.write_text(_log_text([1.0, 2.0, 3.0, 0.5], [10, 20, 30, 5]))
+            times = [sample.time for sample in stitch_logs([log])]
+            self.assertEqual(times, [1.0, 2.0, 3.0, 0.5])
+
+    def test_reversal_without_iteration_rewind_is_kept(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            log = Path(raw) / "c1-log"
+            log.write_text(_log_text([0.0, 1.0, 2.0, 1.5], [0, 10, 20, 30]))
+            times = [sample.time for sample in stitch_logs([log])]
+            self.assertEqual(times, [0.0, 1.0, 2.0, 1.5])
+
+    def test_restore_in_carried_log_keeps_holds(self) -> None:
+        params = {
+            "advWin": 1.0,
+            "advMin": 3.0,
+            "bTol": 0.02,
+            "speedTol": 0.02,
+            "filmCoverage": 0.8,
+            "filmFlatTol": 0.1,
+            "freshFracMin": 0.75,
+            "filmCells": 4.0,
+            "shapeTol": 0.02,
+            "convHold": 2,
+            "tRamp": 0.0,
+            "restartBurnR": 0.0,
+            "requireShapeSteady": 1,
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            log = Path(raw) / "c1-log"
+            log.write_text(
+                _log_text([0.0, 1.0, 2.0, 3.0, 2.5, 3.5, 4.5], [0, 10, 20, 30, 25, 35, 45])
+            )
+            raw_rows = accept_samples(parse_log(log), params)
+            stitched = accept_samples(stitch_logs([log]), params)
+            self.assertFalse(raw_rows.success)
+            self.assertTrue(stitched.success)
+            self.assertEqual(stitched.hold_count, 2)
 
     def test_off_token_matches_solver_bool(self) -> None:
         self.assertFalse(_truthy("off"))

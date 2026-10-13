@@ -353,6 +353,7 @@ class LogSample:
     coverage: float
     fresh_fraction: float
     minimum_cells: float
+    iteration: int = -1
 
 
 def parse_log(path: Path) -> list[LogSample]:
@@ -386,6 +387,7 @@ def parse_log(path: Path) -> list[LogSample]:
                     coverage=values[10],
                     fresh_fraction=values[11],
                     minimum_cells=values[12],
+                    iteration=int(values[0]),
                 )
             )
     if not samples:
@@ -398,11 +400,34 @@ def _first_sample_time(path: Path) -> float:
     return samples[0].time
 
 
-def stitch_logs(paths: Sequence[Path]) -> list[LogSample]:
-    """Concatenate logs in order, dropping only each file's overlapping prefix.
+def _restart_rollback(stitched: Sequence[LogSample], sample: LogSample) -> int | None:
+    """Return how many rows a checkpoint restore keeps, or None if it is not one.
 
-    Later rows in the same file are passed through so a non-monotonic or
-    non-finite sample can reset the observer, matching the C contract.
+    A restore that appends to a carried log rewinds time and the iteration
+    counter to the dump. The superseded rows are replaced by the restored
+    trajectory; any other reversal is left for the observer to reset on.
+    """
+    if not stitched or sample.time > stitched[-1].time:
+        return None
+    if sample.iteration < 0 or sample.iteration >= stitched[-1].iteration:
+        return None
+    keep = len(stitched)
+    while keep and stitched[keep - 1].time >= sample.time:
+        keep -= 1
+    if keep == 0:
+        return 0 if stitched[0].iteration <= sample.iteration else None
+    if stitched[keep - 1].iteration >= sample.iteration:
+        return None
+    return keep
+
+
+def stitch_logs(paths: Sequence[Path]) -> list[LogSample]:
+    """Concatenate logs in order, dropping each file's overlapping prefix.
+
+    A checkpoint restore that appends to a carried log rewinds both time and
+    iteration; the restored rows supersede the rows after the dump time.
+    Other non-monotonic or non-finite samples are passed through so they reset
+    the observer, matching the C contract.
     """
     stitched: list[LogSample] = []
     for path in paths:
@@ -414,6 +439,9 @@ def stitch_logs(paths: Sequence[Path]) -> list[LogSample]:
             ):
                 continue
             in_prefix = False
+            keep = _restart_rollback(stitched, sample)
+            if keep is not None:
+                del stitched[keep:]
             stitched.append(sample)
     if not stitched:
         raise ValueError("stitched log is empty")
@@ -445,6 +473,8 @@ class Acceptance:
     samples: int
     eligible_samples: int
     solver_tol: float
+    hold_count: int = 0
+    shape_hold_count: int = 0
 
 
 def accept_samples(
@@ -496,6 +526,8 @@ def accept_samples(
         samples=len(samples),
         eligible_samples=eligible,
         solver_tol=float(params.get("solverTol", math.nan)),
+        hold_count=observer.hold_count,
+        shape_hold_count=observer.shape_hold_count,
     )
 
 
@@ -533,6 +565,7 @@ def _print_acceptance(label: str, result: Acceptance, stream: TextIO) -> None:
     stream.write(
         f"{label}: success={result.success} film={result.film_converged} "
         f"shape={result.shape_converged} windows={result.windows} "
+        f"holds={result.hold_count}/{result.shape_hold_count} "
         f"t={result.last_time} b={film} Ca_b={speed} "
         f"solverTol={result.solver_tol:.6g}\n"
     )
@@ -581,6 +614,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "film_converged": item["result"].film_converged,
                 "shape_converged": item["result"].shape_converged,
                 "windows": item["result"].windows,
+                "hold_count": item["result"].hold_count,
+                "shape_hold_count": item["result"].shape_hold_count,
                 "last_time": item["result"].last_time,
                 "samples": item["result"].samples,
                 "eligible_samples": item["result"].eligible_samples,

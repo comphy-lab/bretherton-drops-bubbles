@@ -105,7 +105,7 @@ This HTML template is used by Pandoc to generate the HTML pages:
 - **command-data.js**: Data for the command palette.
 - **theme-toggle.js**: Handles theme switching (light/dark mode).
 - **shortcut-key.js**: Implements keyboard shortcuts.
-- **search_db.json**: Search database for the website (generated file, synced daily via GitHub Actions).
+- **search_db.json**: Search database for the website (generated file, synced on the 1st and 15th of each month via GitHub Actions).
 
 ## Deployment
 
